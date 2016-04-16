@@ -1,4 +1,4 @@
-= Transkribus Web UI =
+#Transkribus Web UI
 
 https://read02.uibk.ac.at/wiki/index.php/WebUI_spec (READ login required, excuse the dodgy table format)
 
@@ -12,7 +12,11 @@ So far this is a skeletal website to aid design discussion about the architechtu
 - Publishing module
 - Modification module
 
-Though possibly more apps for smaller bits of functioanilty...
+Though possibly more apps for smaller bits of functioanilty... 
 
+##TODO (very general)
 
-- 
+- Wire in Transkribus web service
+- Add (and improve) elements of TSX functionality and others from specification
+- Install instructions (then write installer)
+- Improve this readme
