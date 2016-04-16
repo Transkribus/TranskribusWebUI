@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+
+{% block nav_buttons_in %}
+	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">up<span></a></li>
+	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">next<span></a></li>
+	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">prev<span></a></li>
+{% endblock %}
+
+{% block nav_buttons_out %}
+	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">up<span></a></li>
+	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">next<span></a></li>
+	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">prev<span></a></li>
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- row 1 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Page view
+                </h1>
+	    </div>
+            <div class="col-md-6 expandable collections_tree">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4><i class="fa fa-fw fa-check"></i>Transcript
+			   <a href="#" id="transcript_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
+			   <a href="#" id="transcript_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
+			</h4>
+                    </div>
+                    <div class="panel-body" id="">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 expandable thumbnails">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4><i class="fa fa-fw fa-gift"></i>Image
+			   <a href="#" id="image_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
+			   <a href="#" id="image_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
+			</h4>
+                    </div>
+                    <div class="panel-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+ <script>
+
+    </script>
+
+{% endblock %}
