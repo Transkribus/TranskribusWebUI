@@ -83,7 +83,7 @@ def t_collection(collId):
     for doc in collection:
 	doc['key'] = doc['docId']
 	doc['folder'] = 'true'
-	doc['children'] = [{'title': "Page "+str(x+1)} for x in range(doc['nrOfPages'])]
+	doc['children'] = [{'title': "Page "+str(x+1), 'key': str(doc['key'])+"_"+str(x+1), 'page': str(x+1)} for x in range(doc['nrOfPages'])]
     
     sys.stdout.write("Collection data: %s%%   \r\n" % (collection) )
     sys.stdout.flush()

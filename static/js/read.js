@@ -68,7 +68,33 @@ $(document).ready(function(){
             	var node = data.node,
                 orgEvent = data.originalEvent;
 		console.log("active node: ",data);
+		$(".documents_intro").hide();
+		if(node.isFolder()){ //we have a document
+			//put the page thumbs back to small
+			$(".page_thumb").show().removeClass("col-md-12").addClass("col-md-3");
+			//hide other documents	
+			$("#doc_"+node.data.docId).siblings(".document_thumbs").hide();
+			//show active document
+			$("#doc_"+node.data.docId).show().find("span.page_title").html("");
 
+
+		}else{ //we have a page
+			//first show the doc div that this page is in
+			$("#page_"+node.key).parents(".document_thumbs").siblings().hide();
+			$("#page_"+node.key).parents(".document_thumbs").show();
+
+			//hide all the other pages
+			$("#page_"+node.key).siblings(".page_thumb").hide();
+			//show active page and make it full size (of panel)
+			$("#page_"+node.key).show().removeClass("col-md-3", function(){
+				$(this).addClass("col-md-12");
+			});
+
+			//update the page_title span in the document h4
+			$("#page_"+node.key).parents(".document_thumbs").find("span.page_title").html("("+node.title+")");
+
+
+		}
            },
 	});
 

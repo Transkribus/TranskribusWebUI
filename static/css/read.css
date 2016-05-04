@@ -71,3 +71,6 @@ fieldset[disabled] .btn-inverse.active {
   color: #000; 
   background-color: #ffffff; 
 }
+
+/* collection */
+.document_thumbs { display: none;}
