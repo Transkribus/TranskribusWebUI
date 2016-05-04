@@ -3,4 +3,5 @@ INSTALLED_APPS = [
     # ...
 ]
 
-APPEND_SLASH = True
+
+#APPEND_SLASH = True

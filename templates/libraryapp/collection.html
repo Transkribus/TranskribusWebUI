@@ -14,11 +14,6 @@
                     Collections Browse
                 </h1>
 	    </div>
-            <div class="col-md-8">
-	   {% include "libraryapp/collections_table.html" with collections=collections %}
-            </div>
-
-{% comment %}
             <div class="col-md-4 expandable collections_tree">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -27,10 +22,28 @@
 			   <a href="#" id="collections_tree_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
 			</h4>
                     </div>
+		<p>This collection contains {{ documents|length }} documents:</p>
+		<script type="text/javascript">
+			var t_data = {{ documents_json|safe }};
+			console.log("tdata:",t_data);
+		</script>
+{% comment %}
+		<table class="table table-striped">
+		   <thead>
+	  		<tr><th>ID</th><th>Title</th><th>Author</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for doc in documents %}
+	  		<tr><td>{{ doc.docId }}</td><td>{{ doc.title }}</td><td>{{ doc.author }}</td></tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+{% endcomment %}
                     <div class="panel-body" id="collections_tree">
                     </div>
                 </div>
             </div>
+{% comment %}
             <div class="col-md-8 expandable thumbnails">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -41,7 +54,6 @@
                     </div>
                     <div class="panel-body">
 			<div class="row">
-
 			    <div class="col-md-3 thumb">
 				<a class="thumbnail" href="{% url 'page' %}">
 				    <img src="http://placehold.it/400x300" alt="">
@@ -107,7 +119,7 @@
                     </div>
                 </div>
             </div>
-{% endcomment %}
+	{% endcomment %}
         </div>
         <!-- /.row -->
 

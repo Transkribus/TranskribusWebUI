@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     url(r'^collections$', views.collections, name='collections'),
-    url(r'^documents$', views.documents, name='documents'),
-    url(r'^document$', views.document, name='document'),
+    url(r'^collection/([0-9]+)$', views.collection, name='collection'),
+    url(r'^document/([0-9]+)/([0-9]+)$', views.document, name='document'),
     url(r'^page$', views.page, name='page'),
     url(r'^search$', views.search, name='search'),
     url(r'^about$', views.about, name='about'),

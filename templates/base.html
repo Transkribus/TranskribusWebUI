@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Simple Sidebar - Start Bootstrap Template</title>
+    <title>READ Web UI</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
@@ -81,7 +81,7 @@
 		    <a href="{% url 'login' %}?next={{request.path}}">Login</a>
                 </li>
                 <li>
-                    <a href="/library/register">Register</a>
+                    <a href="{% url 'register' %}">Register</a>
                 </li>
 		{% endif %}
                 <li>

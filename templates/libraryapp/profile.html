@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
     <!-- Page Content -->
     <div class="container">
 
@@ -12,6 +11,33 @@
                 <h1 class="page-header">
                     Profile page
                 </h1>
+	    </div>
+	    <div class="col-lg-8">
+
+		<dl class="dl-horizontal">
+		   <dt>Username</dt><dd>{{ user.username }}</dd>
+		   <dt>Email</dt><dd>{{ user.email }}</dd>
+		   <dt>Name</dt><dd>{{ user.first_name }} {{ user.last_name }}</dd>
+		   <dt>Gender</dt><dd>{{ user.tsdata.gender }}</dd>
+		   {% if user.tsdata.affiliation %}
+		   <dt>Affiliation</dt><dd>{{ user.tsdata.affiliation }}</dd>
+		   {% endif %}
+		</dl>
+		{% include "libraryapp/collections_table.html" with collections=collections %}
+{% comment %}
+		<p>You are a member of the following {{ collections|length }} collections:</p>
+
+		<table class="table table-striped">
+		   <thead>
+	  		<tr><th>ID</th><th>Collection</th><th>Description</th><th>Role</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for coll in collections %}
+	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+{% endcomment %}
 	    </div>
 	</div>
     </div>	

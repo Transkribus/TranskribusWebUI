@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
 	$(".menu-toggle-wrapper").css("height",window.innerHeight+'px');
 });
@@ -42,8 +43,10 @@ $(document).ready(function(){
     	});
 
    	$("#collections_tree").fancytree({
-	  //TODO plug source in from TSWS
-	  source: [
+	  source: t_data,  //source in from transkribus
+/*
+ * Minimal structure for fancytree rendering
+ * [
 	    {title: "Collection", key: "1", folder: true, children: [
 		      {title: "Document", key: "1.1"},
 		      {title: "Document", key: "1.2"}	
@@ -53,10 +56,20 @@ $(document).ready(function(){
 	      {title: "Document", key: "2.2"}
 	    ]}
 	  ],
+*/
  	  extensions: ["glyph", "wide"],
 	  glyph: glyph_opts,
 	  checkbox: true,
 	  selectMode: 2,
+	  loadChildren: function(event, data) {
+		console.log("Loaded children...",data);
+      	  },
+	  activate: function(event, data){
+            	var node = data.node,
+                orgEvent = data.originalEvent;
+		console.log("active node: ",data);
+
+           },
 	});
 
 	$(".panel-expand").click(function(){

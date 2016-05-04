@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+
 
 
 {% block nav_buttons_in %}
@@ -26,7 +28,38 @@
                     Page view
                 </h1>
 	    </div>
-            <div class="col-md-6 expandable collections_tree">
+            <div class="col-md-12 expandable">
+		<svg marking-surface="" class="svg" height="100%" width="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" style="overflow: hidden; ">
+
+        <g class="pan-zoom svg-pan-zoom_viewport" transform="matrix(1.346467796581459,0,0,1.346467796581459,-377.18131884319206,-93.95161629733094)">
+
+            <g class="rotate-container">
+                <image subject="" class="subject" x="0" y="0" height="1007" width="1536" xlink:href="{% static "images/test_image.jpg" %}"></image>
+                <g class="previous-lines">
+                </g>
+
+                <g class="annotations">
+
+                    <g class="text-annotations">
+                    </g>
+
+                    <g class="graphic-annotations">
+                    <g class="graphic-annotation" graphic-annotation="" data="annotation" ng-repeat="annotation in vm.annotations | filter:{type:'graphic'}:true" style="touch-action: pan-y; -webkit-user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+    <rect class="graphic" draggable="data" ng-attr-x="{{ data.x }}" ng-attr-y="{{ data.y }}" ng-attr-height="{{ data.height }}" ng-attr-width="{{ data.width }}" x="315.6" y="10.9" height="48" width="105.59999999999997"></rect>
+</g>
+                    </g>
+
+                </g>
+
+            </g>
+
+
+        </g>
+
+    </svg>	
+            </div>
+
+            <div class="col-md-6 expandable">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4><i class="fa fa-fw fa-check"></i>Transcript
@@ -38,7 +71,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 expandable thumbnails">
+            <div class="col-md-6 expandable">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4><i class="fa fa-fw fa-gift"></i>Image

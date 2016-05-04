@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
+    'library',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -125,7 +126,39 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+#TODO for when use is heavier use memcached
+#Enable cache
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#        'LOCATION': '127.0.0.1:11211',
+#    }
+#}
+#and cache session
+#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
 # This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
+
+### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
+AUTHENTICATION_BACKENDS = [
+    'library.backends.TranskribusBackend',
+#    'django.contrib.auth.backends.ModelBackend',
+]
+
+### parameters for services
+#transkribus rest service
+TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
+
+#### offline fallbacks for dev on train
+OFFLINE = False
+ADMIN_LOGIN = 'admin'
+ADMIN_PASSWORD = 'norsun'
+TEST_USER_JSON = '{"trpUserLogin": {"userId": "65", "userName": "rory.mcnicholl@gmail.com", "email": "rory.mcnicholl@gmail.com", "affiliation": "None", "firstname": "Rory", "lastname": "McNicholl", "gender": "male", "isActive": "1", "isAdmin": "false", "created": {"nanos": "0"}, "loginTime": "2016-04-18T09:05:45.152+02:00", "userAgent": "python-requests/2.9.1", "ip": "213.205.251.21"}'
+
+TEST_USER_XML = '<trpUserLogin><userId>65</userId><userName>rory.mcnicholl@gmail.com</userName><email>rory.mcnicholl@gmail.com</email><affiliation>None</affiliation><firstname>Snory</firstname><lastname>McNicholl</lastname><gender>male</gender><isActive>1</isActive><isAdmin>false</isAdmin><created><nanos>0</nanos></created><loginTime>2016-04-18T19:59:25.356+02:00</loginTime><sessionId>0B93CDB4DB05EF4993E86421369F825F</sessionId><userAgent>python-requests/2.9.1</userAgent><ip>213.205.251.21</ip></trpUserLogin>'
+
+TEST_COLLECTIONS_JSON = '[{"colId":3,"colName":"Bentham","description":"Bentham documents for TSX","defaultForApp":"TSX","role":"Transcriber"},{"colId":4,"colName":"Transkribus Cloud","defaultForApp":"ALL","role":"Transcriber"}]'
+
 
