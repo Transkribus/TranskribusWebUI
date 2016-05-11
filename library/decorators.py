@@ -9,6 +9,8 @@ from django.shortcuts import resolve_url
 from django.utils.six.moves.urllib.parse import urlparse
 
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import logout
+
 from django.http import HttpResponseRedirect
 
 import sys
@@ -19,9 +21,15 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
     @wraps(function)
     def wrapper(request, *args, **kw):	
         if request.user.is_authenticated():
-	    #setting collections data as a session var if no already set
-	    if "collections" not in request.session:
-	         request.session['collections'] = services.t_collections()
+	    # We check here to see if we are still authenticated with transkribus
+	    # a quick post request ti auth/refresh should do?
+	    # If we don't get a 200 we logout
+    	    if not settings.OFFLINE:
+	        if not services.t_refresh():
+		    return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
+	        #setting collections data as a session var if no already set
+	    if "collections" not in request.session or request.session['collections'] is None:
+	        request.session['collections'] = services.t_collections()
             return function(request, *args, **kw)
         else:
 	    path = request.build_absolute_uri()
