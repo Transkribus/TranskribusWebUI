@@ -1,4 +1,3 @@
-from django.shortcuts import render
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -52,16 +51,34 @@ def collections(request):
 @t_login_required
 def collection(request, collId):
     documents = services.t_collection(collId)
-    return render(request, 'libraryapp/collection.html', {'documents': documents,'documents_json': json.dumps(documents)} )
+    return render(request, 'libraryapp/collection.html', {'collId': collId, 'documents': documents,'documents_json': json.dumps(documents)} )
 
 @t_login_required
-def document(request, collId, docId):
-    pages = services.t_document(collId, docId)
-    return render(request, 'libraryapp/document.html', {'pages': pages} )
+def document(request, collId, docId, page=None):
+    full_doc = services.t_document(collId, docId)
+    return render(request, 'libraryapp/document.html', {
+		'metadata': full_doc.get('md'), 
+		'pageList': full_doc.get('pageList'),
+		'collId': collId} )
 
 @t_login_required
-def page(request):
-    return render(request, 'libraryapp/page.html')
+def page(request, collId, docId, page):
+    full_doc = services.t_document(collId, docId)
+    # big wodge of data from full doc includes data for each page and for each page, each transcript...
+    index = int(page)-1
+    pagedata = full_doc.get('pageList').get('pages')[index]
+    transcripts = pagedata.get('tsList').get('transcripts')
+    # the way xmltodict parses multiple instances of tags means that if there is one <transcripts> we get a dict, 
+    # if there is > 1 we get a list. Solution, but dict in list if dict (or get json from transkribus which is
+    # parsed better, but not yet available)
+    if isinstance(transcripts, dict):
+	transcripts = [transcripts]
+#    sys.stdout.write("Document metadata for doc #%s%%: %s%%   \r\n" % (len) )
+#    sys.stdout.flush()
+
+    return render(request, 'libraryapp/page.html', {
+		'pagedata': pagedata,
+		'transcripts': transcripts})
 
 @t_login_required
 def search(request):
@@ -77,6 +94,4 @@ def user_guide(request):
 def profile(request):
     collections = request.session.get("collections");
     return render(request, 'libraryapp/profile.html', {'collections': collections})
-
-
 
