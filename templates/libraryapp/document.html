@@ -1,8 +1,20 @@
-{% extends "base.html" %}
+{% extends "navi_base.html" %}
 
 {% block content %}
 
 
+    <!-- Page Content 
+    <div class="document_image"/>
+<svg width="700" height="660">
+  <defs>
+    <pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="1" width="1">
+      <image x="0" y="0" xlink:href="http://placehold.it/400x300"></image>
+    </pattern>
+  </defs>
+  <circle id='top' cx="180" cy="120" r="80" fill="url(#image)"/>
+</svg>
+    </div>
+-->
     <!-- Page Content -->
     <div class="container">
 
@@ -10,53 +22,44 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    Collections Browse
+                    Document details
                 </h1>
 	    </div>
-            <div class="col-md-4 expandable collections_tree">
-		
-	    </div>
-        </div>
-        <!-- /.row -->
+            <div class="col-md-8">
+	<ul>
+     {% for item in metadata %}
+	<li>{{ item }} - {{ metadata|get_item:item }}</li>
+     {% endfor %}
+	</ul>
 
-        <hr>
-        <!-- Call to Action Section 
-        <div class="well">
-            <div class="row">
-                <div class="col-md-8">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, expedita, saepe, vero rerum deleniti beatae veniam harum neque nemo praesentium cum alias asperiores commodi.</p>
-                </div>
-                <div class="col-md-4">
-                    <a class="btn btn-lg btn-default btn-block" href="#">More about READ</a>
-                </div>
+	<p>This document has {{ pageList.pages|length }} pages:</p>
+
+	<table class="table table-striped">
+	   <thead>
+		<tr><th>ID</th><th>Page number</th><th>Image file name</th><th>Transcripts</th></tr>
+	   </thead>
+	   <tbody>
+	     {% for page in pageList.pages %}
+		<tr><td>{{ page.pageId }}</td><td><a href="{% url 'page' collId metadata.docId page.pageNr %}">{{ page.pageNr }}</a></td><td>{{ page.imgFileName }}</td><td>{{ page.tsList|length }}</td></tr>
+	     {% endfor %}
+	   </tbody>
+	</table>
+{% comment %}
+	<ul>
+     {% for page in pagelist.pages %}
+	<li>{{ page }} </li>
+     {% endfor %}
+	</ul>
+{% endcomment %}
             </div>
+
         </div>
+     </div>
+
+<!--
+<div class="transcription-interface ng-scope">
+    <svg marking-surface="" class="svg" height="100%" width="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" style="overflow: hidden; ">
+    </svg>
+</div>
 -->
- <script>
-	$(".panel-expand").click(function(){
-		var button = this;
-//		$(this).parents(".expandable").removeClass("col-md-4", function(){
-	
-		var class_to_remove = ($(this).parents(".expandable").attr("class").match(/(^|\s)col-md-\S+/g) || []).join(' ');
-		$(this).parents(".expandable").removeClass(class_to_remove, function(){
-
-			$(this).addClass("col-md-12");
-			$(button).hide(function(){
-				$(button).siblings(".panel-shrink").attr("data-return-class",class_to_remove);
-				$(button).siblings(".panel-shrink").show()
-			});
-
-		});
-	});
-	$(".panel-shrink").click(function(){
-		var button = this;
-		var class_to_reinstate = $(button).attr("data-return-class");
-		$(this).parents(".expandable").addClass(class_to_reinstate, function(){
-			$(this).removeClass("col-md-12");
-			$(button).hide(function(){$(button).siblings(".panel-expand").show()});
-		});
-	});
-
-    </script>
-
 {% endblock %}

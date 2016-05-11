@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "navi_base.html" %}
 
 
 {% block content %}
@@ -27,18 +27,6 @@
 			var t_data = {{ documents_json|safe }};
 			console.log("tdata:",t_data);
 		</script>
-{% comment %}
-		<table class="table table-striped">
-		   <thead>
-	  		<tr><th>ID</th><th>Title</th><th>Author</th></tr>
-		   </thead>
-		   <tbody>
-		     {% for doc in documents %}
-	  		<tr><td>{{ doc.docId }}</td><td>{{ doc.title }}</td><td>{{ doc.author }}</td></tr>
-		     {% endfor %}
-		   </tbody>
-		</table>
-{% endcomment %}
                     <div class="panel-body" id="collections_tree">
                     </div>
                 </div>
@@ -46,7 +34,7 @@
             <div class="col-md-8 expandable thumbnails">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4><i class="fa fa-fw fa-gift"></i>Thumbnnails
+		    	<h4><i class="fa fa-fw fa-gift"></i>Thumbnnails
 			   <a href="#" id="thumbnails_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
 			   <a href="#" id="thumbnails_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
 			</h4>
@@ -61,7 +49,7 @@
 					<h4> {{ doc.title }} - {{ doc.author }} <span class="page_title"></span></h4>
 					     {% for page in doc.children %}
 					    <div class="col-md-3 thumb page_thumb" id="page_{{page.key}}">
-						<a class="thumbnail" href="{% url 'page' %}">
+						<a class="thumbnail" href="{% url 'document' collId doc.docId page.page %}">
 						    <img src="http://placehold.it/400x300" alt="{{ page.title}}" title="{{page.title}}"/>
 						</a>
 					    </div>
@@ -69,28 +57,10 @@
 				</div>
 			     {% endfor %}
 			</div>
-
                     </div>
                 </div>
             </div>
         </div>
         <!-- /.row -->
-
-        <hr>
-        <!-- Call to Action Section 
-        <div class="well">
-            <div class="row">
-                <div class="col-md-8">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, expedita, saepe, vero rerum deleniti beatae veniam harum neque nemo praesentium cum alias asperiores commodi.</p>
-                </div>
-                <div class="col-md-4">
-                    <a class="btn btn-lg btn-default btn-block" href="#">More about READ</a>
-                </div>
-            </div>
-        </div>
--->
- <script>
-
-    </script>
 
 {% endblock %}

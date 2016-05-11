@@ -42,6 +42,8 @@ $(document).ready(function(){
 
     	});
 
+//	$(".pager").hide();
+
    	$("#collections_tree").fancytree({
 	  source: t_data,  //source in from transkribus
 /*
@@ -68,6 +70,7 @@ $(document).ready(function(){
             	var node = data.node,
                 orgEvent = data.originalEvent;
 		console.log("active node: ",data);
+		$(".pager").show();
 		$(".documents_intro").hide();
 		if(node.isFolder()){ //we have a document
 			//put the page thumbs back to small
@@ -76,7 +79,6 @@ $(document).ready(function(){
 			$("#doc_"+node.data.docId).siblings(".document_thumbs").hide();
 			//show active document
 			$("#doc_"+node.data.docId).show().find("span.page_title").html("");
-
 
 		}else{ //we have a page
 			//first show the doc div that this page is in

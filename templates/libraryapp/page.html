@@ -1,5 +1,7 @@
-{% extends "base.html" %}
+{% extends "navi_base.html" %}
 {% load staticfiles %}
+{% load library_tags %}
+
 
 
 
@@ -29,12 +31,30 @@
                 </h1>
 	    </div>
             <div class="col-md-12 expandable">
+		<dl class="dl-horizontal">
+		<dt>ID</dt><dd>{{ pagedata.pageId }}</dd>
+		<dt>Page Number</dt><dd>{{ pagedata.pageNr }}</dd>
+		<dt>Image</dt><dd><img src="{{ pagedata.thumbUrl }}"/></dd>
+		</dl>
+
+		<p>This page has {{ transcripts|length }} transcript{% if transcripts|length > 1 %}s{% endif %}:</p>
+		<table class="table table-striped">
+		   <thead>
+			<tr><th>ID</th><th>URL</th><th>Status</th><th>Transcriber</th><th>timestamp</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for ts in transcripts %}
+			<tr><td>{{ ts.tsId }}</td><td>{{ ts.url }}</td><td>{{ts.status }}</td><td>{{ts.userName }}</td><td>{{ ts.timestamp|print_timestamp }}</td></tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+
 		<svg marking-surface="" class="svg" height="100%" width="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" style="overflow: hidden; ">
 
         <g class="pan-zoom svg-pan-zoom_viewport" transform="matrix(1.346467796581459,0,0,1.346467796581459,-377.18131884319206,-93.95161629733094)">
 
             <g class="rotate-container">
-                <image subject="" class="subject" x="0" y="0" height="1007" width="1536" xlink:href="{% static "images/test_image.jpg" %}"></image>
+                <image subject="" class="subject" x="0" y="0" height="1007" width="1536" xlink:href="{{ pagedata.url }}"></image>
                 <g class="previous-lines">
                 </g>
 
@@ -57,32 +77,6 @@
         </g>
 
     </svg>	
-            </div>
-
-            <div class="col-md-6 expandable">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4><i class="fa fa-fw fa-check"></i>Transcript
-			   <a href="#" id="transcript_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
-			   <a href="#" id="transcript_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
-			</h4>
-                    </div>
-                    <div class="panel-body" id="">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 expandable">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4><i class="fa fa-fw fa-gift"></i>Image
-			   <a href="#" id="image_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
-			   <a href="#" id="image_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
-			</h4>
-                    </div>
-                    <div class="panel-body">
-
-                    </div>
-                </div>
             </div>
         </div>
         <!-- /.row -->
