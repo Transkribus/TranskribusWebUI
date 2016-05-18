@@ -71,7 +71,7 @@ Alias /static/ /path/to/TranskribusWebUI/static/
 </Directory>
 
 ```
-Restart http and check yourUrl.com/ if everything works.
+Restart httpd and check if everything works.
 
 ### Links
 
