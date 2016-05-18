@@ -48,10 +48,10 @@ Make sure that Apache httpd and mod_wsgi is installed and that the apache user c
 Create a file in /etc/httpd/conf.d/ named e.g. library.conf.
 Write the following content to this file:
 ```
-WSGIScriptAlias / /path/to/TranskribusWebUI/read/wsgi.py process-group=transkribus.eu
+WSGIScriptAlias / /path/to/TranskribusWebUI/read/wsgi.py process-group=example.com
 WSGIPythonPath /path/to/TranskribusWebUI
-WSGIDaemonProcess transkribus.eu python-path=/path/to/TranskribusWebUI:/usr/lib/python2.7/site-packages
-WSGIProcessGroup transkribus.eu
+WSGIDaemonProcess example.com python-path=/path/to/TranskribusWebUI:/usr/lib/python2.7/site-packages
+WSGIProcessGroup example.com
 
 Alias /media/ /path/to/TranskribusWebUI/media/
 Alias /static/ /path/to/TranskribusWebUI/static/
