@@ -40,6 +40,38 @@ Then start the server:
 ```sh
 python manage.py runserver
 ```
+### Deployment
+
+Perform the steps in the "Running" section of this Readme except starting the server.
+Make sure that Apache httpd and mod_wsgi is installed and that the apache user can read and write the directory where you have checked out the git repository.
+
+Create a file in /etc/httpd/conf.d/ named e.g. library.conf.
+Write the following content to this file:
+```
+WSGIScriptAlias / /path/to/TranskribusWebUI/read/wsgi.py process-group=transkribus.eu
+WSGIPythonPath /path/to/TranskribusWebUI
+WSGIDaemonProcess transkribus.eu python-path=/path/to/TranskribusWebUI:/usr/lib/python2.7/site-packages
+WSGIProcessGroup transkribus.eu
+
+Alias /media/ /path/to/TranskribusWebUI/media/
+Alias /static/ /path/to/TranskribusWebUI/static/
+
+<Directory /path/to/TranskribusWebUI/read>
+        <Files wsgi.py>
+                Require all granted
+        </Files>
+</Directory>
+
+<Directory /path/to/TranskribusWebUI/static>
+        Require all granted
+</Directory>
+
+<Directory /path/to/TranskribusWebUI/media>
+        Require all granted
+</Directory>
+
+```
+Restart http and check yourUrl.com/ if everything works.
 
 ### Links
 
