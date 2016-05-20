@@ -24,12 +24,7 @@ pip install django django-bootstrap3 requests xmltodict
 ```
 
 ### Running
-To run import the following modules:
-```sh
-pip install django django-bootstrap3 requests xmltodict
-```
-
-and create the database:
+To run, create the database:
 
 ```sh
 python manage.py makemigrations
