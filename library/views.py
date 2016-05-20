@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from .decorators import t_login_required
 
 import services
+import navigation
 import json
 import sys
 
@@ -50,35 +51,56 @@ def collections(request):
 
 @t_login_required
 def collection(request, collId):
-    documents = services.t_collection(collId)
-    return render(request, 'libraryapp/collection.html', {'collId': collId, 'documents': documents,'documents_json': json.dumps(documents)} )
+    collection = services.t_collection(collId)
+    collections = request.session.get("collections");
+    nav = navigation.up_next_prev("collection",collId,collections)
+
+    return render(request, 'libraryapp/collection.html', {
+		'collId': collId, 
+		'documents': collection,
+		'documents_json': json.dumps(collection),
+		'up': nav['up'], 
+		'next': nav['next'],
+		'prev': nav['prev'],
+		})
 
 @t_login_required
 def document(request, collId, docId, page=None):
-    full_doc = services.t_document(collId, docId)
+    collection = services.t_collection(collId)
+    full_doc = services.t_document(collId, docId,-1)
+    nav = navigation.up_next_prev("document",docId,collection,[collId])
+
     return render(request, 'libraryapp/document.html', {
 		'metadata': full_doc.get('md'), 
 		'pageList': full_doc.get('pageList'),
-		'collId': collId} )
+		'collId': int(collId),
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		})
 
 @t_login_required
 def page(request, collId, docId, page):
-    full_doc = services.t_document(collId, docId)
+    full_doc = services.t_document(collId, docId, -1)
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
     pagedata = full_doc.get('pageList').get('pages')[index]
     transcripts = pagedata.get('tsList').get('transcripts')
     # the way xmltodict parses multiple instances of tags means that if there is one <transcripts> we get a dict, 
-    # if there is > 1 we get a list. Solution, but dict in list if dict (or get json from transkribus which is
+    # if there is > 1 we get a list. Solution: put dict in list if dict (or get json from transkribus which is
     # parsed better, but not yet available)
     if isinstance(transcripts, dict):
 	transcripts = [transcripts]
-#    sys.stdout.write("Document metadata for doc #%s%%: %s%%   \r\n" % (len) )
-#    sys.stdout.flush()
+
+    nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
     return render(request, 'libraryapp/page.html', {
 		'pagedata': pagedata,
-		'transcripts': transcripts})
+		'transcripts': transcripts,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		})
 
 @t_login_required
 def search(request):
@@ -88,6 +110,10 @@ def about(request):
     return render(request, 'libraryapp/about.html')
 
 def user_guide(request):
+    return render(request, 'libraryapp/user_guide.html')
+
+@t_login_required
+def user(request):
     return render(request, 'libraryapp/user_guide.html')
 
 @t_login_required

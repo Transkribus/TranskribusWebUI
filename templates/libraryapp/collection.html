@@ -1,6 +1,15 @@
 {% extends "navi_base.html" %}
 
 
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+
 {% block content %}
 
 
@@ -11,7 +20,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    Collections Browse
+                    Collection Browse for {{collection.title}}
                 </h1>
 	    </div>
             <div class="col-md-4 expandable collections_tree">
@@ -46,11 +55,11 @@
 				</div>
 			     {% for doc in documents %}
 		  		<div id="doc_{{ doc.docId }}" class="document_thumbs">
-					<h4> {{ doc.title }} - {{ doc.author }} <span class="page_title"></span></h4>
+					<h4><a href="{%  url 'document' collId  doc.docId %}">{{ doc.title }} - {{ doc.author }}</a> <span class="page_title"><a href="#"></a></span></h4>
 					     {% for page in doc.children %}
 					    <div class="col-md-3 thumb page_thumb" id="page_{{page.key}}">
-						<a class="thumbnail" href="{% url 'document' collId doc.docId page.page %}">
-						    <img src="http://placehold.it/400x300" alt="{{ page.title}}" title="{{page.title}}"/>
+						<a class="thumbnail" href="{% url 'page' collId doc.docId page.pageNr %}">
+						    <img src="{{ page.thumbUrl }}" alt="{{page.title}}" title="{{page.title}} - {{page.pageNr}}"/>
 						</a>
 					    </div>
 					     {% endfor %}

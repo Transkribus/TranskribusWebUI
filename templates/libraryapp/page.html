@@ -2,19 +2,12 @@
 {% load staticfiles %}
 {% load library_tags %}
 
-
-
-
-{% block nav_buttons_in %}
-	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">up<span></a></li>
-	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">next<span></a></li>
-	<li><a href="#" id="" class="btn btn-default btn-inverse btn-xs pull-right"><span class="">prev<span></a></li>
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
 {% endblock %}
 
-{% block nav_buttons_out %}
-	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">up<span></a></li>
-	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">next<span></a></li>
-	<li><a href="#" id="" class="btn btn-default btn-xs pull-left"><span class="">prev<span></a></li>
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
 {% endblock %}
 
 {% block content %}
