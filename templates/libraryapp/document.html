@@ -23,13 +23,17 @@
 	    </div>
             <div class="col-md-8">
 
+<!--
+
 	<ul>
      {% for item in metadata %}
 	<li>{{ item }} - {{ metadata|get_item:item }}</li>
      {% endfor %}
 	</ul>
-	<p>This document was uploaded by <a href="{%url 'user' metadata.uploaderId %}">{{metadata.uploader}}</a>.</p>
-	<p>This document is a also a member of the following collections</p>
+-->
+	<p>This document was uploaded by <a href="{%url 'users' collId metadata.uploaderId %}">{{metadata.uploader}}</a>.</p>
+     {% if metadata.collectionList.colList|length > 1 %}
+	<p>This document is a also a member of the following collection{% if metadata.collectionList.colList|length > 2 %}s{% endif %}</p>
 	<ul>
 	     {% for alt_col in metadata.collectionList.colList %}
 		{% ifnotequal collId alt_col.colId %}
@@ -37,7 +41,7 @@
 		{% endifnotequal %}
 	     {% endfor %}
 	</ul>
-
+      {% endif %}
 	<p>This document has {{ pageList.pages|length }} pages:</p>
 
 	<table class="table table-striped">
