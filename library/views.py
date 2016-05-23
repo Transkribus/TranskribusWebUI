@@ -14,7 +14,7 @@ import services
 import navigation
 import json
 import sys
-
+import re
 
 #import urllib2
 #import xmltodict
@@ -52,6 +52,12 @@ def collections(request):
 @t_login_required
 def collection(request, collId):
     collection = services.t_collection(collId)
+    if(collection == 403): #no access to requested collection
+       sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
+       sys.stdout.flush()
+       return HttpResponseRedirect('/library/collection_noaccess/'+collId)
+#    if(re.match(/\d+/, collection)):
+
     collections = request.session.get("collections");
     nav = navigation.up_next_prev("collection",collId,collections)
 
@@ -113,11 +119,24 @@ def user_guide(request):
     return render(request, 'libraryapp/user_guide.html')
 
 @t_login_required
-def user(request):
-    return render(request, 'libraryapp/user_guide.html')
+def users(request, collId, userId):
+    return render(request, 'libraryapp/users.html')
 
 @t_login_required
 def profile(request):
     collections = request.session.get("collections");
     return render(request, 'libraryapp/profile.html', {'collections': collections})
+
+#error pages
+def collection_noaccess(request, collId):
+
+    if(request.get_full_path() == request.META.get("HTTP_REFERER") or re.match(r'^.*login.*', request.META.get("HTTP_REFERER"))):
+	back = None
+    else:
+        back = request.META.get("HTTP_REFERER") #request.GET.get("back")
+
+    return render(request, 'libraryapp/error.html', {
+				'msg' : "I'm afraid you are not allowed to access this collection",
+				'back' : back,
+			})
 
