@@ -2,6 +2,7 @@ import requests
 #import urllib2
 import xmltodict
 #from lxml import objectify
+from django.http import HttpResponseRedirect
 from django.conf import settings
 import sys
 import json
@@ -15,6 +16,9 @@ def t_login(user, pw):
 
     params = {'user': user, 'pw': pw}
     headers = {'content-type': 'application/x-www-form-urlencoded'}
+    #TODO check wadl and use json (it is throwing a 415 at if just switching in the content-type)
+#    headers = {'content-type': 'application/json'}
+
     #for no connection 
     if settings.OFFLINE:
 	if settings.ADMIN_PASSWORD == pw:
@@ -24,9 +28,14 @@ def t_login(user, pw):
     #for connection 
     else:
     	r = s.post(url, params=params, verify=False, headers=headers)
+        sys.stdout.write("AUTH RESPONSE OBJ: %s  \r\n" % (r.status_code) )
+        sys.stdout.flush()
     	if r.status_code != requests.codes.ok:
         	return None
     	user_xml = r.content
+
+#    sys.stdout.write("RETURN FROM JSON AUTH REQ: %s  \r\n" % (user_xml) )
+#    sys.stdout.flush()
 
     t_user=xmltodict.parse(user_xml)
 
@@ -88,7 +97,7 @@ def t_collections():
 
 def t_collection(collId):
 
-    url = settings.TRP_URL+'collections/'+collId+'/list'
+    url = settings.TRP_URL+'collections/'+unicode(collId)+'/list'
     sys.stdout.write("### IN t_collectionnnn: %s%%   \r\n" % (url) )
     sys.stdout.flush()
 
@@ -103,15 +112,11 @@ def t_collection(collId):
 	if r.status_code != requests.codes.ok:
 	   sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
 	   sys.stdout.flush()
-	   return None
+	   return r.status_code
 	collection_json=r.content
 
     #may skip this and pass the json straight thru
     collection = json.loads(collection_json)
-
-
-#    sys.stdout.write("Collection data: %s%%   \r\n" % (collection_json) )
-#    sys.stdout.flush()
 
     for doc in collection:
         doc['collId'] = collId
@@ -124,20 +129,10 @@ def t_collection(collId):
 	   x['title']=x['imgFileName'] 
 	   x['collId']=collId
 
-
-#[{'title': "Page "+str(x+1), 'key': str(doc['key'])+"_"+str(x+1), 'page': str(x+1)} for x in range(doc['nrOfPages'])]
-
-    
-  #  sys.stdout.write("Collection data: %s%%   \r\n" % (collection) )
-   # sys.stdout.flush()
-   # sys.stdout.write("User: %s%%   \r\n" % (request.user) )
-   # sys.stdout.flush()
-
     return collection
 
 def t_document(collId, docId, nrOfTranscripts=None):
 
-#    url = settings.TRP_URL+'collections/'+collId+'/'+docId+'/fulldoc.xml'
     url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/fulldoc'
     headers = {'content-type': 'application/xml'}
     params = {}
@@ -159,13 +154,4 @@ def t_document(collId, docId, nrOfTranscripts=None):
     t_doc = json.loads(doc_json)
 
     t_doc['key'] = docId 
-#    sys.stdout.write("Document metadata XML: #%s%%   \r\n" % (doc_json) )
-#    sys.stdout.flush()
-
-#    t_doc=xmltodict.parse(doc_xml)
-
-#    sys.stdout.write("Document metadata for doc #%s%%: %s%%   \r\n" % (docId, t_doc) )
- #   sys.stdout.flush()
-
-#    return t_doc.get('trpDoc')
     return t_doc
