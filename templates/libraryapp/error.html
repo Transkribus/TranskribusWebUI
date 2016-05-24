@@ -1,0 +1,25 @@
+{% extends "navi_base.html" %}
+
+{% block content %}
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- Marketing Icons Section -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+			We have a slight problem
+                </h1>
+		<p>{{ msg }}</p>
+		{% if back %}<p>Return to the <a href="{{back}}">previous page</a></p>{% endif %}
+		<p>Or to the READ WebUI <a href="{% url 'index' %}">home page</a></p>
+
+
+	    </div>
+	</div>
+    </div>	
+
+{% endblock %}
+
