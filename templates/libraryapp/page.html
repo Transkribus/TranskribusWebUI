@@ -37,7 +37,7 @@
 		   </thead>
 		   <tbody>
 		     {% for ts in transcripts %}
-			<tr><td>{{ ts.tsId }}</td><td>{{ ts.url }}</td><td>{{ts.status }}</td><td>{{ts.userName }}</td><td>{{ ts.timestamp|print_timestamp }}</td></tr>
+			<tr><td><a href="{% url 'transcript' collId docId pagedata.pageNr ts.tsId %}">{{ ts.tsId }}</a></td><td>{{ ts.url }}</td><td>{{ts.status }}</td><td>{{ts.userName }}</td><td>{{ ts.timestamp|print_timestamp }}</td></tr>
 		     {% endfor %}
 		   </tbody>
 		</table>

@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^collection_noaccess/([0-9]+)$', views.collection_noaccess, name='collection_noaccess'),
     url(r'^document/([0-9]+)/([0-9]+)$', views.document, name='document'),
     url(r'^page/([0-9]+)/([0-9]+)/([0-9]+)$', views.page, name='page'),
+    url(r'^transcript/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)$', views.transcript, name='transcript'),
     url(r'^search$', views.search, name='search'),
     url(r'^about$', views.about, name='about'),
     url(r'^user_guide$', views.user_guide, name='user_guide'),

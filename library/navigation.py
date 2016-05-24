@@ -12,7 +12,7 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
     up=prev=next=None
     up=[hierarchy.get(this_level)]
     if parent_ids:
-	for id in parent_ids: #TODO work out sslicker way to do this
+	for id in parent_ids: #TODO work out slicker way to do this
             up.append(id)
 
 #    sys.stdout.write("NAV DATA: %s   \r\n" % (data) )
@@ -23,8 +23,8 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
     last_id=None
     for x in data:
         that_id = x.get("key")
- #       sys.stdout.write("NAV DATA: %s   \r\n" % (that_id) )
- #       sys.stdout.flush()
+      #  sys.stdout.write("NAV DATA: %s == %s \r\n" % (that_id,this_id) )
+      #  sys.stdout.flush()
 
 	if next_promise:
 	    next=that_id
@@ -34,8 +34,8 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
 	    next_promise=True
 	last_id = that_id
 
-#    sys.stdout.write("UP: %s \nNEXT: %s\nPREV: %s  \r\n" % (up, next, prev) )
-    sys.stdout.flush()
+  #  sys.stdout.write("UP: %s \nNEXT: %s\nPREV: %s  \r\n" % (up, next, prev) )
+  #  sys.stdout.flush()
 
     return {'up':"/library/"+"/".join(up),'next':next,'prev':prev}
 
