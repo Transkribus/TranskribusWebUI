@@ -128,6 +128,19 @@ def profile(request):
     collections = request.session.get("collections");
     return render(request, 'libraryapp/profile.html', {'collections': collections})
 
+#error pages
+def collection_noaccess(request, collId):
+
+    if(request.get_full_path() == request.META.get("HTTP_REFERER") or re.match(r'^.*login.*', request.META.get("HTTP_REFERER"))):
+        back = None
+    else:
+        back = request.META.get("HTTP_REFERER") #request.GET.get("back")
+
+    return render(request, 'libraryapp/error.html', {
+                'msg' : "I'm afraid you are not allowed to access this collection",
+                'back' : back,
+            })
+    
 @t_login_required
 def ingest_mets_url(request):
     if request.method == 'POST':
