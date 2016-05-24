@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from . import views
 
 urlpatterns = [
+    url(r'^ingest_mets_url$', views.ingest_mets_url, name='ingest_mets_url'),
     url(r'^collections$', views.collections, name='collections'),
     url(r'^collection/([0-9]+)$', views.collection, name='collection'),
     url(r'^document/([0-9]+)/([0-9]+)/([0-9]+)?$', views.document, name='document'),

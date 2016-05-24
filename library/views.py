@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from .forms import RegisterForm
+from .forms import IngestMetsUrlForm
  
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -94,4 +95,17 @@ def user_guide(request):
 def profile(request):
     collections = request.session.get("collections");
     return render(request, 'libraryapp/profile.html', {'collections': collections})
+
+@t_login_required
+def ingest_mets_url(request):
+    if request.method == 'POST':
+        # What should be checked here and what can be left up to Transkribus?
+        #if ingest_mets_url_form.is_valid():
+        services.t_ingest_mets_url(request.POST.get('collection_choice'), request.POST.get('url'))  
+        #ingest_mets_url_form.cleaned_data['url'])
+        return HttpResponseRedirect('/thanks/')
+    else:
+        data = {'url': request.GET.get('metsURL', '')}
+        ingest_mets_url_form = IngestMetsUrlForm(initial=data, collections = request.session.get("collections"))
+        return render(request, 'libraryapp/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form} )
 

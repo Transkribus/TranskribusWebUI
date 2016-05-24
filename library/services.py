@@ -144,3 +144,18 @@ def t_document(collId, docId):
  #   sys.stdout.flush()
 
     return t_doc.get('trpDoc')
+
+def t_ingest_mets_url(collId, mets_url):
+    
+    url = settings.TRP_URL+'collections/' + collId + '/createDocFromMetsUrl'
+    params = {'fileName': mets_url}#, 'checkForDuplicateTitle': 'false'}# Perhaps this won't work even for testing! TODO Resolve!
+    r = s.post(url, params=params, verify=False)
+    
+    sys.stdout.write("Ingesting document from METS XML file: %s%%   \r\n" % (mets_url) )
+    sys.stdout.flush()
+    
+    if r.status_code != requests.codes.ok:
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
+        sys.stdout.flush()
+        return None
+    # TODO What to do when we're successful?'
