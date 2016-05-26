@@ -171,11 +171,7 @@ def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
         #if ingest_mets_url_form.is_valid():
-        sys.stdout.write("COLLECTION CHOSEN %s%% \r\n" % request.POST);#.get('collection') )
-        sys.stdout.flush()
-        # TODO Update this to accept the id:
-        #services.t_ingest_mets_url(request.POST.get('collection_choice'), request.POST.get('url'))  
-        #ingest_mets_url_form.cleaned_data['url'])
+        services.t_ingest_mets_url(request.POST.get('collection_choice'), request.POST.get('url'))  
         return HttpResponseRedirect('/thanks/')
     else:
         data = {'url': request.GET.get('metsURL', '')}
