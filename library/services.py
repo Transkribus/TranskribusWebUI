@@ -115,7 +115,6 @@ def t_collection(collId):
 	   return r.status_code
 	collection_json=r.content
 
-    #may skip this and pass the json straight thru
     collection = json.loads(collection_json)
 
     for doc in collection:
@@ -155,6 +154,69 @@ def t_document(collId, docId, nrOfTranscripts=None):
 
     t_doc['key'] = docId 
     return t_doc
+
+def t_page(collId, docId, page, nrOfTranscripts=None):
+
+    #TODO get page metadata 
+#    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page) #??
+
+    #list of transcripts for this page
+    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/list'
+    sys.stdout.write("### IN t_page: %s%%   \r\n" % (url) )
+    sys.stdout.flush()
+
+    headers = {'content-type': 'application/json'}
+    params = {}
+	
+    #for no connection:
+    if settings.OFFLINE:
+	page_json = settings.TEST_PAGE_JSON
+    #for connection 
+    else:
+    	r = s.get(url, params=params, verify=False, headers=headers)
+    	if r.status_code != requests.codes.ok:
+        	return None
+    	page_json = r.content
+
+    t_page = json.loads(page_json)
+
+    #TODO would prefer a pageId rather than "page" which is a the page number
+    for x  in t_page:
+        sys.stdout.write("### X: %s%%   \r\n" % (x['tsId']) )
+        sys.stdout.flush()
+	#key is used already for transcripts, however using key is handy for jquery things like fancy tree... maybe some neat namespace trickis called for
+	x['key'] = x.get('tsId')
+    return t_page
+
+def t_transcript(collId, docId, page, transcriptId):
+
+    #TODO get page metadata 
+    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page) #??
+
+    #list of transcripts for this page
+    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/text'
+    sys.stdout.write("### IN t_transcript: %s%%   \r\n" % (url) )
+    sys.stdout.flush()
+
+    headers = {'content-type': 'text/plain'}
+    params = {'transcriptId': transcriptId}
+	
+    #for no connection:
+    if settings.OFFLINE:
+	page_json = settings.TEST_TRANSCRIPT
+    #for connection 
+    else:
+    	r = s.get(url, params=params, verify=False, headers=headers)
+        sys.stdout.write("### Status code: %s%%   \r\n %s" % (r.status_code,r.content) )
+        sys.stdout.flush()
+
+    	if r.status_code != requests.codes.ok:
+        	return None
+    	transcript = r.content #this just returns the transcript text
+
+    t_transcript = {'key': transcriptId, 'text': transcirpt}
+
+    return t_transcript
 
 def t_ingest_mets_url(collId, mets_url):
     

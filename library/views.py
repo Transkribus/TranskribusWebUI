@@ -88,9 +88,11 @@ def document(request, collId, docId, page=None):
 
 @t_login_required
 def page(request, collId, docId, page):
+    #call t_document with noOfTranscript=-1 which will return no transcript data
     full_doc = services.t_document(collId, docId, -1)
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
+    #extract page data from full_doc (may be better from a  separate page data request)
     pagedata = full_doc.get('pageList').get('pages')[index]
     transcripts = pagedata.get('tsList').get('transcripts')
     # the way xmltodict parses multiple instances of tags means that if there is one <transcripts> we get a dict, 
@@ -107,6 +109,29 @@ def page(request, collId, docId, page):
 		'up': nav['up'],
 		'next': nav['next'],
 		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		})
+
+@t_login_required
+def transcript(request, collId, docId, page, transcriptId):
+    #t_page returns an array of the transcripts for a page
+    pagedata = services.t_page(collId, docId, page)
+    transcript = services.t_transcript(collId, docId, page, transcriptId)
+
+    sys.stdout.write("Page data (list): %s%% \r\n" % (pagedata) )
+    sys.stdout.flush()
+
+    nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
+
+    return render(request, 'libraryapp/transcript.html', {
+		'transcriptId' : transcriptId,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
 		})
 
 @t_login_required
