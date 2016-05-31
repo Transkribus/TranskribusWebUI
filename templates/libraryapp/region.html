@@ -1,0 +1,64 @@
+{% extends "navi_base.html" %}
+{% load staticfiles %}
+{% load library_tags %}
+
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- row 1 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Region view
+                </h1>
+	    </div>
+            <div class="col-md-12 expandable">
+
+		<dl class="dl-horizontal">
+		<dt>ID</dt><dd>{{ region|get_item:"@id" }}</dd>
+		<dt>Type</dt><dd>{{ region|get_item:"@type" }}</dd>
+		<dt>Text</dt><dd>{{ region|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
+		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+
+		</dl>
+
+		<p>This region has {{ lines|length }} line{% if lines|length != 1 %}s{% endif %}:</p>
+		<table class="table table-striped">
+		   <thead>
+			<tr><th>ID</th><th style="color: red;">WORDS</th><th>COORDS</th><th>BASELINE</th><th>TEXT</th><th style="color: red;">METADATA</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for line in lines %}
+			<tr>
+			<td>{{line|get_item:"@id"}}</td><td>{{line|get_item:"Word"|length}}</td>
+			<td>{% if line|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{line.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">Yes</a>{%else%}No{%endif%}</td>
+			<td>{% if line|get_item:"Baseline" %}<a href="#" title="{{line.Baseline|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
+			<td>{{line|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
+			<td>TODO: parse tags and display metadata for each line</td>
+			</tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+{%comment%}
+		<pre>{{region}}</pre>
+{%endcomment%}
+            </div>
+        </div>
+        <!-- /.row -->
+
+ <script>
+
+    </script>
+
+{% endblock %}

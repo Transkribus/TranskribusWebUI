@@ -116,22 +116,85 @@ def page(request, collId, docId, page):
 @t_login_required
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
-    pagedata = services.t_page(collId, docId, page)
-    transcript = services.t_transcript(collId, docId, page, transcriptId)
-
-    sys.stdout.write("Page data (list): %s%% \r\n" % (pagedata) )
-    sys.stdout.flush()
-
+    pagedata = services.t_page(collId, docId, page) 
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
 
+    pageXML_url = None;
+    for x in pagedata:
+	sys.stdout.write("x in pagedata: %s == %s\r\n" % (x.get("tsId"),transcriptId) )
+        sys.stdout.flush()
+	if int(x.get("tsId")) == int(transcriptId):
+	     pageXML_url = x.get("url")
+	     break
+    if pageXML_url:
+	transcript = services.t_transcript(transcriptId,pageXML_url)
+
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    sys.stdout.write("Transcript MD: %s \r\n" % (transcript) )
+    sys.stdout.flush()
+
+
     return render(request, 'libraryapp/transcript.html', {
-		'transcriptId' : transcriptId,
+		'transcript' : transcript,
+		'regions' : regions,
 		'up': nav['up'],
 		'next': nav['next'],
 		'prev': nav['prev'],
 		'collId': collId,
 		'docId': docId,
 		'pageId': page, #NB actually the number for now
+		})
+
+@t_login_required
+def region(request, collId, docId, page, transcriptId, regionId):
+    # We need to be able to target a transcript (as mentioned elsewhere)
+    # here there is no need for anything over than the pageXML really
+    # we could get one transcript from ...{page}/curr, but for completeness would 
+    # rather use transciptId to target a particular transcript
+    pagedata = services.t_page(collId, docId, page) 
+    #we are only using the pagedata to get the pageXML for a particular
+    pageXML_url = None;
+    for x in pagedata:
+	if int(x.get("tsId")) == int(transcriptId):
+	    pageXML_url = x.get("url")
+	    break
+ 
+    if pageXML_url:
+	transcript = services.t_transcript(transcriptId,pageXML_url)
+
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
+
+    for x in regions:
+	#this sucks a bit
+	if(unicode(regionId) == unicode(x.get("@id"))):
+	    region = x
+	    break
+	
+#    sys.stdout.write("REGION: %s\r\n" % (region) )
+#    sys.stdout.flush()
+
+    lines = region.get("TextLine")
+    if isinstance(lines, dict):
+        lines = [lines]
+
+    return render(request, 'libraryapp/region.html', {
+		'region' : region,
+		'lines' : lines,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
+		'transcriptId': transcriptId,
 		})
 
 @t_login_required

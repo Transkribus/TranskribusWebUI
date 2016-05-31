@@ -151,8 +151,10 @@ def t_document(collId, docId, nrOfTranscripts=None):
     	doc_json = r.content
 
     t_doc = json.loads(doc_json)
+    pages = t_doc.get("pageList").get("pages")
+    for x  in pages:
+	x['key'] = x.get('pageNr') #I'm aware this will replacce the legitimate key....
 
-    t_doc['key'] = docId 
     return t_doc
 
 def t_page(collId, docId, page, nrOfTranscripts=None):
@@ -182,24 +184,18 @@ def t_page(collId, docId, page, nrOfTranscripts=None):
 
     #TODO would prefer a pageId rather than "page" which is a the page number
     for x  in t_page:
-        sys.stdout.write("### X: %s%%   \r\n" % (x['tsId']) )
-        sys.stdout.flush()
 	#key is used already for transcripts, however using key is handy for jquery things like fancy tree... maybe some neat namespace trickis called for
 	x['key'] = x.get('tsId')
     return t_page
 
-def t_transcript(collId, docId, page, transcriptId):
+def t_transcript(transcriptId,url):
 
-    #TODO get page metadata 
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page) #??
-
-    #list of transcripts for this page
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/text'
-    sys.stdout.write("### IN t_transcript: %s%%   \r\n" % (url) )
+    #transcript metadata for this page ie the pageXML
+    sys.stdout.write("### IN t_transcript: %s   \r\n" % (url) )
     sys.stdout.flush()
 
-    headers = {'content-type': 'text/plain'}
-    params = {'transcriptId': transcriptId}
+    headers = {'content-type': 'application/xml'}
+    params = {}
 	
     #for no connection:
     if settings.OFFLINE:
@@ -207,14 +203,12 @@ def t_transcript(collId, docId, page, transcriptId):
     #for connection 
     else:
     	r = s.get(url, params=params, verify=False, headers=headers)
-        sys.stdout.write("### Status code: %s%%   \r\n %s" % (r.status_code,r.content) )
-        sys.stdout.flush()
-
     	if r.status_code != requests.codes.ok:
-        	return None
-    	transcript = r.content #this just returns the transcript text
+            return None
+    	page_xml = r.content #this just returns the pageXML...
 
-    t_transcript = {'key': transcriptId, 'text': transcirpt}
+    t_transcript=xmltodict.parse(page_xml)
+    t_transcript.tsId = transcriptId
 
     return t_transcript
 

@@ -3,7 +3,9 @@ import requests
 from django.conf import settings
 import sys
 
-hierarchy = {'page': 'document',
+hierarchy = {'region': 'transcript',
+	     'transcript': 'page',
+	     'page': 'document',
 	     'document': 'collection',
 	     'collection': 'collections'}
 
@@ -23,8 +25,8 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
     last_id=None
     for x in data:
         that_id = x.get("key")
-      #  sys.stdout.write("NAV DATA: %s == %s \r\n" % (that_id,this_id) )
-      #  sys.stdout.flush()
+#        sys.stdout.write("NAV DATA: %s == %s \r\n" % (that_id,this_id) )
+#        sys.stdout.flush()
 
 	if next_promise:
 	    next=that_id
@@ -37,6 +39,8 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
   #  sys.stdout.write("UP: %s \nNEXT: %s\nPREV: %s  \r\n" % (up, next, prev) )
   #  sys.stdout.flush()
 
-    return {'up':"/library/"+"/".join(up),'next':next,'prev':prev}
+    return {'up':"/library/"+"/".join(up),
+		'next':next,
+		'prev':prev}
 
 
