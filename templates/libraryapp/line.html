@@ -1,0 +1,75 @@
+{% extends "navi_base.html" %}
+{% load staticfiles %}
+{% load library_tags %}
+
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- row 1 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Line view
+                </h1>
+	    </div>
+            <div class="col-md-12 expandable">
+
+		<dl class="dl-horizontal">
+		<dt>ID</dt><dd>{{ line|get_item:"@id" }}</dd>
+		<dt>Text</dt><dd>{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
+		<dt>Primary language</dt><dd>{{ line|get_item:"@PrimaryLanguage" }}</dd>
+		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+
+		</dl>
+
+		<p>This line has {{ words|length }} word{% if words|length != 1 %}s{% endif %}:</p>
+		<table class="table table-striped">
+		   <thead>
+			<tr><th>ID</th><th>LETTERS</th><th>COORDS</th><th>BASELINE</th><th>TEXT</th><th>METADATA</th><th>LANGUAGE</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for word in words %}
+			<tr>
+			<td><a href="{%url 'word' collId docId pageId transcriptId regionId lineId word|get_item:"@id"%}">{{word|get_item:"@id"}}</a></td>
+			<td>{{word|get_item:"TextEquiv"|get_item:"Unicode"|length}}</td>
+			<td>{% if word|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{word.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">Yes</a>{%else%}No{%endif%}</td>
+			<td>{% if word|get_item:"Baseline" %}<a href="#" title="{{word.Baseline|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
+			<td>{{word|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
+			<td>
+				<table class="table">
+				{% for class in word|get_item:"md" %}
+					<tr><th colspan="2">{{class}}</th></tr>
+					{% for  rule in word|get_item:"md"|get_item:class %}
+						<tr><td>{{rule}}</td><td>{{word|get_item:"md"|get_item:class|get_item:rule}}</td></tr>
+					{%endfor%}
+				{%endfor%}
+				</table>
+			</td>
+			<td>{{word|get_item:"@language"}}</td>
+			</tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+{%comment%}
+		<pre>{{region}}</pre>
+{%endcomment%}
+            </div>
+        </div>
+        <!-- /.row -->
+
+ <script>
+
+    </script>
+
+{% endblock %}

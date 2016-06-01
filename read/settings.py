@@ -172,4 +172,3 @@ TEST_FULL_DOC_JSON = '{"md":{"docId":338,"title":"Bentham Test 8","uploadTimesta
 
 TEST_PAGE_JSON = '[]'
 TEST_TRANSCRIPT=''
-

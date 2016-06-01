@@ -1,0 +1,59 @@
+{% extends "navi_base.html" %}
+{% load staticfiles %}
+{% load library_tags %}
+
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- row 1 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Word view
+                </h1>
+	    </div>
+            <div class="col-md-12 expandable">
+
+		<dl class="dl-horizontal">
+		<dt>ID</dt><dd>{{ word|get_item:"@id" }}</dd>
+		<dt>Text</dt><dd>{{ word|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
+		<dt>Language</dt><dd>{{ word|get_item:"@PrimaryLanguage" }}</dd>
+		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+
+		</dl>
+
+		<p>This word has some metadata:</p>
+
+		<table class="table table-striped">
+		{% for class in word|get_item:"md" %}
+			<thead>
+			<tr><th colspan="2">{{class}}</th></tr>
+			</thead>
+			<tbody>
+			{% for  rule in word|get_item:"md"|get_item:class %}
+				<tr><td>{{rule}}</td><td>{{word|get_item:"md"|get_item:class|get_item:rule}}</td></tr>
+			{%endfor%}
+			</tbody>
+		{%endfor%}
+		</table>
+
+            </div>
+        </div>
+        <!-- /.row -->
+
+ <script>
+
+    </script>
+
+{% endblock %}

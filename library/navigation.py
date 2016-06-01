@@ -3,7 +3,9 @@ import requests
 from django.conf import settings
 import sys
 
-hierarchy = {'region': 'transcript',
+hierarchy = {'word': 'line',
+	     'line': 'region',
+	     'region': 'transcript',
 	     'transcript': 'page',
 	     'page': 'document',
 	     'document': 'collection',
