@@ -170,20 +170,22 @@ def region(request, collId, docId, page, transcriptId, regionId):
     if isinstance(regions, dict):
 	regions = [regions]
 
-    nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
-
     for x in regions:
-	#this sucks a bit
+	x['key'] = x.get("@id")
 	if(unicode(regionId) == unicode(x.get("@id"))):
 	    region = x
-	    break
-	
+
+    nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
+
 #    sys.stdout.write("REGION: %s\r\n" % (region) )
 #    sys.stdout.flush()
 
     lines = region.get("TextLine")
     if isinstance(lines, dict):
         lines = [lines]
+    #parse metadata
+    for x in lines:
+	x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/region.html', {
 		'region' : region,
@@ -196,6 +198,127 @@ def region(request, collId, docId, page, transcriptId, regionId):
 		'pageId': page, #NB actually the number for now
 		'transcriptId': transcriptId,
 		})
+
+@t_login_required
+def line(request, collId, docId, page, transcriptId, regionId, lineId):
+    # We need to be able to target a transcript (as mentioned elsewhere)
+    # here there is no need for anything over than the pageXML really
+    # we could get one transcript from ...{page}/curr, but for completeness would 
+    # rather use transciptId to target a particular transcript
+    pagedata = services.t_page(collId, docId, page) 
+    #we are only using the pagedata to get the pageXML for a particular
+    pageXML_url = None;
+    for x in pagedata:
+	if int(x.get("tsId")) == int(transcriptId):
+	    pageXML_url = x.get("url")
+	    break
+ 
+    if pageXML_url:
+	transcript = services.t_transcript(transcriptId,pageXML_url)
+
+    #This now officially bonkers....
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	if(unicode(regionId) == unicode(x.get("@id"))):
+	    region = x
+
+    lines=region.get("TextLine");
+
+    if isinstance(lines, dict):
+	lines = [lines]
+
+    for x in lines:
+	x['key'] = x.get("@id")
+	if(unicode(lineId) == unicode(x.get("@id"))):
+	    line = x
+
+    nav = navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
+
+#    sys.stdout.write("REGION: %s\r\n" % (region) )
+#    sys.stdout.flush()
+
+    words = line.get("Word")
+    if isinstance(words, dict):
+        words = [words]
+    #parse metadata
+    for x in words:
+	x['md'] = services.t_metadata(x.get("@custom"))
+
+    return render(request, 'libraryapp/line.html', {
+		'line' : line,
+		'words' : words,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
+		'transcriptId': transcriptId,
+		'regionId': regionId,
+		'lineId': lineId,
+		})
+
+@t_login_required
+def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
+    # booo hiss
+    pagedata = services.t_page(collId, docId, page) 
+    #we are only using the pagedata to get the pageXML for a particular
+    pageXML_url = None;
+    for x in pagedata:
+	if int(x.get("tsId")) == int(transcriptId):
+	    pageXML_url = x.get("url")
+	    break
+ 
+    if pageXML_url:
+	transcript = services.t_transcript(transcriptId,pageXML_url)
+
+    #This now officially bonkers....
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	if(unicode(regionId) == unicode(x.get("@id"))):
+	    region = x
+
+    lines=region.get("TextLine");
+
+    if isinstance(lines, dict):
+	lines = [lines]
+
+    for x in lines:
+	if(unicode(lineId) == unicode(x.get("@id"))):
+	    line = x
+
+    words = line.get("Word")
+    if isinstance(words, dict):
+        words = [words]
+
+    #parse metadata
+    for x in words:
+	x['key'] = x.get("@id")
+	if(unicode(wordId) == unicode(x.get("@id"))):
+		x['md'] = services.t_metadata(x.get("@custom"))
+		word = x
+		
+    nav = navigation.up_next_prev("word",wordId,words,[collId,docId,page,transcriptId,regionId,lineId])
+
+    return render(request, 'libraryapp/word.html', {
+		'word' : word,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
+		'transcriptId': transcriptId,
+		'regionId': regionId,
+		'lineId': lineId,
+		})
+
 
 @t_login_required
 def search(request):
