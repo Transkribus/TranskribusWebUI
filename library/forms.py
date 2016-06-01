@@ -9,8 +9,6 @@ class RegisterForm(forms.Form):
 
 class IngestMetsUrlForm(forms.Form):
     url = forms.URLField(label='METS XML file URL')
-    
-    def  __init__(self,  collections, *args,  **kwargs):
-        super(IngestMetsUrlForm, self).__init__(*args, **kwargs)
-        choices=[(collection['colId'], collection['colName']) for collection in collections]
-        self.fields['collection_choice'] = forms.ChoiceField(label= 'Choose collection', choices=choices)
+
+class CollectionForm(forms.Form):
+    collection_name = forms.CharField(label='Collection Name', max_length=100)

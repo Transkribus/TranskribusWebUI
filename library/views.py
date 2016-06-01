@@ -357,11 +357,20 @@ def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
         #if ingest_mets_url_form.is_valid():
-        services.t_ingest_mets_url(request.POST.get('collection_choice'), request.POST.get('url'))  
-        #ingest_mets_url_form.cleaned_data['url'])
+        services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))  
         return HttpResponseRedirect('/thanks/')
     else:
         data = {'url': request.GET.get('metsURL', '')}
-        ingest_mets_url_form = IngestMetsUrlForm(initial=data, collections = request.session.get("collections"))
-        return render(request, 'libraryapp/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form} )
+        ingest_mets_url_form = IngestMetsUrlForm(initial=data)
+        collections = request.session.get("collections")
+        return render(request, 'libraryapp/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
 
+def collections_dropdown(request):
+    collections = services.t_collections()
+    return render(request, 'libraryapp/collections_dropdown.html', {'collections': collections})
+
+def create_collection_modal(request):
+    if (services.t_create_collection(request.POST.get('collection_name'))):
+        return HttpResponse("New collection created successfully!", content_type="text/plain")
+    #else:
+           # TODO Handle failures... 

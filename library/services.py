@@ -268,3 +268,13 @@ def t_ingest_mets_url(collId, mets_url):
         sys.stdout.flush()
         return None
     # TODO What to do when we're successful?'
+
+def t_create_collection(collection_name):
+    url = settings.TRP_URL+'collections/createCollection'
+    params = {'collName': collection_name}
+    r = s.post(url, params=params, verify=False)
+    
+    sys.stdout.write("Response to create collection: %s  \r\n" % (r.status_code) )
+    sys.stdout.flush()
+    
+    return r.status_code == requests.codes.ok

@@ -4,26 +4,25 @@
 
 {% block content %}
 
-    <!-- Page Content -->
-    <div class="container">
-
-        <!-- Marketing Icons Section -->
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">
-                    Ingest METS XML
-                </h1>
-	    </div>
-	    <div class="col-lg-8">
-
-		<form action="ingest_mets_url" method="post" role="form">
-		    {% csrf_token %}
-		    {% bootstrap_form ingest_mets_url_form %}
-		    <input type="submit" value="Submit" />
-		</form>
-
-	    </div>
+<!-- Page Content -->
+<div class="container">
+    <!-- Marketing Icons Section -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Ingest METS XML URL
+            </h1>
+		    <div class="col-lg-8">
+				<form action="ingest_mets_url" method="post" role="form">
+				    {% csrf_token %}
+				    {% bootstrap_form ingest_mets_url_form %}
+		        	{% include "libraryapp/collections_dropdown.html" with collections=collections %}
+		            {% include "libraryapp/create_collection_modal.html" %}
+				    <input class="btn btn-large btn-primary" type="submit" value="Submit" />
+				</form>
+		    </div>         
+		</div>
 	</div>
-    </div>	
+</div>
 
 {% endblock %}
