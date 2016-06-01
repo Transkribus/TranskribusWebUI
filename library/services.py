@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 import sys
 import json
+import re
 
 s = requests.Session()
 
@@ -199,7 +200,7 @@ def t_transcript(transcriptId,url):
 	
     #for no connection:
     if settings.OFFLINE:
-	page_json = settings.TEST_TRANSCRIPT
+	page_xml = settings.TEST_TRANSCRIPT
     #for connection 
     else:
     	r = s.get(url, params=params, verify=False, headers=headers)
@@ -210,7 +211,48 @@ def t_transcript(transcriptId,url):
     t_transcript=xmltodict.parse(page_xml)
     t_transcript.tsId = transcriptId
 
+    #TODO cache this data for subsequent lower level requests...
+
     return t_transcript
+
+def quote_value(m):
+    return ':"'+m.group(1)+'",'
+
+def quote_property(m):
+    return '"'+m.group(1)+'":'
+
+def t_metadata(custom_attr):
+
+    #transcript metadata for this page ie the pageXML
+
+    #CSS parsing (tinycss or cssutils) wasn't much cop so css => json by homemade regex (gulp!)
+
+     #TODO rationalise steps
+#    sys.stdout.write("### CSS: %s   \r\n" % (custom_attr) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r' {', ': {', custom_attr)
+#    sys.stdout.write("### JSON 0: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r'}', '},', custom_json)
+#    sys.stdout.write("### JSON 1: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r':([^,{:]+);', quote_value, custom_json)
+#    sys.stdout.write("### JSON 2: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r'([^,:{}\s]+):', quote_property, custom_json)
+    custom_json = "{"+custom_json+"}"
+#    sys.stdout.write("### JSON 3: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r',}', '}', custom_json)
+#    sys.stdout.write("### JSON FINAL: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+
+    t_metadata = json.loads(custom_json)
+
+    sys.stdout.write("### METADATA from CSS: %s   \r\n" % (t_metadata) )
+    sys.stdout.flush()
+
+    return t_metadata
 
 def t_ingest_mets_url(collId, mets_url):
     
