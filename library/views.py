@@ -52,7 +52,7 @@ def collections(request):
 
 @t_login_required
 def collection(request, collId):
-    collection = services.t_collection(collId)
+    collection = services.t_collection(request,collId)
     if(collection == 403): #no access to requested collection
        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
        sys.stdout.flush()
@@ -73,8 +73,8 @@ def collection(request, collId):
 
 @t_login_required
 def document(request, collId, docId, page=None):
-    collection = services.t_collection(collId)
-    full_doc = services.t_document(collId, docId,-1)
+    collection = services.t_collection(request, collId)
+    full_doc = services.t_document(request, collId, docId,-1)
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
     return render(request, 'libraryapp/document.html', {
@@ -89,7 +89,7 @@ def document(request, collId, docId, page=None):
 @t_login_required
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
-    full_doc = services.t_document(collId, docId, -1)
+    full_doc = services.t_document(request, collId, docId, -1)
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
     #extract page data from full_doc (may be better from a  separate page data request)
@@ -116,7 +116,7 @@ def page(request, collId, docId, page):
 @t_login_required
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
-    pagedata = services.t_page(collId, docId, page) 
+    pagedata = services.t_page(request, collId, docId, page) 
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
 
     pageXML_url = None;
@@ -126,17 +126,19 @@ def transcript(request, collId, docId, page, transcriptId):
 	if int(x.get("tsId")) == int(transcriptId):
 	     pageXML_url = x.get("url")
 	     break
+    sys.stdout.write("PAGEXML URL : %s \r\n" % (pageXML_url) )
+    sys.stdout.flush()
+
     if pageXML_url:
-	transcript = services.t_transcript(transcriptId,pageXML_url)
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
 
     if isinstance(regions, dict):
 	regions = [regions]
 
-    sys.stdout.write("Transcript MD: %s \r\n" % (transcript) )
-    sys.stdout.flush()
-
+    for x in regions:
+	x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/transcript.html', {
 		'transcript' : transcript,
@@ -155,7 +157,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    pagedata = services.t_page(collId, docId, page) 
+    pagedata = services.t_page(request,collId, docId, page) 
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
     for x in pagedata:
@@ -164,7 +166,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(transcriptId,pageXML_url)
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
     if isinstance(regions, dict):
@@ -205,7 +207,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    pagedata = services.t_page(collId, docId, page) 
+    pagedata = services.t_page(request,collId, docId, page) 
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
     for x in pagedata:
@@ -214,7 +216,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(transcriptId,pageXML_url)
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
 
     #This now officially bonkers....
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
@@ -244,8 +246,9 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     if isinstance(words, dict):
         words = [words]
     #parse metadata
-    for x in words:
-	x['md'] = services.t_metadata(x.get("@custom"))
+    if words:
+        for x in words:
+	    x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/line.html', {
 		'line' : line,
@@ -264,7 +267,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 @t_login_required
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
-    pagedata = services.t_page(collId, docId, page) 
+    pagedata = services.t_page(request, collId, docId, page) 
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
     for x in pagedata:
@@ -273,7 +276,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(transcriptId,pageXML_url)
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
 
     #This now officially bonkers....
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
