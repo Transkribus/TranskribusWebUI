@@ -27,7 +27,7 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
     	    if not settings.OFFLINE:
 	        if not services.t_refresh():
 		    return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
-	        #setting collections data as a session var if no already set
+            #setting collections data as a session var if no already set
 	    if "collections" not in request.session or request.session['collections'] is None:
 	        request.session['collections'] = services.t_collections()
             return function(request, *args, **kw)
