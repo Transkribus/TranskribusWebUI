@@ -32,7 +32,7 @@
 		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
 
 		</dl>
-
+		{% if words|length > 0 %}
 		<p>This line has {{ words|length }} word{% if words|length != 1 %}s{% endif %}:</p>
 		<table class="table table-striped">
 		   <thead>
@@ -61,9 +61,7 @@
 		     {% endfor %}
 		   </tbody>
 		</table>
-{%comment%}
-		<pre>{{region}}</pre>
-{%endcomment%}
+		{%endif%}
             </div>
         </div>
         <!-- /.row -->
