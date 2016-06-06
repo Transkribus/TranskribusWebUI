@@ -16,6 +16,7 @@ import navigation
 import json
 import sys
 import re
+import random
 
 #import urllib2
 #import xmltodict
@@ -61,6 +62,19 @@ def collection(request, collId):
 
     collections = request.session.get("collections");
     nav = navigation.up_next_prev("collection",collId,collections)
+
+    #collection view goes down two levels (ie documents and then pages)
+    for doc in collection:
+        doc['collId'] = collId
+	doc['key'] = doc['docId']
+	doc['folder'] = 'true'
+	#fetch full document data with no transcripts for pages
+	fulldoc  = services.t_document(request, collId, doc['docId'], 0)
+	doc['children'] = fulldoc.get('pageList').get("pages")
+        for x in doc['children']:
+	   x['title']=x['imgFileName'] 
+	   x['collId']=collId
+
 
     return render(request, 'libraryapp/collection.html', {
 		'collId': collId, 
@@ -321,6 +335,45 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		'regionId': regionId,
 		'lineId': lineId,
 		})
+
+
+@t_login_required
+def rand(request, collId, element):
+    docs = services.t_collection(request,collId)
+    if(collection == 403): #no access to requested collection
+       sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
+       sys.stdout.flush()
+       return HttpResponseRedirect('/library/collection_noaccess/'+collId)
+#    if(re.match(/\d+/, collection)):
+
+    doc = random.choice(docs)
+ 
+    sys.stdout.write("RANDOM DOC: %s\r\n" % (doc.get("docId")) )
+    sys.stdout.flush()
+   
+    pages  = services.t_document(request, collId, doc.get("docId"), 0)
+
+    page = random.choice(pages.get("pageList").get("pages"))
+
+    sys.stdout.write("RANDOM PAGE: %s\r\n" % (page.get("pageNr")) )
+    sys.stdout.flush()
+
+    transcripts = services.t_page(request, collId, doc.get("docId"), page.get("pageNr"))
+    transcript = random.choice(transcripts)
+
+    sys.stdout.write("RANDOM TRANSCIRPT: %s\r\n" % (transcript) )
+    sys.stdout.flush()
+
+    regions = services.t_transcript(request, transcript.get("tsId"),transcript.get("url"))
+    region = random.choice(regions.get("PcGts").get("Page").get("TextRegion"))
+
+    sys.stdout.write("RANDOM REGION: %s\r\n" % (region) )
+    sys.stdout.flush()
+    if element == "region":
+	data = region
+#    transcript = random.choice(transcripts)
+
+    return render(request, 'libraryapp/random.html', {"data": data} )
 
 
 @t_login_required
