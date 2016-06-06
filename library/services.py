@@ -15,6 +15,11 @@ import sys
 import json
 import re
 
+#TODO rationalise this code
+# - lots of repitition
+# - possible to find or create (UIBK to create) more efficient ways of getting data
+# - epecially t_collection (which calls t_document in loop)
+
 s = requests.Session()
 
 def t_login(user, pw):
@@ -95,11 +100,6 @@ def t_collections():
     for col in collections:
 	col['key'] = col['colId']
 
-#    sys.stdout.write("Collections data: %s%%   \r\n" % (collections) )
-#    sys.stdout.flush()
-#    sys.stdout.write("User: %s%%   \r\n" % (request.user) )
-#    sys.stdout.flush()
-
     return collections
 
 def t_collection(request,collId):
@@ -133,16 +133,17 @@ def t_collection(request,collId):
 
     t_collection = json.loads(collection_json)
 
-    for doc in t_collection:
-        doc['collId'] = collId
-	doc['key'] = doc['docId']
-	doc['folder'] = 'true'
-	#fetch full document data with no transcripts for pages
-	fulldoc  = t_document(request, collId, doc['docId'], 0)
-	doc['children'] = fulldoc.get('pageList').get("pages")
-        for x in doc['children']:
-	   x['title']=x['imgFileName'] 
-	   x['collId']=collId
+#    for doc in t_collection:
+#        doc['collId'] = collId
+#	doc['key'] = doc['docId']
+#	doc['folder'] = 'true'
+#	#fetch full document data with no transcripts for pages
+#        #TODO avoid this request if possible... actually we should be doing this in the view...
+#	fulldoc  = t_document(request, collId, doc['docId'], 0)
+#	doc['children'] = fulldoc.get('pageList').get("pages")
+#        for x in doc['children']:
+#	   x['title']=x['imgFileName'] 
+#	   x['collId']=collId
 
     #Cache this to reduce calls on subsequent lower level web-pages
     t_collection[0]['cache_url'] = url
@@ -165,7 +166,8 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     	    sys.stdout.flush()
             return request.session['doc']
 
-    headers = {'content-type': 'application/xml'}
+    headers = {'content-type': 'application/json'}
+
     params = {}
     if not nrOfTranscripts is None:
 	params['nrOfTranscripts'] = nrOfTranscripts
@@ -181,7 +183,6 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     	r = s.get(url, params=params, verify=False, headers=headers)
     	if r.status_code != requests.codes.ok:
         	return None
-#    	doc_xml = r.content
     	doc_json = r.content
 
     t_doc = json.loads(doc_json)
@@ -232,7 +233,7 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
 
     #TODO would prefer a pageId rather than "page" which is a the page number
     for x  in t_page:
-	#key is used already for transcripts, however using key is handy for jquery things like fancy tree... maybe some neat namespace trickis called for
+	#key is used already for transcripts, however using key is handy for jquery things like fancy tree...
 	x['key'] = x.get('tsId')
 
     #Cache this to reduce calls on subsequent lower level web-pages
