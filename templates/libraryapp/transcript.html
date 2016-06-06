@@ -24,12 +24,41 @@
                 </h1>
 	    </div>
             <div class="col-md-12 expandable">
+
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ transcriptId }}</dd>
+		<dt>ID</dt><dd>{{ transcript.tsId }}</dd>
 		</dl>
 
-		<p>Transcript data here</p>
-
+		<p>This transcript has {{ regions|length }} region{% if regions|length != 1 %}s{% endif %}:</p>
+		<table class="table table-striped">
+		   <thead>
+			<tr><th>ID</th><th>TYPE</th><th>TEXTLINES</th><th>COORDS</th><th>TEXT</th><th>METADATA</th></tr>
+		   </thead>
+		   <tbody>
+		     {% for region in regions %}
+			<tr>
+			<td><a href="{% url 'region' collId docId pageId transcript.tsId region|get_item:"@id" %}">{{region|get_item:"@id"}}</a></td>
+			<td>{{region|get_item:"@type"}}</td>
+			<td>{{region|get_item:"TextLine"|length}}</td>
+			<td>{% if region|get_item:"Coords" %}<a href="#" title="{{region.Coords|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
+			<td>{{region|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
+			<td>
+				<table class="table">
+				{% for class in region|get_item:"md" %}
+					<tr><th colspan="2">{{class}}</th></tr>
+					{% for  rule in region|get_item:"md"|get_item:class %}
+						<tr><td>{{rule}}</td><td>{{region|get_item:"md"|get_item:class|get_item:rule}}</td></tr>
+					{%endfor%}
+				{%endfor%}
+				</table>
+			</td>
+			</tr>
+		     {% endfor %}
+		   </tbody>
+		</table>
+		{%comment%}
+		<pre>{{transcript}}</pre>
+		{%endcomment%}
             </div>
         </div>
         <!-- /.row -->

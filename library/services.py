@@ -185,6 +185,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     	doc_json = r.content
 
     t_doc = json.loads(doc_json)
+
     pages = t_doc.get("pageList").get("pages")
     for x  in pages:
 	x['key'] = x.get('pageNr') #I'm aware this will replacce the legitimate key....
