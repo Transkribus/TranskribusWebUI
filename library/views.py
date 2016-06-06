@@ -474,6 +474,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		'lineId': lineId,
 		})
 
+
 @t_login_required
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
