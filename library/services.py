@@ -45,13 +45,7 @@ def t_login(user, pw):
         	return None
     	user_xml = r.content
 
-    sys.stdout.write("RETURN FROM JSON AUTH REQ: %s  \r\n" % (user_xml) )
-    sys.stdout.flush()
-
     t_user=xmltodict.parse(user_xml)
-
-    sys.stdout.write("trpUserLogin: %s%%   \r\n" % (t_user['trpUserLogin']) )
-    sys.stdout.flush()
 
     return t_user['trpUserLogin']
 
@@ -282,9 +276,53 @@ def t_transcript(request,transcriptId,url):
 
     t_transcript['tsId'] = transcriptId
 
-    t_transcript = {'key': transcriptId, 'text': transcript}
+    #Cache this to reduce calls on subsequent lower level web-pages
+    t_transcript['cache_url'] = url
+    sys.stdout.write("### [CAHCING] t_transcript CACHING transcript with ref : %s   \r\n" % (t_transcript.get('cache_url')) )
+    sys.stdout.flush()
+    request.session['transcript'] = t_transcript
 
     return t_transcript
+
+def quote_value(m):
+    return ':"'+m.group(1)+'",'
+
+def quote_property(m):
+    return '"'+m.group(1)+'":'
+
+def t_metadata(custom_attr):
+
+    #transcript metadata for this page ie the pageXML
+
+    #CSS parsing (tinycss or cssutils) wasn't much cop so css => json by homemade regex (gulp!)
+
+     #TODO rationalise steps
+#    sys.stdout.write("### CSS: %s   \r\n" % (custom_attr) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r' {', ': {', custom_attr)
+#    sys.stdout.write("### JSON 0: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r'}', '},', custom_json)
+#    sys.stdout.write("### JSON 1: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r':([^,{:]+);', quote_value, custom_json)
+#    sys.stdout.write("### JSON 2: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r'([^,:{}\s]+):', quote_property, custom_json)
+    custom_json = "{"+custom_json+"}"
+#    sys.stdout.write("### JSON 3: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+    custom_json = re.sub(r',}', '}', custom_json)
+#    sys.stdout.write("### JSON FINAL: %s   \r\n" % (custom_json) )
+#    sys.stdout.flush()
+
+    t_metadata = json.loads(custom_json)
+
+    sys.stdout.write("### METADATA from CSS: %s   \r\n" % (t_metadata) )
+    sys.stdout.flush()
+
+    return t_metadata
+
 
 def t_ingest_mets_xml(collId, mets_file):
 
