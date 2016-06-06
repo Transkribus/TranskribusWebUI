@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^create_collection_modal', views.create_collection_modal, name='create_collection_modal'),
     url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),           
     url(r'^ingest_mets_url$', views.ingest_mets_url, name='ingest_mets_url'),
+    
     url(r'^collections$', views.collections, name='collections'),
     url(r'^collection/([0-9]+)$', views.collection, name='collection'),
     url(r'^collection_noaccess/([0-9]+)$', views.collection_noaccess, name='collection_noaccess'),
@@ -17,6 +18,9 @@ urlpatterns = [
     #oh no he di'nt
     url(r'^word/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/(\w+)/(\w+)/(\w+)$', views.word, name='word'), #TODO as above...
     #oh yes he di'
+    
+    url(r'^random/([0-9]+)/(word|line|region|transcript|document)$', views.rand, name='rand'),
+
     url(r'^search$', views.search, name='search'),
     url(r'^about$', views.about, name='about'),
     url(r'^user_guide$', views.user_guide, name='user_guide'),
