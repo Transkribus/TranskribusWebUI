@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 
 from .forms import RegisterForm
 from .forms import IngestMetsUrlForm
+from .forms import MetsFileForm
  
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -33,7 +34,7 @@ def register(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-#TODO	    services.t_register(form)
+#TODO        services.t_register(form)
             return HttpResponseRedirect('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
@@ -52,7 +53,7 @@ def collections(request):
 
 @t_login_required
 def collection(request, collId):
-    collection = services.t_collection(collId)
+    collection = services.t_collection(request,collId)
     if(collection == 403): #no access to requested collection
        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
        sys.stdout.flush()
@@ -63,33 +64,33 @@ def collection(request, collId):
     nav = navigation.up_next_prev("collection",collId,collections)
 
     return render(request, 'libraryapp/collection.html', {
-		'collId': collId, 
-		'documents': collection,
-		'documents_json': json.dumps(collection),
-		'up': nav['up'], 
-		'next': nav['next'],
-		'prev': nav['prev'],
-		})
+        'collId': collId, 
+        'documents': collection,
+        'documents_json': json.dumps(collection),
+        'up': nav['up'], 
+        'next': nav['next'],
+        'prev': nav['prev'],
+        })
 
 @t_login_required
 def document(request, collId, docId, page=None):
-    collection = services.t_collection(collId)
-    full_doc = services.t_document(collId, docId,-1)
+    collection = services.t_collection(request, collId)
+    full_doc = services.t_document(request, collId, docId,-1)
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
     return render(request, 'libraryapp/document.html', {
-		'metadata': full_doc.get('md'), 
-		'pageList': full_doc.get('pageList'),
-		'collId': int(collId),
-		'up': nav['up'],
-		'next': nav['next'],
-		'prev': nav['prev'],
-		})
+        'metadata': full_doc.get('md'), 
+        'pageList': full_doc.get('pageList'),
+        'collId': int(collId),
+        'up': nav['up'],
+        'next': nav['next'],
+        'prev': nav['prev'],
+        })
 
 @t_login_required
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
-    full_doc = services.t_document(collId, docId, -1)
+    full_doc = services.t_document(request, collId, docId, -1)
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
     #extract page data from full_doc (may be better from a  separate page data request)
@@ -99,40 +100,58 @@ def page(request, collId, docId, page):
     # if there is > 1 we get a list. Solution: put dict in list if dict (or get json from transkribus which is
     # parsed better, but not yet available)
     if isinstance(transcripts, dict):
-	transcripts = [transcripts]
+        transcripts = [transcripts]
 
     nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
     return render(request, 'libraryapp/page.html', {
-		'pagedata': pagedata,
-		'transcripts': transcripts,
-		'up': nav['up'],
-		'next': nav['next'],
-		'prev': nav['prev'],
-		'collId': collId,
-		'docId': docId,
-		})
+        'pagedata': pagedata,
+        'transcripts': transcripts,
+        'up': nav['up'],
+        'next': nav['next'],
+        'prev': nav['prev'],
+        'collId': collId,
+        'docId': docId,
+        })
 
 @t_login_required
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
-    pagedata = services.t_page(collId, docId, page)
-    transcript = services.t_transcript(collId, docId, page, transcriptId)
-
-    sys.stdout.write("Page data (list): %s%% \r\n" % (pagedata) )
-    sys.stdout.flush()
-
+    pagedata = services.t_page(request, collId, docId, page) 
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
 
+    pageXML_url = None;
+    for x in pagedata:
+	sys.stdout.write("x in pagedata: %s == %s\r\n" % (x.get("tsId"),transcriptId) )
+        sys.stdout.flush()
+	if int(x.get("tsId")) == int(transcriptId):
+	     pageXML_url = x.get("url")
+	     break
+    sys.stdout.write("PAGEXML URL : %s \r\n" % (pageXML_url) )
+    sys.stdout.flush()
+
+    if pageXML_url:
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	x['md'] = services.t_metadata(x.get("@custom"))
+
     return render(request, 'libraryapp/transcript.html', {
-		'transcriptId' : transcriptId,
-		'up': nav['up'],
-		'next': nav['next'],
-		'prev': nav['prev'],
-		'collId': collId,
-		'docId': docId,
-		'pageId': page, #NB actually the number for now
-		})
+        'transcriptId' : transcriptId,
+        'up': nav['up'],
+        'next': nav['next'],
+        'prev': nav['prev'],
+        'collId': collId,
+        'docId': docId,
+        'pageId': page, #NB actually the number for now
+        })
+
+
 
 @t_login_required
 def search(request):
@@ -165,18 +184,24 @@ def collection_noaccess(request, collId):
                 'msg' : "I'm afraid you are not allowed to access this collection",
                 'back' : back,
             })
-    
+
+@t_login_required
+def ingest_mets_xml(request):
+    if request.method == 'POST':
+        #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages?
+        services.t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
+        return HttpResponseRedirect('/thanks/')# TODO Something else!
+    else:
+        ingest_mets_xml_file_form = MetsFileForm()
+        collections = request.session.get("collections")
+        return render(request, 'libraryapp/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
+
 @t_login_required
 def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
-        #if ingest_mets_url_form.is_valid():
-        sys.stdout.write("COLLECTION CHOSEN %s%% \r\n" % request.POST);#.get('collection') )
-        sys.stdout.flush()
-        # TODO Update this to accept the id:
-        #services.t_ingest_mets_url(request.POST.get('collection_choice'), request.POST.get('url'))  
-        #ingest_mets_url_form.cleaned_data['url'])
-        return HttpResponseRedirect('/thanks/')
+        services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))  
+        return HttpResponseRedirect('/thanks/')# TODO Something else!
     else:
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)

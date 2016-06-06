@@ -3,8 +3,9 @@ from django.conf.urls import include, url
 from . import views
 
 urlpatterns = [
-    url(r'^create_collection_modal', views.create_collection_modal, name='create_collection_modal'),
-    url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),           
+    url(r'^create_collection_modal$', views.create_collection_modal, name='create_collection_modal'),
+    url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),
+    url(r'^ingest_mets_xml$', views.ingest_mets_xml, name='ingest_mets_xml'),    
     url(r'^ingest_mets_url$', views.ingest_mets_url, name='ingest_mets_url'),
     url(r'^collections$', views.collections, name='collections'),
     url(r'^collection/([0-9]+)$', views.collection, name='collection'),
@@ -12,6 +13,12 @@ urlpatterns = [
     url(r'^document/([0-9]+)/([0-9]+)$', views.document, name='document'),
     url(r'^page/([0-9]+)/([0-9]+)/([0-9]+)$', views.page, name='page'),
     url(r'^transcript/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)$', views.transcript, name='transcript'),
+    # These had to be uncommented in order to get this to run.
+    # url(r'^region/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/(\w+)$', views.region, name='region'), #TODO improve regionId regex
+    # url(r'^line/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/(\w+)/(\w+)$', views.line, name='line'), #TODO as above...
+    #oh no he di'nt
+    # url(r'^word/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/(\w+)/(\w+)/(\w+)$', views.word, name='word'), #TODO as above...
+    #oh yes he di'
     url(r'^search$', views.search, name='search'),
     url(r'^about$', views.about, name='about'),
     url(r'^user_guide$', views.user_guide, name='user_guide'),
