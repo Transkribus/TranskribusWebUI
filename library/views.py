@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 
 from .forms import RegisterForm
 from .forms import IngestMetsUrlForm
+from .forms import MetsFileForm
  
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -34,7 +35,7 @@ def register(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-#TODO	    services.t_register(form)
+#TODO        services.t_register(form)
             return HttpResponseRedirect('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
@@ -77,13 +78,13 @@ def collection(request, collId):
 
 
     return render(request, 'libraryapp/collection.html', {
-		'collId': collId, 
-		'documents': collection,
-		'documents_json': json.dumps(collection),
-		'up': nav['up'], 
-		'next': nav['next'],
-		'prev': nav['prev'],
-		})
+        'collId': collId, 
+        'documents': collection,
+        'documents_json': json.dumps(collection),
+        'up': nav['up'], 
+        'next': nav['next'],
+        'prev': nav['prev'],
+        })
 
 @t_login_required
 def document(request, collId, docId, page=None):
@@ -92,13 +93,13 @@ def document(request, collId, docId, page=None):
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
     return render(request, 'libraryapp/document.html', {
-		'metadata': full_doc.get('md'), 
-		'pageList': full_doc.get('pageList'),
-		'collId': int(collId),
-		'up': nav['up'],
-		'next': nav['next'],
-		'prev': nav['prev'],
-		})
+        'metadata': full_doc.get('md'), 
+        'pageList': full_doc.get('pageList'),
+        'collId': int(collId),
+        'up': nav['up'],
+        'next': nav['next'],
+        'prev': nav['prev'],
+        })
 
 @t_login_required
 def page(request, collId, docId, page):
@@ -113,21 +114,172 @@ def page(request, collId, docId, page):
     # if there is > 1 we get a list. Solution: put dict in list if dict (or get json from transkribus which is
     # parsed better, but not yet available)
     if isinstance(transcripts, dict):
-	transcripts = [transcripts]
+        transcripts = [transcripts]
 
     nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
     return render(request, 'libraryapp/page.html', {
-		'pagedata': pagedata,
-		'transcripts': transcripts,
+        'pagedata': pagedata,
+        'transcripts': transcripts,
+        'up': nav['up'],
+        'next': nav['next'],
+        'prev': nav['prev'],
+        'collId': collId,
+        'docId': docId,
+        })
+
+@t_login_required
+def transcript(request, collId, docId, page, transcriptId):
+    #t_page returns an array of the transcripts for a page
+    pagedata = services.t_page(request, collId, docId, page) 
+    nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
+
+    pageXML_url = None;
+    for x in pagedata:
+	sys.stdout.write("x in pagedata: %s == %s\r\n" % (x.get("tsId"),transcriptId) )
+        sys.stdout.flush()
+	if int(x.get("tsId")) == int(transcriptId):
+	     pageXML_url = x.get("url")
+	     break
+    sys.stdout.write("PAGEXML URL : %s \r\n" % (pageXML_url) )
+    sys.stdout.flush()
+
+    if pageXML_url:
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	x['md'] = services.t_metadata(x.get("@custom"))
+
+    return render(request, 'libraryapp/transcript.html', {
+		'transcript' : transcript,
+		'regions' : regions,
 		'up': nav['up'],
 		'next': nav['next'],
 		'prev': nav['prev'],
 		'collId': collId,
 		'docId': docId,
+		'pageId': page, #NB actually the number for now
 		})
 
 @t_login_required
+def region(request, collId, docId, page, transcriptId, regionId):
+    # We need to be able to target a transcript (as mentioned elsewhere)
+    # here there is no need for anything over than the pageXML really
+    # we could get one transcript from ...{page}/curr, but for completeness would 
+    # rather use transciptId to target a particular transcript
+    pagedata = services.t_page(request,collId, docId, page) 
+    #we are only using the pagedata to get the pageXML for a particular
+    pageXML_url = None;
+    for x in pagedata:
+	if int(x.get("tsId")) == int(transcriptId):
+	    pageXML_url = x.get("url")
+	    break
+ 
+    if pageXML_url:
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	x['key'] = x.get("@id")
+	if(unicode(regionId) == unicode(x.get("@id"))):
+	    region = x
+
+    nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
+
+#    sys.stdout.write("REGION: %s\r\n" % (region) )
+#    sys.stdout.flush()
+
+    lines = region.get("TextLine")
+    if isinstance(lines, dict):
+        lines = [lines]
+    #parse metadata
+    for x in lines:
+	x['md'] = services.t_metadata(x.get("@custom"))
+
+    return render(request, 'libraryapp/region.html', {
+		'region' : region,
+		'lines' : lines,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
+		'transcriptId': transcriptId,
+		})
+
+@t_login_required
+def line(request, collId, docId, page, transcriptId, regionId, lineId):
+    # We need to be able to target a transcript (as mentioned elsewhere)
+    # here there is no need for anything over than the pageXML really
+    # we could get one transcript from ...{page}/curr, but for completeness would 
+    # rather use transciptId to target a particular transcript
+    pagedata = services.t_page(request,collId, docId, page) 
+    #we are only using the pagedata to get the pageXML for a particular
+    pageXML_url = None;
+    for x in pagedata:
+	if int(x.get("tsId")) == int(transcriptId):
+	    pageXML_url = x.get("url")
+	    break
+ 
+    if pageXML_url:
+	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    #This now officially bonkers....
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    if isinstance(regions, dict):
+	regions = [regions]
+
+    for x in regions:
+	if(unicode(regionId) == unicode(x.get("@id"))):
+	    region = x
+
+    lines=region.get("TextLine");
+
+    if isinstance(lines, dict):
+	lines = [lines]
+
+    for x in lines:
+	x['key'] = x.get("@id")
+	if(unicode(lineId) == unicode(x.get("@id"))):
+	    line = x
+
+    nav = navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
+
+#    sys.stdout.write("REGION: %s\r\n" % (region) )
+#    sys.stdout.flush()
+
+    words = line.get("Word")
+    if isinstance(words, dict):
+        words = [words]
+    #parse metadata
+    if words:
+        for x in words:
+	    x['md'] = services.t_metadata(x.get("@custom"))
+
+    return render(request, 'libraryapp/line.html', {
+		'line' : line,
+		'words' : words,
+		'up': nav['up'],
+		'next': nav['next'],
+		'prev': nav['prev'],
+		'collId': collId,
+		'docId': docId,
+		'pageId': page, #NB actually the number for now
+		'transcriptId': transcriptId,
+		'regionId': regionId,
+		'lineId': lineId,
+		})
+
+
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
     pagedata = services.t_page(request, collId, docId, page) 
@@ -375,7 +527,6 @@ def rand(request, collId, element):
 
     return render(request, 'libraryapp/random.html', {"data": data} )
 
-
 @t_login_required
 def search(request):
     return render(request, 'libraryapp/search.html')
@@ -407,14 +558,24 @@ def collection_noaccess(request, collId):
                 'msg' : "I'm afraid you are not allowed to access this collection",
                 'back' : back,
             })
-    
+
+@t_login_required
+def ingest_mets_xml(request):
+    if request.method == 'POST':
+        #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages?
+        services.t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
+        return HttpResponseRedirect('/thanks/')# TODO Something else!
+    else:
+        ingest_mets_xml_file_form = MetsFileForm()
+        collections = request.session.get("collections")
+        return render(request, 'libraryapp/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
+
 @t_login_required
 def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
-        #if ingest_mets_url_form.is_valid():
         services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))  
-        return HttpResponseRedirect('/thanks/')
+        return HttpResponseRedirect('/thanks/')# TODO Something else!
     else:
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)

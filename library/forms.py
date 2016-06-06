@@ -12,3 +12,6 @@ class IngestMetsUrlForm(forms.Form):
 
 class CollectionForm(forms.Form):
     collection_name = forms.CharField(label='Collection Name', max_length=100)
+
+class MetsFileForm(forms.Form):
+    mets_file = forms.FileField()

@@ -186,6 +186,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     	doc_json = r.content
 
     t_doc = json.loads(doc_json)
+
     pages = t_doc.get("pageList").get("pages")
     for x  in pages:
 	x['key'] = x.get('pageNr') #I'm aware this will replacce the legitimate key....
@@ -324,13 +325,26 @@ def t_metadata(custom_attr):
 
     return t_metadata
 
+
+def t_ingest_mets_xml(collId, mets_file):
+
+    url = settings.TRP_URL+'collections/' + collId + '/createDocFromMets'
+    files = {'mets':  mets_file}
+    r = s.post(url, files=files, verify=False)
+        
+    if r.status_code != requests.codes.ok:
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
+        sys.stdout.flush()
+        return None
+    # TODO What to do when we're successful?'
+
 def t_ingest_mets_url(collId, mets_url):
     
     url = settings.TRP_URL+'collections/' + collId + '/createDocFromMetsUrl'
     params = {'fileName': mets_url}#, 'checkForDuplicateTitle': 'false'}# Perhaps this won't work even for testing! TODO Resolve!
     r = s.post(url, params=params, verify=False)
     
-    sys.stdout.write("Ingesting document from METS XML file: %s%%   \r\n" % (mets_url) )
+    sys.stdout.write("Ingesting document from METS XML file URL: %s%% \r\n" % (mets_url) )
     sys.stdout.flush()
     
     if r.status_code != requests.codes.ok:

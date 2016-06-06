@@ -3,8 +3,9 @@ from django.conf.urls import include, url
 from . import views
 
 urlpatterns = [
-    url(r'^create_collection_modal', views.create_collection_modal, name='create_collection_modal'),
-    url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),           
+    url(r'^create_collection_modal$', views.create_collection_modal, name='create_collection_modal'),
+    url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),
+    url(r'^ingest_mets_xml$', views.ingest_mets_xml, name='ingest_mets_xml'),    
     url(r'^ingest_mets_url$', views.ingest_mets_url, name='ingest_mets_url'),
     
     url(r'^collections$', views.collections, name='collections'),
