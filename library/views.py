@@ -163,7 +163,10 @@ def transcript(request, collId, docId, page, transcriptId):
     if isinstance(regions, dict):
 	regions = [regions]
 
+
     for x in regions:
+        sys.stdout.write("CUSTOM : %s \r\n" % (x.get("@custom")) )
+        sys.stdout.flush()
 	x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/transcript.html', {
@@ -214,8 +217,9 @@ def region(request, collId, docId, page, transcriptId, regionId):
     if isinstance(lines, dict):
         lines = [lines]
     #parse metadata
-    for x in lines:
-	x['md'] = services.t_metadata(x.get("@custom"))
+    if lines:
+        for x in lines:
+	     x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/region.html', {
 		'region' : region,

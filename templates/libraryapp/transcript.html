@@ -30,6 +30,7 @@
 		</dl>
 
 		<p>This transcript has {{ regions|length }} region{% if regions|length != 1 %}s{% endif %}:</p>
+		{% if regions|length > 0 %}
 		<table class="table table-striped">
 		   <thead>
 			<tr><th>ID</th><th>TYPE</th><th>TEXTLINES</th><th>COORDS</th><th>TEXT</th><th>METADATA</th></tr>
@@ -41,8 +42,9 @@
 			<td>{{region|get_item:"@type"}}</td>
 			<td>{{region|get_item:"TextLine"|length}}</td>
 			<td>{% if region|get_item:"Coords" %}<a href="#" title="{{region.Coords|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
-			<td>{{region|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
+			<td>{% if region|get_item:"TextEquiv" %}{{region|get_item:"TextEquiv"|get_item:"Unicode"}}{%else%}No Text{% endif %}</td>
 			<td>
+			   {% if region|get_item:"md" %}
 				<table class="table">
 				{% for class in region|get_item:"md" %}
 					<tr><th colspan="2">{{class}}</th></tr>
@@ -51,14 +53,15 @@
 					{%endfor%}
 				{%endfor%}
 				</table>
+			   {% else %}
+				No custom metadata
+			   {% endif %}
 			</td>
 			</tr>
 		     {% endfor %}
 		   </tbody>
 		</table>
-		{%comment%}
-		<pre>{{transcript}}</pre>
-		{%endcomment%}
+		{%endif%}
             </div>
         </div>
         <!-- /.row -->

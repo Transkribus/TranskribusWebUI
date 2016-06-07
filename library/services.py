@@ -339,7 +339,8 @@ def quote_property(m):
 def t_metadata(custom_attr):
 
     #transcript metadata for this page ie the pageXML
-
+    if not custom_attr:
+	return None
     #CSS parsing (tinycss or cssutils) wasn't much cop so css => json by homemade regex (gulp!)
 
      #TODO rationalise steps
