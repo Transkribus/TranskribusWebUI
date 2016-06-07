@@ -246,6 +246,50 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
 
     return t_page
 
+#returns the current transcript for a page
+def t_current_transcript(request,collId, docId, page):
+
+    #list of transcripts for this page
+    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/curr'
+
+    sys.stdout.write("### IN t_current_transcript: %s   \r\n" % (url) )
+    sys.stdout.flush()
+
+    #we will keep the current page in the session to decrease the number of calls to transkribus
+    if "current_transcript" in request.session :
+	if request.session.get('current_transcript').get('cache_url') == url :
+            sys.stdout.write("### [HAVE CACHE] t_current_transcript HAS CACHED current_transcript for: %s \r\n" % (url) )
+    	    sys.stdout.flush()
+            return request.session['current_transcript']
+
+    headers = {'content-type': 'application/json'}
+    params = {}
+	
+    #for no connection:
+    if settings.OFFLINE:
+	transcript_json = settings.TEST_PAGE_JSON
+    #for connection 
+    else:
+        sys.stdout.write("### [GET REQUEST] t_current_transcript will GET %s with %s \r\n" % (url,params) )
+        sys.stdout.flush()
+    	r = s.get(url, params=params, verify=False, headers=headers)
+    	if r.status_code != requests.codes.ok:
+        	return None
+    	transcript_json = r.content
+
+    t_transcript = json.loads(transcript_json)
+
+    t_transcript['key'] = t_transcript.get('tsId')
+
+    #Cache this to reduce calls on subsequent lower level web-pages
+    #t_page is a list of objects, so where shall we keep the url.... in the first object I guess
+    t_transcript['cache_url'] = url
+    sys.stdout.write("### [CAHCING] t_current_transcript CACHING current_transcript with ref : %s   \r\n" % (t_transcript.get('cache_url')) )
+    sys.stdout.flush()
+    request.session['current_transcript'] = t_transcript
+
+    return t_transcript
+
 def t_transcript(request,transcriptId,url):
 
     #transcript metadata for this page ie the pageXML

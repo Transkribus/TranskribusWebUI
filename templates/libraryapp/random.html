@@ -20,11 +20,15 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    Region view
+                    {{level}} view
                 </h1>
 	    </div>
             <div class="col-md-12 expandable">
-		<pre>{{data}}</pre>
+		{% if text %}
+		<pre>{{text}}</pre>
+		{%else%}
+		<p>The random transcript we found had no text encoded at {{level}} level.</p>
+		{%endif%}
             </div>
         </div>
         <!-- /.row -->
