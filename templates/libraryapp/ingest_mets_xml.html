@@ -16,7 +16,7 @@
 				<form action="ingest_mets_xml" method="post" role="form" enctype="multipart/form-data">
 				    {% csrf_token %}
 				    {% bootstrap_form ingest_mets_xml_form %}
-		        	{% include "libraryapp/collections_dropdown.html" with collections=collections %}
+		        	{% include "libraryapp/collections_dropdown.html"  %}
 		            {% include "libraryapp/create_collection_modal.html" %}
 				    <input class="btn btn-large btn-primary" type="submit" value="Submit" />
 				</form>
