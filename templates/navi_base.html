@@ -31,8 +31,8 @@
                 <li>
                     <a href="#" id="ingest" data-toggle="collapse" data-target="#ingestion" aria-expanded="false">Ingest documents</a>
 						<ul class="nav collapse" id="ingestion" role="menu" aria-labelledby="ingest">
-							<li><a href="ingest_mets_xml">Upload METS XML file</a></li>
-							<li><a href="ingest_mets_url">Enter URL to METS XML file</a></li>
+							<li><a href="{% url 'ingest_mets_xml' %}">Upload METS XML file</a></li>
+							<li><a href="{% url 'ingest_mets_url' %}">Enter URL to METS XML file</a></li>
 						</ul>
                 </li>
                 <li>
