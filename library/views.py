@@ -487,12 +487,30 @@ def ingest_mets_url(request):
         collections = request.session.get("collections")
         return render(request, 'libraryapp/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
 
+@t_login_required
 def collections_dropdown(request):
     collections = services.t_collections()
     return render(request, 'libraryapp/collections_dropdown.html', {'collections': collections})
 
+@t_login_required
 def create_collection_modal(request):
     if (services.t_create_collection(request.POST.get('collection_name'))):
         return HttpResponse("New collection created successfully!", content_type="text/plain")
     #else:
            # TODO Handle failures... 
+
+@t_login_required           
+def jobs_list(request):
+    if ('true' == request.POST.get('only_unfinished')):# TODO Consider making a form instead for persistence?
+        jobs = services.t_jobs('UNFINISHED')# Transkribus does not yet support this as intended. UNFINISHED = RUNNING in Transkribus, which is not what we want here.
+        only_unfinished = 'checked'
+    else:
+        jobs = services.t_jobs()
+        only_unfinished = ''
+    return render(request, 'libraryapp/jobs_list.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
+
+@t_login_required
+def jobs(request):
+    jobs = services.t_jobs('UNFINISHED')# We assume this by default since the list will be shorter like this. And the same thing as stated above applies.
+    only_unfinished = 'checked'
+    return render(request, 'libraryapp/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})

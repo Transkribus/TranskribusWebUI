@@ -407,3 +407,15 @@ def t_create_collection(collection_name):
     sys.stdout.flush()
     
     return r.status_code == requests.codes.ok
+
+def t_jobs(status = ''):
+    url = settings.TRP_URL+'jobs/list'
+    params = {'status': status}
+    r = s.get(url, params=params, verify=False)        
+    if r.status_code != requests.codes.ok:
+       sys.stdout.write("Error getting jobs: %s \r\n ERROR: %s" % (r.status_code, r.content))
+       sys.stdout.flush()
+       return None
+    jobs_json=r.content
+    jobs = json.loads(jobs_json) 
+    return jobs

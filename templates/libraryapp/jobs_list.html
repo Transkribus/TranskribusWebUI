@@ -1,0 +1,20 @@
+<div class="checkbox">
+	<label><input type="checkbox" value="" id="whatToShow"  {{only_unfinished}}>Only show unfinished jobs.</label>			
+</div>
+<table class="table table-striped">
+	<thead>
+		<tr><th>Type</th><th>State</th><th>Description</th><th>Created</th><th>ID</th></tr>
+	</thead>
+   <tbody>
+   		{% for job in jobs %}
+			<tr><td>{{ job.type}}</td><td>{{ job.state}}</td><td>{{ job.description}}</td><td>{{  job.createTime | print_timestamp}}</td><td>{{ job.jobId}}</td></tr>
+		{% endfor %}   
+   </tbody>
+</table>
+<script>
+    $('#whatToShow').change(function(event) {
+    	$.post('jobs_list', {only_unfinished: this.checked, csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) { 
+		 	$('.jobs_list').html(data);
+		});
+	})
+</script>
