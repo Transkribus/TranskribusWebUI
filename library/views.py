@@ -502,7 +502,7 @@ def create_collection_modal(request):
 @t_login_required           
 def jobs_list(request):
     if ('true' == request.POST.get('only_unfinished')):# TODO Consider making a form instead for persistence?
-        jobs = services.t_jobs('UNFINISHED')# Transkribus does not yet support this as intended. UNFINISHED = RUNNING in Transkribus, which is not what we want here.
+        jobs = services.t_jobs('INCOMPLETE')
         only_unfinished = 'checked'
     else:
         jobs = services.t_jobs()
@@ -511,6 +511,6 @@ def jobs_list(request):
 
 @t_login_required
 def jobs(request):
-    jobs = services.t_jobs('UNFINISHED')# We assume this by default since the list will be shorter like this. And the same thing as stated above applies.
+    jobs = services.t_jobs('INCOMPLETE')
     only_unfinished = 'checked'
     return render(request, 'libraryapp/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
