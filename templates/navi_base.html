@@ -1,12 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
 
 {% load staticfiles %}
+
 
 {% block body_content %}
 
 <body>
-
-    <div id="wrapper">
+   <div id="wrapper">
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
@@ -18,43 +20,55 @@
                 </li>
          	<li class="sidebar-brand">
                     <a href="{% url 'index' %}">
-			<h4>Transkribus Library</h4>
+			<h4>{%trans "Transkribus Library" %}</h4>
 		    </a>
 		</li>
 		{% if user.is_authenticated %}
                 <li>
-                    <a href="{% url 'collections' %}">Collections</a>
+                    <a href="{% url 'collections' %}">{% trans "Collections" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'search' %}">Search</a>
+                    <a href="{% url 'search' %}">{% trans "Search" %}</a>
                 </li>
                 <li>
-		    <a href="{% url 'profile' %}">Profile</a>
+		    <a href="{% url 'profile' %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
-		    <a href="{% url 'logout' %}?next={{request.path}}">Logout</a>
+		    <a href="{% url 'logout' %}?next={{request.path}}">{% trans "Logout" %}</a>
                 </li>
 		{% else %}
                 <li>
-		    <a href="{% url 'login' %}?next={{request.path}}">Login</a>
+		    <a href="{% url 'login' %}?next={{request.path}}">{% trans "Login" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'register' %}">Register</a>
+                    <a href="{% url 'register' %}">{% trans "Register" %}</a>
                 </li>
 		{% endif %}
                 <li>
-                    <a href="{% url 'about' %}">About</a>
+                    <a href="{% url 'about' %}">{% trans "About" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'user_guide' %}">User Guide</a>
+                    <a href="{% url 'user_guide' %}">{% trans "User Guide" %}</a>
                 </li>
+		<li>
+	    {% get_current_language as LANGUAGE_CODE %}
+
+
+	<form action="{% url 'set_language' %}" method="post" id="language_switcher">
+
+	    <input name="next" type="hidden" value="{{ request.path }}" />
+		{% csrf_token %}
+		{% bootstrap_form language_form %}
+       	   	<span class="flag-icon flag-icon-{{LANGUAGE_CODE}}"></span>
+	</form>
+	</li>
+
             </ul>
 		<div class="read_nav read_nav_in pull-right">
 	            <ul>
 			<li><a href="#menu-toggle" id="menu-toggle-in" class="menu-toggle btn btn-inverse btn-xs pull-right"><span class="glyphicon glyphicon-chevron-left"><span></a></li>
 		    	{% block nav_buttons_in %}{% endblock %}
 		</div>
-
         </div>
         <!-- /#sidebar-wrapper -->
 
@@ -84,13 +98,12 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>READ - A horizon 2020 e-infrastructure project</p>
+                    <p>{% trans "READ - A horizon 2020 e-infrastructure project" %}</p>
                 </div>
             </div>
         </footer>
     </div>
     <!-- /#wrapper -->
-
     <!-- Menu Toggle Script -->
     <script>
     var sidebar_state = localStorage.getItem("sidebar_state");
@@ -105,7 +118,9 @@
    }
 
 $(document).ready(function(){
-
+ 	    $("#id_language").on("change keyup", function () {
+                $(this).closest("form").submit();
+            });
 });
     </script>
 </body>

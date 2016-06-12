@@ -31,7 +31,7 @@
      {% endfor %}
 	</ul>
 -->
-	<p>This document was uploaded by <a href="{%url 'users' collId metadata.uploaderId %}">{{metadata.uploader}}</a>.</p>
+	<p>{% trans "This document was uploaded by " %}<a href="{%url 'users' collId metadata.uploaderId %}">{{metadata.uploader}}</a>.</p>
      {% if metadata.collectionList.colList|length > 1 %}
 	<p>This document is a also a member of the following collection{% if metadata.collectionList.colList|length > 2 %}s{% endif %}</p>
 	<ul>
@@ -46,7 +46,7 @@
 
 	<table class="table table-striped">
 	   <thead>
-		<tr><th>ID</th><th>Page number</th><th>Image file name</th><th>Transcripts</th></tr>
+		<tr><th>{% trans "ID" %}</th><th>{% trans "Page number" %}</th><th>{% trans "Image file name" %}</th><th>{% trans "Transcripts" %}</th></tr>
 	   </thead>
 	   <tbody>
 	     {% for page in pageList.pages %}

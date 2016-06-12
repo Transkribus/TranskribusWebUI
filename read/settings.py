@@ -50,6 +50,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'
@@ -65,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+    		"library.context_processors.language_form_context_processor",
             ],
 	    'libraries' : {
 		'library_tags': 'library.templatetags',
@@ -109,7 +111,34 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+from django.utils.translation import ugettext_lazy as _
+LANGUAGES = [
+	('bg', _('Bulgarian')),
+	('hr', _('Croatian')),
+	('cs', _('Czech')),
+	('da', _('Danish')),
+	('nl', _('Dutch')),
+	('en', _('English')),
+	('et', _('Estonian')),
+	('fi', _('Finnish')),
+	('fr', _('French')),
+	('de', _('German')),
+	('el', _('Greek')),
+	('hu', _('Hungarian')),
+	('ga', _('Irish')),
+	('it', _('Italian')),
+	('lv', _('Latvian')),
+	('lt', _('Lithuanian')),
+#	('mt', _('Maltese')), NO MALTESE IN DJANGO
+	('pl', _('Polish')),
+	('pt', _('Portuguese')),
+	('ro', _('Romanian')),
+	('sk', _('Slovak')),
+	('sl', _('Slovenian')),
+	('es', _('Spanish')),
+	('sv', _('Swedish')),
+];
 
 TIME_ZONE = 'UTC'
 
@@ -119,6 +148,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale"),
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/

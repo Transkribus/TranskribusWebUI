@@ -1,4 +1,7 @@
 from django import forms
+from django.utils import translation
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 class RegisterForm(forms.Form):
     given_name = forms.CharField(label='Given Name', max_length=100)
@@ -15,3 +18,7 @@ class CollectionForm(forms.Form):
 
 class MetsFileForm(forms.Form):
     mets_file = forms.FileField()
+
+class LanguageForm(forms.Form):
+    language = forms.ChoiceField(label=_('Language'),choices=settings.LANGUAGES)
+
