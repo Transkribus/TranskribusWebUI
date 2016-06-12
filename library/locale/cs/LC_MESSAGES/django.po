@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-12 20:03+0100\n"
+"POT-Creation-Date: 2016-06-12 20:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: forms.py:7
 msgid "Given Name"
@@ -38,10 +38,8 @@ msgid "Password"
 msgstr ""
 
 #: forms.py:17
-#, fuzzy
-#| msgid "Collections"
 msgid "Collection Name"
-msgstr "Collections"
+msgstr ""
 
 #: forms.py:23
 msgid "Language"
@@ -50,9 +48,3 @@ msgstr ""
 #: views.py:508
 msgid "I'm afraid you are not allowed to access this collection"
 msgstr ""
-
-#~ msgid "Welcome to our page"
-#~ msgstr "Bienvenue sur notre page"
-
-#~ msgid "Transkribus Library"
-#~ msgstr "Bibliothèque Transkribus"
