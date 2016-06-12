@@ -25,6 +25,9 @@ import random
 
 def register(request):
 #TODO this is generic guff need to extend form for extra fields, send reg data to transkribus and authticate (which will handle the user creation)
+
+    if request.user.is_authenticated(): #shouldn't really happen but...
+            return HttpResponseRedirect('/library/')
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -174,11 +177,11 @@ def transcript(request, collId, docId, page, transcriptId):
     if isinstance(regions, dict):
 	regions = [regions]
 
-
-    for x in regions:
-        sys.stdout.write("CUSTOM : %s \r\n" % (x.get("@custom")) )
-        sys.stdout.flush()
-	x['md'] = services.t_metadata(x.get("@custom"))
+    if regions:
+        for x in regions:
+            sys.stdout.write("CUSTOM : %s \r\n" % (x.get("@custom")) )
+            sys.stdout.flush()
+	    x['md'] = services.t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/transcript.html', {
 		'transcript' : transcript,

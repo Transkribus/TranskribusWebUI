@@ -1,4 +1,6 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
+
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -25,15 +27,15 @@
 	    </div>
             <div class="col-md-12 expandable">
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ pagedata.pageId }}</dd>
-		<dt>Page Number</dt><dd>{{ pagedata.pageNr }}</dd>
-		<dt>Image</dt><dd><img src="{{ pagedata.thumbUrl }}"/></dd>
+		<dt>{% trans "ID" %}</dt><dd>{{ pagedata.pageId }}</dd>
+		<dt>{% trans "Page Number" %}</dt><dd>{{ pagedata.pageNr }}</dd>
+		<dt>{% trans "Image" %}</dt><dd><img src="{{ pagedata.thumbUrl }}"/></dd>
 		</dl>
 
 		<p>This page has {{ transcripts|length }} transcript{% if transcripts|length != 1 %}s{% endif %}:</p>
 		<table class="table table-striped">
 		   <thead>
-			<tr><th>ID</th><th>URL</th><th>Status</th><th>Transcriber</th><th>timestamp</th></tr>
+			<tr><th>{% trans "ID" %}</th><th>{% trans "URL" %}</th><th>{% trans "Status" %}</th><th>{% trans "Transcriber" %}</th><th>{% trans "timestamp" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for ts in transcripts %}
