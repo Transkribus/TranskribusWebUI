@@ -419,3 +419,15 @@ def t_jobs(status = ''):
     jobs_json=r.content
     jobs = json.loads(jobs_json) 
     return jobs
+
+def t_job_count(status = ''):
+    url = settings.TRP_URL+'jobs/count'
+    params = {'status': status}
+    r = s.get(url, params=params, verify=False)        
+    if r.status_code != requests.codes.ok:
+       sys.stdout.write("Error getting job count: %s \r\n ERROR: %s" % (r.status_code, r.content))
+       sys.stdout.flush()
+       return None
+    count=r.content 
+    return count
+
