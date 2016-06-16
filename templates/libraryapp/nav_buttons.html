@@ -1,10 +1,12 @@
+{% load i18n %}
+
 {% if up %}
-<li><a href="{{up}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">up<span></a></li>
+<li><a href="{{up}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">{% trans "up" %}<span></a></li>
 {% endif %}
 {% if next %}
-    <li><a href="{{next}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">next<span></a></li>
+    <li><a href="{{next}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">{% trans "next" %}<span></a></li>
 {% endif %}
 {% if prev %}
-    <li><a href="{{prev}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">prev<span></a></li>
+    <li><a href="{{prev}}" id="" class="btn btn-default btn-xs {% if out %}pull-left{%else%}pull-right btn-inverse{%endif%}"><span class="">{% trans "prev" %}<span></a></li>
 {% endif %}
 

@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <div class="collections form-group">
-	<label for="collection">Select collection</label>
+	<label for="collection">{% trans "Select collection" %}</label>
 	<select class="form-control" name="collection">
 		{% for coll in collections %}
 			<option value="{{ coll.colId }}">{{ coll.colName }}</option>

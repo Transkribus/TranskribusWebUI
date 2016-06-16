@@ -1,4 +1,5 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
 
 {% block content %}
 
@@ -13,10 +14,8 @@
 			We have a slight problem
                 </h1>
 		<p>{{ msg }}</p>
-		{% if back %}<p>Return to the <a href="{{back}}">previous page</a></p>{% endif %}
-		<p>Or to the READ WebUI <a href="{% url 'index' %}">home page</a></p>
-
-
+		{% if back %}<p>{% trans "Return to the " %}<a href="{{back}}">{% trans "previous page" %}</a></p>{% endif %}
+		<p>{% trans "Or to the READ WebUI " %}<a href="{% url 'index' %}">{% trans "home page" %}</a></p>
 	    </div>
 	</div>
     </div>	

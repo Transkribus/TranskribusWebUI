@@ -1,4 +1,5 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
 
 {% block content %}
 
@@ -10,10 +11,10 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    Users
+                    {% trans "Users" %}
                 </h1>
 
-		<p>Show as much as we are allowed to see about this user (perhaps a lot if we are a collection owner?)</p>
+		<p>{% trans "Show as much as we are allowed to see about this user (perhaps a lot if we are a collection owner?)" %}</p>
 	    </div>
 	</div>
     </div>	

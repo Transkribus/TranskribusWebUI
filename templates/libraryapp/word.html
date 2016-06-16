@@ -1,4 +1,6 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
+
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -26,14 +28,14 @@
             <div class="col-md-12 expandable">
 
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ word|get_item:"@id" }}</dd>
-		<dt>Text</dt><dd>{{ word|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
-		<dt>Language</dt><dd>{{ word|get_item:"@PrimaryLanguage" }}</dd>
-		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+		<dt>{% trans "ID" %}</dt><dd>{{ word|get_item:"@id" }}</dd>
+		<dt>{% trans "Text" %}</dt><dd>{{ word|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
+		<dt>{% trans "Language" %}</dt><dd>{{ word|get_item:"@PrimaryLanguage" }}</dd>
+		<dt>{% trans "Image" %}</dt><dd style="color: red;">{% trans "Use coords + IIIF to pull image of region?" %}</dd>
 
 		</dl>
 
-		<p>This word has some metadata:</p>
+		<p>{% trans "This word has some metadata:" %}</p>
 
 		<table class="table table-striped">
 		{% for class in word|get_item:"md" %}

@@ -1,8 +1,10 @@
-		<p>You are a member of the following {{ collections|length }} collections:</p>
+{% load i18n %}
+
+	<p>You are a member of the following {{ collections|length }} collections:</p>
 
 		<table class="table table-striped">
 		   <thead>
-	  		<tr><th>ID</th><th>Collection</th><th>Description</th><th>Role</th></tr>
+	  		<tr><th>{% trans "ID" %}</th><th>{% trans "Collection" %}</th><th>{% trans "Description" %}</th><th>{% trans "Role" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for coll in collections %}

@@ -1,4 +1,6 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
+
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -26,25 +28,25 @@
             <div class="col-md-12 expandable">
 
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ line|get_item:"@id" }}</dd>
-		<dt>Text</dt><dd>{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
-		<dt>Primary language</dt><dd>{{ line|get_item:"@PrimaryLanguage" }}</dd>
-		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+		<dt>{% trans "ID" %}</dt><dd>{{ line|get_item:"@id" }}</dd>
+		<dt>{% trans "Text" %}</dt><dd>{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
+		<dt>{% trans "Primary language" %}</dt><dd>{{ line|get_item:"@PrimaryLanguage" }}</dd>
+		<dt>{% trans "Image" %}</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
 
 		</dl>
 		<p>This line has {{ words|length }} word{% if words|length != 1 %}s{% endif %}:</p>
 		{% if words|length > 0 %}
 		<table class="table table-striped">
 		   <thead>
-			<tr><th>ID</th><th>LETTERS</th><th>COORDS</th><th>BASELINE</th><th>TEXT</th><th>METADATA</th><th>LANGUAGE</th></tr>
+			<tr><th>{% trans "ID" %}</th><th>{% trans "LETTERS" %}</th><th>{% trans "COORDS" %}</th><th>{% trans "BASELINE" %}</th><th>{% trans "TEXT" %}</th><th>{% trans "METADATA" %}</th><th>{% trans "LANGUAGE" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for word in words %}
 			<tr>
 			<td><a href="{%url 'word' collId docId pageId transcriptId regionId lineId word|get_item:"@id"%}">{{word|get_item:"@id"}}</a></td>
 			<td>{{word|get_item:"TextEquiv"|get_item:"Unicode"|length}}</td>
-			<td>{% if word|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{word.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">Yes</a>{%else%}No{%endif%}</td>
-			<td>{% if word|get_item:"Baseline" %}<a href="#" title="{{word.Baseline|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
+			<td>{% if word|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{word.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">{% trans "Yes" %}</a>{%else%}{% trans "No" %}{%endif%}</td>
+			<td>{% if word|get_item:"Baseline" %}<a href="#" title="{{word.Baseline|get_item:"@points"}}">{% trans "Yes" %}</a>{%else%}No{%endif%}</td>
 			<td>{{word|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
 			<td>
 				<table class="table">

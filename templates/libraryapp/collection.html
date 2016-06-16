@@ -1,5 +1,5 @@
 {% extends "navi_base.html" %}
-
+{% load i18n %}
 
 {% block nav_buttons_out %}
 {% include "libraryapp/nav_buttons.html" with out=True %}
@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    Collection Browse for {{collection.title}}
+                    Collection Browse for {{collection.colName}}
                 </h1>
 	    </div>
 
@@ -29,7 +29,7 @@
 
 		<table class="table table-striped">
 		   <thead>
-	  		<tr><th>ID</th><th>Collection</th><th>Author</th><th>Pages</th></tr>
+	  		<tr><th>{% trans "ID" %}</th><th>{% trans "DOCUMENT" %}</th><th>{% trans "AUTHOR" %}</th><th>{% trans "PAGES" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for doc in documents %}
@@ -37,6 +37,18 @@
 		     {% endfor %}
 		   </tbody>
 		</table>
+		<p>From this collection (if available) get a random:</p>
+		<ul>
+	{%comment%}
+			<li><a href="{% url 'random' collection.colId 'region' %}">{% trans "Region" %}</a></li>
+			<li><a href="{% url 'random' collection.colId 'line' %}">{% trans "Line" %}</a></li>
+			<li><a href="{% url 'random' collection.colId 'word' %}">{% trans "Word" %}</a></li>
+	{%endcomment%}
+			<li><a href="/library/random/{{collection.colId}}/region">{% trans "Region" %}</a></li>
+			<li><a href="/library/random/{{collection.colId}}/line">{% trans "Line" %}</a></li>
+			<li><a href="/library/random/{{collection.colId}}/word">{% trans "Word" %}</a></li>
+
+		</ul>
 	    </div>
 	</div>
         <div class="row">
@@ -61,8 +73,7 @@
             <div class="col-md-8 expandable thumbnails">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-		    	<h4><i class="fa fa-fw fa-gift"></i>Thumbnnails
-			   <a href="#" id="thumbnails_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
+		    	<h4><i class="fa fa-fw fa-gift"></i>{% trans "Thumbnnails" %}<a href="#" id="thumbnails_full" class="panel-expand btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-chevron-right"><span></a>
 			   <a href="#" id="thumbnails_mini" class="panel-shrink btn btn-default btn-sm pull-right" style="display: none;"><span class="glyphicon glyphicon-chevron-left"><span></a>
 			</h4>
                     </div>

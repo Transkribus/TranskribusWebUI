@@ -1,4 +1,5 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -26,14 +27,14 @@
             <div class="col-md-12 expandable">
 
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ transcript.tsId }}</dd>
+		<dt>{% trans "ID" %}</dt><dd>{{ transcript.tsId }}</dd>
 		</dl>
 
 		<p>This transcript has {{ regions|length }} region{% if regions|length != 1 %}s{% endif %}:</p>
 		{% if regions|length > 0 %}
 		<table class="table table-striped">
 		   <thead>
-			<tr><th>ID</th><th>TYPE</th><th>TEXTLINES</th><th>COORDS</th><th>TEXT</th><th>METADATA</th></tr>
+			<tr><th>{% trans "ID" %}</th><th>{% trans "TYPE" %}</th><th>{% trans "TEXTLINES" %}</th><th>{% trans "COORDS" %}</th><th>{% trans "TEXT" %}</th><th>{% trans "METADATA" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for region in regions %}
@@ -41,8 +42,8 @@
 			<td><a href="{% url 'region' collId docId pageId transcript.tsId region|get_item:"@id" %}">{{region|get_item:"@id"}}</a></td>
 			<td>{{region|get_item:"@type"}}</td>
 			<td>{{region|get_item:"TextLine"|length}}</td>
-			<td>{% if region|get_item:"Coords" %}<a href="#" title="{{region.Coords|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
-			<td>{% if region|get_item:"TextEquiv" %}{{region|get_item:"TextEquiv"|get_item:"Unicode"}}{%else%}No Text{% endif %}</td>
+			<td>{% if region|get_item:"Coords" %}<a href="#" title="{{region.Coords|get_item:"@points"}}">{% trans "Yes" %}</a>{%else%}{% trans "No" %}{%endif%}</td>
+			<td>{% if region|get_item:"TextEquiv" %}{{region|get_item:"TextEquiv"|get_item:"Unicode"}}{%else%}{% trans "No Text" %}{% endif %}</td>
 			<td>
 			   {% if region|get_item:"md" %}
 				<table class="table">

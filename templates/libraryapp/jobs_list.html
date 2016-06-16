@@ -1,9 +1,11 @@
+{% load i18n %}
+
 <div class="checkbox">
-	<label><input type="checkbox" value="" id="whatToShow"  {{only_unfinished}}>Only show unfinished jobs.</label>			
+	<label><input type="checkbox" value="" id="whatToShow"  {{only_unfinished}}>{% trans "Only show unfinished jobs." %}</label>			
 </div>
 <table class="table table-striped">
 	<thead>
-		<tr><th>Type</th><th>State</th><th>Description</th><th>Created</th><th>ID</th></tr>
+		<tr><th>{% trans "Type" %}</th><th>{% trans "State" %}</th><th>{% trans "Description" %}</th><th>{% trans "Created" %}</th><th>{% trans "ID" %}</th></tr>
 	</thead>
    <tbody>
    		{% for job in jobs %}

@@ -41,23 +41,10 @@ $(document).ready(function(){
            e.preventDefault();
 
     	});
-
+	if(typeof t_data === "undefined") t_data = [];
 //	$(".pager").hide();
 	$("#collections_tree").fancytree({
 		  source: t_data,  //source in from transkribus
-	/*
-	 * Minimal structure for fancytree rendering
-	 * [
-		    {title: "Collection", key: "1", folder: true, children: [
-			      {title: "Document", key: "1.1"},
-			      {title: "Document", key: "1.2"}	
-		    ]},
-		    {title: "Collection", key: "2", folder: true, children: [
-		      {title: "Document", key: "2.1"},
-		      {title: "Document", key: "2.2"}
-		    ]}
-		  ],
-	*/
 		  extensions: ["glyph", "wide"],
 		  glyph: glyph_opts,
 		  checkbox: true,

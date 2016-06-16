@@ -1,4 +1,6 @@
 {% extends "navi_base.html" %}
+{% load i18n %}
+
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -26,24 +28,24 @@
             <div class="col-md-12 expandable">
 
 		<dl class="dl-horizontal">
-		<dt>ID</dt><dd>{{ region|get_item:"@id" }}</dd>
-		<dt>Type</dt><dd>{{ region|get_item:"@type" }}</dd>
-		<dt>Text</dt><dd>{% if region|get_item:"TextEquiv" %}{{ region|get_item:"TextEquiv"|get_item:"Unicode" }}{%else%}No text{%endif%}</dd>
-		<dt>Image</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+		<dt>{% trans "ID" %}</dt><dd>{{ region|get_item:"@id" }}</dd>
+		<dt>{% trans "Type" %}</dt><dd>{{ region|get_item:"@type" }}</dd>
+		<dt>{% trans "Text" %}</dt><dd>{% if region|get_item:"TextEquiv" %}{{ region|get_item:"TextEquiv"|get_item:"Unicode" }}{%else%}No text{%endif%}</dd>
+		<dt>{% trans "Image" %}</dt><dd style="color: red;">{% trans "Use coords + IIIF to pull image of region?" %}</dd>
 
 		</dl>
 		<p>This region has {{ lines|length }} line{% if lines|length != 1 %}s{% endif %}:</p>
 		{% if lines|length > 0 %}
 		<table class="table table-striped">
 		   <thead>
-			<tr><th>ID</th><th>WORDS</th><th>COORDS</th><th>BASELINE</th><th>TEXT</th><th>METADATA</th><th>LANGUAGE</th></tr>
+			<tr><th>{% trans "ID" %}</th><th>{% trans "WORDS" %}</th><th>{% trans "COORDS" %}</th><th>{% trans "BASELINE" %}</th><th>{% trans "TEXT" %}</th><th>{% trans "METADATA" %}</th><th>{% trans "LANGUAGE" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for line in lines %}
 			<tr>
 			<td><a href="{% url 'line' collId docId pageId transcriptId region|get_item:"@id" line|get_item:"@id"  %}">{{line|get_item:"@id"}}</a></td><td>{{line|get_item:"Word"|length}}</td>
-			<td>{% if line|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{line.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">Yes</a>{%else%}No{%endif%}</td>
-			<td>{% if line|get_item:"Baseline" %}<a href="#" title="{{line.Baseline|get_item:"@points"}}">Yes</a>{%else%}No{%endif%}</td>
+			<td>{% if line|get_item:"Coords" %}<a href="#" title="Link to portion of image denoted by: {{line.Coords|get_item:"@points"}} If possible using IIIF url to get from IIIF compliant image server?">{% trans "Yes" %}</a>{%else%}{% trans "No" %}{%endif%}</td>
+			<td>{% if line|get_item:"Baseline" %}<a href="#" title="{{line.Baseline|get_item:"@points"}}">{% trans "Yes" %}</a>{%else%}{% trans "No" %}{%endif%}</td>
 			<td>{{line|get_item:"TextEquiv"|get_item:"Unicode"}}</td>
 			<td>
 				<table class="table">
@@ -61,9 +63,6 @@
 		   </tbody>
 		</table>
 		{%endif%}
-{%comment%}
-		<pre>{{region}}</pre>
-{%endcomment%}
             </div>
         </div>
         <!-- /.row -->
