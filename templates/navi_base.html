@@ -1,202 +1,190 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
-
 {% load staticfiles %}
-
-
 {% block body_content %}
 
 <body>
-   <div id="wrapper">
-
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="http://read.transkribus.eu/">
-                        <img src="{% static "images/read.png" %}" />
-                    </a>
-                </li>
-         	<li class="sidebar-brand">
-                    <a href="{% url 'index' %}">
-			<h4>{%trans "Transkribus Library" %}</h4>
-		    </a>
-		</li>
-		{% if user.is_authenticated %}
-                <li>
-                    <a href="{% url 'collections' %}">{% trans "Collections" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'search' %}">{% trans "Search" %}</a>
-                </li>
-                <li>
-                    <a href="#" id="ingest" data-toggle="collapse" data-target="#ingestion" aria-expanded="false">Ingest documents</a>
+	<div class="changed-jobs-modal"></div>
+	<div id="wrapper"><!-- Sidebar -->
+		<div id="sidebar-wrapper">
+			<ul class="sidebar-nav" style="padding-left: 10px; padding-right: 10px;">
+				<li class="sidebar-brand">
+					<a href="http://read.transkribus.eu/"><img src="{% static "images/read.png" %}" /></a>
+				</li>
+				<li class="sidebar-brand">
+					<a href="{% url 'index' %}"><h4>{%trans "Transkribus Library" %}</h4></a>
+				</li>
+				{% if user.is_authenticated %}
+					<li>
+						<a href="{% url 'collections' %}">{% trans "Collections" %}</a>
+					</li>
+					<li>
+						<a href="{% url 'search' %}">{% trans "Search" %}</a>
+					</li>
+					<li>
+						<a href="#" id="ingest" data-toggle="collapse" data-target="#ingestion" aria-expanded="false">{% trans "Ingest documents" %}</a>
 						<ul class="nav collapse" id="ingestion" role="menu" aria-labelledby="ingest">
-							<li><a href="{% url 'ingest_mets_xml' %}">Upload METS XML file</a></li>
-							<li><a href="{% url 'ingest_mets_url' %}">Enter URL to METS XML file</a></li>
+							<li><a href="{% url 'ingest_mets_xml' %}">{% trans "Upload METS XML file" %}</a></li>
+							<li><a href="{% url 'ingest_mets_url' %}">{% trans "Enter URL to METS XML file" %}</a></li>
 						</ul>
-                </li>
-                <li>
-		   			<a href="{% url 'profile' %}">Profile</a>
-                </li>
-                <li>
-		    		<a href="{% url 'logout' %}?next={{request.path}}">Logout</a>
-                </li>
-		{% else %}
-                <li>
-		    <a href="{% url 'login' %}?next={{request.path}}">{% trans "Login" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'register' %}">{% trans "Register" %}</a>
-                </li>
-		{% endif %}
-                <li>
-                    <a href="{% url 'about' %}">{% trans "About" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'user_guide' %}">{% trans "User Guide" %}</a>
-                </li>
-		{% if user.is_authenticated %}
-             	<li class="sidebar-brand collapse job-notification">
-                	 <div class="badge">
-						<a href="{% url 'jobs' %}">Job status changed!</a>
-                	</div>  
-            	</li>
-		{% endif %}
-		<li>
-	    {% get_current_language as LANGUAGE_CODE %}
-
-
-	<form action="{% url 'set_language' %}" method="post" id="language_switcher">
-
-	    <input name="next" type="hidden" value="{{ request.path }}" />
-		{% csrf_token %}
-		{% bootstrap_form language_form %}
-       	   	<span class="flag-icon flag-icon-{{LANGUAGE_CODE}}"></span>
-	</form>
-	</li>
-
-            </ul>
-		<div class="read_nav read_nav_in pull-right">
-	            <ul>
-			<li><a href="#menu-toggle" id="menu-toggle-in" class="menu-toggle btn btn-inverse btn-xs pull-right"><span class="glyphicon glyphicon-chevron-left"><span></a></li>
-		    	{% block nav_buttons_in %}{% endblock %}
-		</div>
-        </div>
-        <!-- /#sidebar-wrapper -->
-
-        <!-- Page Content -->
-	<div>
-
-        <div id="page-content-wrapper">
-	   <div class="read_nav read_nav_out pull-left">
-		   <ul>
-		      <li><a href="#menu-toggle" id="menu-toggle-out" class="menu-toggle btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-chevron-right"><span></a></li>
-		    	{% block nav_buttons_out %}{% endblock %}
-		   </ul>
-	    </div>
-
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-			    {% block content %}{% endblock %}
-                    </div>
-                </div>
-            </div>
-        </div>
-	</div>
-        <!-- /#page-content-wrapper -->
-
-        <!-- Footer -->
-        <footer>
-            <div class="row">
-                <div class="col-lg-12">
-                    <p>{% trans "READ - A horizon 2020 e-infrastructure project" %}</p>
-                </div>
-            </div>
-        </footer>
-    </div>
-    <!-- /#wrapper -->
-    <!-- Menu Toggle Script -->
-    <script>
-	    var sidebar_state = localStorage.getItem("sidebar_state");
-	    
-		function getCookie(cookieName) {
-		    var cookieArray = document.cookie.split(';');
-		    for(var i = 0; i < cookieArray.length; i++) {
-		        var cookie = cookieArray[i];
-		        while (cookie.charAt(0)==' ') {
-		            cookie = cookie.substring(1);
-		        }
-		        if (cookie.indexOf(cookieName) == 0) {
-		            return cookie.substring(cookieName.length + 1, cookie.length);
-		        }
+					</li>
+					<li>
+						<a href="{% url 'profile' %}">{% trans "Profile"%}</a>
+					</li>
+					<li>
+						<a href="{% url 'logout' %}?next={{request.path}}">{% trans "Logout" %}</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="{% url 'login' %}?next={{request.path}}">{% trans "Login" %}</a>
+					</li>
+					<li>
+						<a href="{% url 'register' %}">{% trans "Register" %}</a>
+					</li>
+				{% endif %}
+				<li>
+					<a href="{% url 'about' %}">{% trans "About" %}</a>
+				</li>
+				<li>
+					<a href="{% url 'user_guide' %}">{% trans "User Guide" %}</a>
+				</li>
+				<li>
+				{% get_current_language as LANGUAGE_CODE %}
+				<form action="{% url 'set_language' %}" method="post" id="language_switcher">
+					<input name="next" type="hidden" value="{{ request.path }}" />
+					{% csrf_token %}
+					{% bootstrap_form language_form %}
+					<span class="flag-icon flag-icon-{{LANGUAGE_CODE}}"></span>
+				</form>
+				</li>
+				{% if user.is_authenticated %}
+					<li>
+						<div class="alert alert-info job-notification collapse" role="alert">
+							<button type="button" class="close job-notification-close"  aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<strong>{% trans "Job status changed!" %}</strong>
+							<a href="#" class="alert-link job-notification-close"  data-toggle="modal" data-target="#changedJobsModal">{% trans "Details." %}</a>
+						</div>
+					</li>
+				{% endif %}		
+			</ul>
+			<div class="read_nav read_nav_in pull-right">
+				<ul>
+					<li><a href="#menu-toggle" id="menu-toggle-in" class="menu-toggle btn btn-inverse btn-xs pull-right"><span class="glyphicon glyphicon-chevron-left"><span></a></li>
+				</ul>
+				{% block nav_buttons_in %}{% endblock %}
+			</div>
+		</div><!-- /#sidebar-wrapper -->
+		<div id="page-content-wrapper"><!-- Page Content -->
+			<div class="read_nav read_nav_out pull-left">
+				<ul>
+					<li><a href="#menu-toggle" id="menu-toggle-out" class="menu-toggle btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-chevron-right"><span></a></li>
+					{% block nav_buttons_out %}{% endblock %}
+				</ul>
+			</div>		
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						{% block content %}{% endblock %}
+					</div>
+				</div>
+			</div>
+		</div><!-- /#page-content-wrapper -->
+		<footer>
+			<div class="row">
+				<div class="col-lg-12">
+					<p>{% trans "READ - A horizon 2020 e-infrastructure project" %}
+				</div>
+			</div>
+		</footer>
+	</div><!-- /#wrapper -->
+	
+	<!-- Menu Toggle Script -->
+	<script>
+		    var sidebar_state = localStorage.getItem("sidebar_state");
+		    var jobs_changed = false; 
+		    
+			function getCookie(cookieName) {
+			    var cookieArray = document.cookie.split(';');
+			    for(var i = 0; i < cookieArray.length; i++) {
+			        var cookie = cookieArray[i];
+			        while (cookie.charAt(0)==' ') {
+			            cookie = cookie.substring(1);
+			        }
+			        if (cookie.indexOf(cookieName) == 0) {
+			            return cookie.substring(cookieName.length + 1, cookie.length);
+			        }
+				}
+				return "";
 			}
-			return "";
-		}
+			
+			function compareJobCounts(json) {
+				jobs = getCookie("jobs");
+				stringified = JSON.stringify(json);
+				if ("" == jobs) {// TODO Decide whether to consider changes in jobs between sessions worth informing the user about. Cookie expiration decides this. 
+					document.cookie = "jobs=" + stringified; 
+				} else if (jobs != stringified) {
+					jobs_changed = true;
+					document.cookie = "jobs=" + stringified;
+				}
+				if (jobs_changed) {// TODO Optimize this, it's dumb.
+					if("" == $('.changed-jobs-modal').html()) {// Are we already showing the modal?
+						$('.changed-jobs-modal').load("{% url 'changed_jobs_modal' %}");// No, prepare it.
+						$('.job-notification').show();// And show the alert. We don't show this, if the modal is already shown.
+					} else {
+						$('.changed-jobs-content').load("{% url 'jobs_list_compact' %}");// Refresh the modal if job statuses have changed since it was shown.
+					}						
+				}
+			}
 		
-		function compareJobCounts(json) {
-			jobs = getCookie("jobs");
-			stringified = JSON.stringify(json);
-			if ("" == jobs) {// TODO Decide whether to consider changes in jobs between sessions worth informing the user about. If so, how? For now we only informa about jobs that change during a session. 
-				document.cookie = "jobs=" + stringified;
-			} else if (jobs != stringified) {
-				$('.job-notification').show();
-				// TODO A modal instead of a link to the jobs page!?
-				document.cookie = "jobs=" + stringified;
+			function jobCountsPoll() { 
+				setTimeout(function(){
+					$.ajax({ url: "job_count", method: 'GET', success: function(json) {
+						compareJobCounts(json);
+						jobCountsPoll();
+					}});
+				}, 5000);// How frequent?
 			}
-		}
-	
-		function jobCountsPoll() { 
-			setTimeout(function(){
-				$.ajax({ url: "job_count", method: 'GET', success: function(json) {
-					compareJobCounts(json);
+		
+		    if (sidebar_state === "in") {
+		        $("#wrapper").toggleClass("toggled");
+				//	$("#menu-toggle-out").show();
+				$(".read_nav_out").show();
+				$(".read_nav_in").hide();
+		    } else {
+				$(".read_nav_in").show();
+				$(".read_nav_out").hide();
+		   }
+		
+			window.onload = function() {// TODO Only for logged in users.
+				{% if user.is_authenticated %}
 					jobCountsPoll();
-				}});
-			}, 5000);// How frequent?
-		}
-	
+					$(".job-notification-close").click(function(event) {
+			    		$('.job-notification').hide();
+			    		jobs_changed = false;// The user acknowledges the status change(s)
+				  	});
+				{% endif %}
+			}
+		
+	    var sidebar_state = localStorage.getItem("sidebar_state");
 	    if (sidebar_state === "in") {
 	        $("#wrapper").toggleClass("toggled");
-			//	$("#menu-toggle-out").show();
+		//	$("#menu-toggle-out").show();
 			$(".read_nav_out").show();
 			$(".read_nav_in").hide();
 	    } else {
 			$(".read_nav_in").show();
 			$(".read_nav_out").hide();
-	   }
-	
-		window.onload = function() {// TODO Only for logged in users.
-			{% if user.is_authenticated %}
-				jobCountsPoll();
-				$(".job-notification").click(function(event) {
-		    		$('.job-notification').hide();
-			  	});
-				
-			{% endif %}
 		}
 	
-		$(document).ready(function(){
-			// Using this does not work. No idea why but the code above does what's needed. 
-		});	
-    var sidebar_state = localStorage.getItem("sidebar_state");
-    if(sidebar_state === "in"){
-        $("#wrapper").toggleClass("toggled");
-//	$("#menu-toggle-out").show();
-	$(".read_nav_out").show();
-	$(".read_nav_in").hide();
-    }else{
-	$(".read_nav_in").show();
-	$(".read_nav_out").hide();
-   }
-
-$(document).ready(function(){
- 	    $("#id_language").on("change keyup", function () {
-                $(this).closest("form").submit();
-            });
-});
+	$(document).ready(function(){
+		$("#id_language").on("change keyup", function () {
+			$(this).closest("form").submit();
+		});
+	});
+	
     </script>
+	    
 </body>
 
 {% endblock body_content %}

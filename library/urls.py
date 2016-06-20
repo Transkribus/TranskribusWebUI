@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^changed_jobs_modal$', views.changed_jobs_modal, name='changed_jobs_modal'),
     url(r'^jobs$', views.jobs, name='jobs'),
     url(r'^jobs_list$', views.jobs_list, name='jobs_list'),
+    url(r'^jobs_list_compact$', views.jobs_list_compact, name='jobs_list_compact'),
     url(r'^create_collection_modal$', views.create_collection_modal, name='create_collection_modal'),
     url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),
     url(r'^ingest_mets_xml$', views.ingest_mets_xml, name='ingest_mets_xml'),    
