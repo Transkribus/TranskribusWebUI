@@ -569,6 +569,12 @@ def job_count(request):# TODO Consider how much of a DOS risk these queries cons
     #return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='application/json')
     return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='text/plain')
 
+@t_login_required
 def changed_jobs_modal(request):
-    return render(request, 'libraryapp/changed_jobs_modal.html')
-    return render(request, 'libraryapp/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
+    jobs = services.t_jobs()
+    return render(request, 'libraryapp/changed_jobs_modal.html', {'jobs': jobs})
+
+@t_login_required           
+def jobs_list_compact(request):
+    jobs = services.t_jobs()
+    return render(request, 'libraryapp/jobs_list_compact.html', {'jobs': jobs})# TODO Decide what should be shown in the compact view. Only jobs which have changed since some "acknowledgement"? Since the last login? Since...?
