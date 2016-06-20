@@ -81,7 +81,7 @@ The Transkribus Web UI uses django's internationalisation and localisation (note
 #### Translate
 To make translations available:
 * find the appropriate .po file ```locale/[lang_code]/LC_MESSAGES/django.po```
-* In this file you will see msgid's that correspond to the phrases in {% trans "..." %} or _("...")
+* In this file you will see msgid's that correspond to the phrases in ```{% trans "..." %}``` or ```_("...")```
 * Simply fill in the msgstr with the correct translation eg:
 ```
 #: library/forms.py:7
@@ -92,11 +92,13 @@ msgstr ""
 
 #### Adding new phrases
 
-If you need to add a new phrase to a template of .py file these msut be compiled on the host
+If you have added a new phrase to a template or .py file there are a couple of things to do on the host afterwards. First the new phrases need to be added to the .po files. This is done with the following command:
 
 * ```django-admin makemessages -l [lang_code] (or -a for all languages)```
-* ```django-admin compilemessages```
 
+Then the translated templates must be compiled with:
+
+* ```django-admin compilemessages```
 
 ### Links
 
