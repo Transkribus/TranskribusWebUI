@@ -96,7 +96,7 @@ If you have added a new phrase to a template or .py file there are a couple of t
 
 * ```django-admin makemessages -l [lang_code] (or -a for all languages)```
 
-Then the translated templates must be compiled with:
+Then (once the translations have been made in the .po files) the phrases must be be recompiled with:
 
 * ```django-admin compilemessages```
 
