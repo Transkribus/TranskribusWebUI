@@ -1,7 +1,27 @@
-
+/* side bar related JS */
 $(document).ready(function(){
 	$(".menu-toggle-wrapper").css("height",window.innerHeight+'px');
+
+	var sidebar_state = localStorage.getItem("sidebar_state");
+	if (sidebar_state === "in") {
+		$("#wrapper").toggleClass("toggled");
+		$(".read_nav_out").show();
+		$(".read_nav_in").hide();
+	} else {
+		$(".read_nav_in").show();
+		$(".read_nav_out").hide();
+	}
+
 });
+
+
+
+$(document).ready(function(){
+	$("#id_language").on("change keyup", function () {
+		$(this).closest("form").submit();
+	});
+});
+
 
 /* Collections */
 
@@ -23,7 +43,7 @@ glyph_opts = {
       loading: "glyphicon glyphicon-refresh"
     }
   };
-
+/* The fancytree rendering */
 $(document).ready(function(){
 
     	$(".menu-toggle").click(function(e) {
@@ -84,8 +104,9 @@ $(document).ready(function(){
 				$("#page_"+node.key).parents(".document_thumbs").find("span.page_title > a").html(node.title).attr("href",page_link);
 			}
 		   },
-		});
+	}); //endof fancytree
 
+	/*panel expand/shrink (possibly not used*/
 	$(".panel-expand").click(function(){
 		var button = this;
 //		$(this).parents(".expandable").removeClass("col-md-4", function(){
@@ -111,3 +132,5 @@ $(document).ready(function(){
 	});
 
 });
+
+
