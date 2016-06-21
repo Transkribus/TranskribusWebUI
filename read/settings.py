@@ -110,6 +110,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale"),
+]
 
 LANGUAGE_CODE = 'en'
 from django.utils.translation import ugettext_lazy as _
@@ -148,9 +151,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = [
-    os.path.join(BASE_DIR, "locale"),
-]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/

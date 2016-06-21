@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-17 16:58+0100\n"
+"POT-Creation-Date: 2016-06-17 17:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,95 +48,95 @@ msgstr ""
 msgid "I'm afraid you are not allowed to access this collection"
 msgstr ""
 
-#: read/settings.py:117
+#: read/settings.py:120
 msgid "Bulgarian"
 msgstr ""
 
-#: read/settings.py:118
+#: read/settings.py:121
 msgid "Croatian"
 msgstr ""
 
-#: read/settings.py:119
+#: read/settings.py:122
 msgid "Czech"
 msgstr ""
 
-#: read/settings.py:120
+#: read/settings.py:123
 msgid "Danish"
 msgstr ""
 
-#: read/settings.py:121
+#: read/settings.py:124
 msgid "Dutch"
 msgstr ""
 
-#: read/settings.py:122
+#: read/settings.py:125
 msgid "English"
 msgstr ""
 
-#: read/settings.py:123
+#: read/settings.py:126
 msgid "Estonian"
 msgstr ""
 
-#: read/settings.py:124
+#: read/settings.py:127
 msgid "Finnish"
 msgstr ""
 
-#: read/settings.py:125
+#: read/settings.py:128
 msgid "French"
 msgstr ""
 
-#: read/settings.py:126
+#: read/settings.py:129
 msgid "German"
 msgstr ""
 
-#: read/settings.py:127
+#: read/settings.py:130
 msgid "Greek"
 msgstr ""
 
-#: read/settings.py:128
+#: read/settings.py:131
 msgid "Hungarian"
 msgstr ""
 
-#: read/settings.py:129
+#: read/settings.py:132
 msgid "Irish"
 msgstr ""
 
-#: read/settings.py:130
+#: read/settings.py:133
 msgid "Italian"
 msgstr ""
 
-#: read/settings.py:131
+#: read/settings.py:134
 msgid "Latvian"
 msgstr ""
 
-#: read/settings.py:132
+#: read/settings.py:135
 msgid "Lithuanian"
 msgstr ""
 
-#: read/settings.py:134
+#: read/settings.py:137
 msgid "Polish"
 msgstr ""
 
-#: read/settings.py:135
+#: read/settings.py:138
 msgid "Portuguese"
 msgstr ""
 
-#: read/settings.py:136
+#: read/settings.py:139
 msgid "Romanian"
 msgstr ""
 
-#: read/settings.py:137
+#: read/settings.py:140
 msgid "Slovak"
 msgstr ""
 
-#: read/settings.py:138
+#: read/settings.py:141
 msgid "Slovenian"
 msgstr ""
 
-#: read/settings.py:139
+#: read/settings.py:142
 msgid "Spanish"
 msgstr ""
 
-#: read/settings.py:140
+#: read/settings.py:143
 msgid "Swedish"
 msgstr ""
 

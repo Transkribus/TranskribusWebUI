@@ -98,39 +98,6 @@
 			</div>
 		</footer>
 	</div><!-- /#wrapper -->
-	
-	<!-- Menu Toggle Script -->
-	<script>
-	    var sidebar_state = localStorage.getItem("sidebar_state");
-	
-		if (sidebar_state === "in") {
-			$("#wrapper").toggleClass("toggled");
-			//	$("#menu-toggle-out").show();
-			$(".read_nav_out").show();
-			$(".read_nav_in").hide();
-		} else {
-			$(".read_nav_in").show();
-			$(".read_nav_out").hide();
-		}
-		
-	    var sidebar_state = localStorage.getItem("sidebar_state");
-	    if (sidebar_state === "in") {
-	        $("#wrapper").toggleClass("toggled");
-		//	$("#menu-toggle-out").show();
-			$(".read_nav_out").show();
-			$(".read_nav_in").hide();
-	    } else {
-			$(".read_nav_in").show();
-			$(".read_nav_out").hide();
-		}
-	
-	$(document).ready(function(){
-		$("#id_language").on("change keyup", function () {
-			$(this).closest("form").submit();
-		});
-	});
-	
-    </script>
 	    
 </body>
 

@@ -68,6 +68,38 @@ Alias /static/ /path/to/TranskribusWebUI/static/
 ```
 Restart httpd and check if everything works.
 
+### Internationalisation
+
+The Transkribus Web UI uses django's internationalisation and localisation (note the use of 's' rather than 'z'). The site has been prepared for translations for all the official languages of the EU (https://en.wikipedia.org/wiki/Languages_of_the_European_Union)
+
+#### Conditions for internatioanlisation:
+* templates need to ```{% load i18n %}```
+* then anything in ```{% trans "some phrase" %}``` will be translated if a translation is available
+* .py files need to ```from django.utils.translation import ugettext_lazy as _```
+* then anything in _("some phrase") will be translated if a translation is available
+
+#### Translate
+To make translations available:
+* find the appropriate .po file ```locale/[lang_code]/LC_MESSAGES/django.po```
+* In this file you will see msgid's that correspond to the phrases in ```{% trans "..." %}``` or ```_("...")```
+* Simply fill in the msgstr with the correct translation eg:
+```
+#: library/forms.py:7
+msgid "Given Name"
+msgstr ""
+```
+* commit the changes to the .po files
+
+#### Adding new phrases
+
+If you have added a new phrase to a template or .py file there are a couple of things to do on the host afterwards. First the new phrases need to be added to the .po files. This is done with the following command:
+
+* ```django-admin makemessages -l [lang_code] (or -a for all languages)```
+
+Then (once the translations have been made in the .po files) the phrases must be be recompiled with:
+
+* ```django-admin compilemessages```
+
 ### Links
 
 * [WebUISpec] WebUI spec
