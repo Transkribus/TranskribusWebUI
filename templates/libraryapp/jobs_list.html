@@ -9,14 +9,31 @@
 	</thead>
    <tbody>
    		{% for job in jobs %}
-			<tr><td>{{ job.type}}</td><td>{{ job.state}}</td><td>{{ job.description}}</td><td>{{  job.createTime | print_timestamp}}</td><td>{{ job.jobId}}</td></tr>
+			<tr><td>{{ job.type}}</td><td>{{ job.state}}</td><td>{{ job.description}}</td><td>{{  job.createTime | print_timestamp}}</td><td>{{ job.jobId}}</td>
+				<td>
+					{% if job.state == 'CREATED' or job.state == 'WAITING' or job.state == 'RUNNING' %}
+	                	<a href="#" class="btn btn-primary" onclick="killJob({{ job.jobId}});">{% trans "Cancel job" %}</a>
+                	{% endif %}
+				</td>
+			</tr>
 		{% endfor %}   
    </tbody>
 </table>
 <script>
+
+	function killJob(id) {
+    	$.post('kill_job', {job_id: id, only_unfinished: document.getElementById("whatToShow").checked, csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) { 
+			$('.jobs_list').html(data);
+		}).fail(function () {
+			// TODO Notify the user?
+			}
+		);
+	}
+
     $('#whatToShow').change(function(event) {
     	$.post('jobs_list', {only_unfinished: this.checked, csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) { 
 		 	$('.jobs_list').html(data);
 		});
 	})
+
 </script>

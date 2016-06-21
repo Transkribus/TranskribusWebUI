@@ -38,7 +38,14 @@
     <script src="{% static "js/jquery.fancytree-all.min.js" %}"></script>
     <!-- Local JS -->
     <script src="{% static "js/read.js" %}"></script>
-
+	<!--- Only needed when logged in -->
+	{% if user.is_authenticated %}
+	    <script>
+	    	var changed_jobs_modal = "{% url 'changed_jobs_modal' %}";
+	    	var jobs_list_compact = "{% url 'jobs_list_compact' %}";
+    	</script>
+    	<script src="{% static "js/jobs.js" %}"></script>
+	{% endif %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

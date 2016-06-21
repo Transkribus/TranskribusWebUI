@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from . import views
 
 urlpatterns = [
+   url(r'^kill_job$', views.kill_job, name='kill_job'),
     url(r'^job_count$', views.job_count, name='job_count'),
     url(r'^changed_jobs_modal$', views.changed_jobs_modal, name='changed_jobs_modal'),
     url(r'^jobs$', views.jobs, name='jobs'),

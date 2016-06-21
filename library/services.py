@@ -431,3 +431,11 @@ def t_job_count(status = ''):
     count=r.content 
     return count
 
+def t_kill_job(job_id):
+    url = settings.TRP_URL + 'jobs/' + job_id + '/kill'
+    r = s.post(url, verify=False)
+    
+    sys.stdout.write("Response to kill job: %s  \r\n" % (r.status_code) )
+    sys.stdout.flush()
+    
+    return r.status_code == requests.codes.ok

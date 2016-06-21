@@ -563,8 +563,10 @@ def jobs(request):
 @t_login_required
 def job_count(request):# TODO Consider how much of a DOS risk these queries constitute.
     # I DO NOT KNOW why returning a JsonResponse or 'application/json' breaks the cookies. The uncommented response below is what works. HttpFox indicates that the only difference is text/plain vs. application/json (or just json, both fail).
-    sys.stdout.write("COOKIES: %s%% \r\n" % request.COOKIES)
-    sys.stdout.flush() 
+    
+    #sys.stdout.write("COOKIES: %s%% \r\n" % request.COOKIES)
+    #sys.stdout.flush() 
+    
     #return  JsonResponse({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')});
     #return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='application/json')
     return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='text/plain')
