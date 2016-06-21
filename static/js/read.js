@@ -1,8 +1,3 @@
-
-$(document).ready(function(){
-	$(".menu-toggle-wrapper").css("height",window.innerHeight+'px');
-});
-
 /* Collections */
 
 glyph_opts = {
