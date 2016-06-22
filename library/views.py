@@ -580,3 +580,11 @@ def changed_jobs_modal(request):
 def jobs_list_compact(request):
     jobs = services.t_jobs()
     return render(request, 'libraryapp/jobs_list_compact.html', {'jobs': jobs})# TODO Decide what should be shown in the compact view. Only jobs which have changed since some "acknowledgement"? Since the last login? Since...?
+
+@t_login_required
+def kill_job(request):
+    if (services.t_kill_job(request.POST.get('job_id'))):
+        return jobs_list(request) # TODO Consider combining this and jobs_list above
+    else:
+        return jobs_list(request) # test
+    # Leave as is or return an error message? The javascript could also handle the error...

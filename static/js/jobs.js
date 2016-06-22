@@ -20,13 +20,10 @@ function jobCountsChanged(json) {
 	} else if (jobs != stringified) {
 		document.cookie = "jobs=" + stringified;
 		document.cookie = "changes_acknowledged=false";
-		if("" == $('.changed-jobs-modal').html()) {// Are we already showing the modal?
-			$('.changed-jobs-modal').load(changed_jobs_modal);// No, prepare it.
-			jobStatusAlert();// Note: It's unnecessary to show this when the modal is shown so we don't do it below.
-		} else {
+		jobStatusAlert();
+	} else {
 			$('.changed-jobs-content').load(jobs_list_compact);// Refresh the modal if job statuses have changed since it was shown.
-		}
-	}	
+	}
 }
 
 function jobCountsPoll() { 
@@ -39,7 +36,12 @@ function jobCountsPoll() {
 }
 
 function jobStatusAlert() {
-	$('.job-notification').show();	
+	if("" == $('.changed-jobs-modal').html()) {// Are we already showing the modal?
+		$('.changed-jobs-modal').load(changed_jobs_modal);// No, prepare it.
+		$('.job-notification').show();// Note: It's unnecessary to show this when the modal is shown so we don't do it below.
+	} else {
+		$('.changed-jobs-content').load(jobs_list_compact);// Refresh the modal if job statuses have changed since it was shown.
+	}	
 }
 
 $(document).ready(function(){
