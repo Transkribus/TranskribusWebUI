@@ -584,7 +584,8 @@ def jobs_list_compact(request):
 @t_login_required
 def kill_job(request):
     if (services.t_kill_job(request.POST.get('job_id'))):
-        return jobs_list(request) # TODO Consider combining this and jobs_list above
+        return jobs_list(request)
     else:
         return jobs_list(request) # test
     # Leave as is or return an error message? The javascript could also handle the error...
+    
