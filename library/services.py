@@ -160,11 +160,11 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     sys.stdout.flush()
 
     #we will keep the current document in the session to decrease the number of calls transkribus.eu
-    if "doc" in request.session :
-	if request.session.get('doc').get('cache_url') == url :
-            sys.stdout.write("### [HAVE CACHE] t_doc HAS CACHED doc for: %s \r\n" % (url) )
-    	    sys.stdout.flush()
-            return request.session['doc']
+#    if "doc" in request.session :
+#	if request.session.get('doc').get('cache_url') == url :
+#            sys.stdout.write("### [HAVE CACHE] t_doc HAS CACHED doc for: %s \r\n" % (url) )
+#    	    sys.stdout.flush()
+#            return request.session['doc']
 
     headers = {'content-type': 'application/json'}
 

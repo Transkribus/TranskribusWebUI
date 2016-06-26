@@ -1,5 +1,6 @@
 {% extends "navi_base.html" %}
 {% load i18n %}
+
 {% load staticfiles %}
 {% load library_tags %}
 
@@ -34,6 +35,8 @@
 		<pre>{{text}}</pre>
 		{%else%}
 		<p>The random transcript we found had no text encoded at {{level}} level.</p>
+
+		<pre>{{ transcript }}</pre>
 		{%endif%}
             </div>
         </div>

@@ -133,11 +133,16 @@ def page(request, collId, docId, page):
     #extract page data from full_doc (may be better from a  separate page data request)
     pagedata = full_doc.get('pageList').get('pages')[index]
     transcripts = pagedata.get('tsList').get('transcripts')
+
+    sys.stdout.write("############## PAGEDATA: %s\r\n" % ( pagedata ) )
+
     # the way xmltodict parses multiple instances of tags means that if there is one <transcripts> we get a dict, 
     # if there is > 1 we get a list. Solution: put dict in list if dict (or get json from transkribus which is
     # parsed better, but not yet available)
     if isinstance(transcripts, dict):
         transcripts = [transcripts]
+
+    sys.stdout.write("############## PAGEDATA.TRANSCRIPTS: %s\r\n" % ( transcripts ) )
 
     nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
@@ -404,6 +409,10 @@ def rand(request, collId, element):
     #best to avoid a random transcript, so we'll go for the current in the hope that it is best....
     current_transcript = services.t_current_transcript(request, collId, doc.get("docId"), page.get("pageNr"))
     transcript = services.t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
+ 
+    word = None
+    line = None
+    region = None
 
     regions = transcript.get("PcGts").get("Page").get("TextRegion")
     if isinstance(regions, dict):
@@ -411,6 +420,8 @@ def rand(request, collId, element):
 
     if regions:
          region = random.choice(regions)
+	 if element == "region" :
+	    	sys.stdout.write("region I have\r\n" )
          lines = region.get("TextLine")
     else:
 	if transcript.get("PcGts").get("Page").get("TextLine"):
@@ -419,54 +430,63 @@ def rand(request, collId, element):
      	    sys.stdout.flush()
 	    lines = transcript.get("PcGts").get("Page").get("TextLine")
 	else:
+    	    sys.stdout.write("NO TEXT IN REGION\r\n" )
     	    return render(request, 'libraryapp/random.html', {
 			"level": element, 
 			"text": {},
 			"collection" : collection,
 			"document" : doc,
 			"page" : page,
+			"transcript" : transcript,
 			} )
     
     if isinstance(lines, dict):
         lines = [lines]
 
-    if lines:
-        line = random.choice(lines);
-    else:
-        return render(request, 'libraryapp/random.html', {
-			"level": element, 
-			"text": {},
-			"collection" : collection,
-			"document" : doc,
-			"page" : page,
-			} )
+    if element in ['line', 'word'] :
+	    if lines:
+		line = random.choice(lines);
+	    else:
+		return render(request, 'libraryapp/random.html', {
+				"level": element, 
+				"text": {},
+				"collection" : collection,
+				"document" : doc,
+				"page" : page,
+				"transcript" : transcript,
+				} )
 
+	    sys.stdout.write("LINE: %s\r\n" % ( line ) )
+	    if element == "word" :
+		    words = line.get("Word")
+		    if isinstance(words, dict):
+			words = [words]
 
-    words = line.get("Word")
-    if isinstance(words, dict):
-        words = [words]
-
-    if words:
-        word = random.choice(words);
-    else:
-        return render(request, 'libraryapp/random.html', {
-			"level": element, 
-			"text": {},
-			"collection" : collection,
-			"document" : doc,
-			"page" : page,
-			} )
+		    if words:
+			word = random.choice(words);
+		    else:
+			return render(request, 'libraryapp/random.html', {
+					"level": element, 
+					"text": {},
+					"collection" : collection,
+					"document" : doc,
+					"page" : page,
+					"transcript" : transcript,
+					} )
 
     switcher = {
         "region" : display_random(request,element,region,collection,doc,page),
         "line" : display_random(request,element,line,collection,doc,page),
         "word" : display_random(request,element,word,collection,doc,page),
     }
+
     return switcher.get(element, {})
 
 def display_random(request,level,data, collection, doc, page):
     text = None
-    if data.get("TextEquiv"):
+    if not data :
+	text = {}
+    elif data.get("TextEquiv"):
 	if data.get("TextEquiv").get("Unicode"):
 	    text = unicode(data.get("TextEquiv").get("Unicode"))
 
