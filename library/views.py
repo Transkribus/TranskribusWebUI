@@ -227,6 +227,25 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	if(unicode(regionId) == unicode(x.get("@id"))):
 	    region = x
 
+    if(region.get("Coords")):
+        sys.stdout.write("############# COORDS: %s\r\n" % region.get("Coords") )
+        coords = region.get("Coords").get("@points")
+	points = coords.split()	
+	t=l=99999999 #TODO durh...
+	b=r=0
+	points = [map(float, point.split(',')) for point in points]
+	#boo two loops! but I like this one above here...
+	#TODO woops... I actually need this to x-off y-off widht and height...
+	for point in points:
+		if point[0] > r : r=point[0]
+		if point[0] < l : l=point[0]
+		if point[1] > b : b=point[1]
+		if point[1] < t : t=point[1]
+	
+        sys.stdout.write("POINTS: %s\r\n" % (points) )
+        sys.stdout.write("TOP/LEFT/BOTTOME/RIGHT: %s/%s/%s/%s\r\n" % (t,l,b,r) )
+
+
     nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
 
 #    sys.stdout.write("REGION: %s\r\n" % (region) )
