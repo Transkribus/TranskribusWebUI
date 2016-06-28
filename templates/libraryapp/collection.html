@@ -39,15 +39,9 @@
 		</table>
 		<p>From this collection (if available) get a random:</p>
 		<ul>
-	{%comment%}
-			<li><a href="{% url 'random' collection.colId 'region' %}">{% trans "Region" %}</a></li>
-			<li><a href="{% url 'random' collection.colId 'line' %}">{% trans "Line" %}</a></li>
-			<li><a href="{% url 'random' collection.colId 'word' %}">{% trans "Word" %}</a></li>
-	{%endcomment%}
-			<li><a href="/library/random/{{collection.colId}}/region">{% trans "Region" %}</a></li>
-			<li><a href="/library/random/{{collection.colId}}/line">{% trans "Line" %}</a></li>
-			<li><a href="/library/random/{{collection.colId}}/word">{% trans "Word" %}</a></li>
-
+			<li><a href="{% url 'rand' collection.colId 'region' %}">{% trans "Region" %}</a></li>
+			<li><a href="{% url 'rand' collection.colId 'line' %}">{% trans "Line" %}</a></li>
+			<li><a href="{% url 'rand' collection.colId 'word' %}">{% trans "Word" %}</a></li>
 		</ul>
 	    </div>
 	</div>
