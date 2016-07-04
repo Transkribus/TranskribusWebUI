@@ -28,7 +28,7 @@ function jobCountsChanged(json) {
 
 function jobCountsPoll() { 
 	setTimeout(function(){
-		$.ajax({ url: "job_count", method: 'GET', success: function(json) {
+		$.ajax({ url: job_count_url, method: 'GET', success: function(json) {
 			jobCountsChanged(json);
 			jobCountsPoll();
 		}});
