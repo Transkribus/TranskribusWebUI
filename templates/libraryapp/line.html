@@ -31,7 +31,8 @@
 		<dt>{% trans "ID" %}</dt><dd>{{ line|get_item:"@id" }}</dd>
 		<dt>{% trans "Text" %}</dt><dd>{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
 		<dt>{% trans "Primary language" %}</dt><dd>{{ line|get_item:"@PrimaryLanguage" }}</dd>
-		<dt>{% trans "Image" %}</dt><dd style="color: red;">Use coords + IIIF to pull image of region?</dd>
+		<dt>{% trans "Image" %}</dt><dd><img class="img_snip line" src="{{imageUrl}}&crop={{ line|get_item:"crop_str"}}"/></dd>
+
 
 		</dl>
 		<p>This line has {{ words|length }} word{% if words|length != 1 %}s{% endif %}:</p>

@@ -31,7 +31,7 @@
 		<dt>{% trans "ID" %}</dt><dd>{{ region|get_item:"@id" }}</dd>
 		<dt>{% trans "Type" %}</dt><dd>{{ region|get_item:"@type" }}</dd>
 		<dt>{% trans "Text" %}</dt><dd>{% if region|get_item:"TextEquiv" %}{{ region|get_item:"TextEquiv"|get_item:"Unicode" }}{%else%}No text{%endif%}</dd>
-		<dt>{% trans "Image" %}</dt><dd style="color: red;">{% trans "Use coords + IIIF to pull image of region?" %}</dd>
+		<dt>{% trans "Image" %}</dt><dd><img class="img_snip region" src="{{imageUrl}}&crop={{ region|get_item:"crop_str"}}"/></dd>
 
 		</dl>
 		<p>This region has {{ lines|length }} line{% if lines|length != 1 %}s{% endif %}:</p>

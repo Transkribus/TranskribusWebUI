@@ -66,7 +66,6 @@ h1.page-header { margin-top: 5px; }
 }
 .flag-icon-sl.flag-icon-squared {
   background-image: url(../flags/1x1/si.svg);
-
 }
 
 #language_switcher select#id_language { width: 170px; display: inline;}
@@ -157,4 +156,8 @@ fieldset[disabled] .btn-inverse.active {
 	padding: 0;
 }
 
-
+/* page bits */
+.img_snip {
+	width: 600px;
+	height: auto;
+}
