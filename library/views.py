@@ -39,7 +39,7 @@ def register(request):
             # ...
             # redirect to a new URL:
 #TODO        services.t_register(form)
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/library/profile')
 
     # if a GET (or any other method) we'll create a blank form
     else:
