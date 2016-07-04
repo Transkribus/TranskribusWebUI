@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% load bootstrap3 %}
-
+{% load staticfiles %}
 {% block content %}
 
 <!-- Page Content -->
@@ -25,5 +25,8 @@
 		</div>
 	</div>
 </div>
+
+<div id="messages"></div>
+<script src='{% static "js/forms.js" %}'></script>
 
 {% endblock %}

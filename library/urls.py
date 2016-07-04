@@ -6,6 +6,9 @@ urlpatterns = [
     url(r'^kill_job$', views.kill_job, name='kill_job'),
     url(r'^job_count$', views.job_count, name='job_count'),
     url(r'^changed_jobs_modal$', views.changed_jobs_modal, name='changed_jobs_modal'),
+    
+    url(r'^message_modal$', views.message_modal, name='message_modal'),
+    
     url(r'^jobs$', views.jobs, name='jobs'),
     url(r'^jobs_list$', views.jobs_list, name='jobs_list'),
     url(r'^jobs_list_compact$', views.jobs_list_compact, name='jobs_list_compact'),
