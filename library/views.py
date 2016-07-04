@@ -207,10 +207,18 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    pagedata = services.t_page(request,collId, docId, page) 
-    #we are only using the pagedata to get the pageXML for a particular
+    transcripts = services.t_page(request,collId, docId, page) 
+
+    #To get the page image url we need the full_doc (we hope it's been cached)
+    full_doc = services.t_document(request, collId, docId, -1)
+    index = int(page)-1
+    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
+    pagedata = full_doc.get('pageList').get('pages')[index]
+    
+    sys.stdout.write("############# PAGEDATA: %s\r\n" % pagedata )
+    #we are only using the transcripts to get the pageXML for a particular transcript...
     pageXML_url = None;
-    for x in pagedata:
+    for x in transcripts:
 	if int(x.get("tsId")) == int(transcriptId):
 	    pageXML_url = x.get("url")
 	    break
@@ -228,23 +236,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    region = x
 
     if(region.get("Coords")):
-        sys.stdout.write("############# COORDS: %s\r\n" % region.get("Coords") )
-        coords = region.get("Coords").get("@points")
-	points = coords.split()	
-	t=l=99999999 #TODO durh...
-	b=r=0
-	points = [map(float, point.split(',')) for point in points]
-	#boo two loops! but I like this one above here...
-	#TODO woops... I actually need this to x-off y-off widht and height...
-	for point in points:
-		if point[0] > r : r=point[0]
-		if point[0] < l : l=point[0]
-		if point[1] > b : b=point[1]
-		if point[1] < t : t=point[1]
-	
-        sys.stdout.write("POINTS: %s\r\n" % (points) )
-        sys.stdout.write("TOP/LEFT/BOTTOME/RIGHT: %s/%s/%s/%s\r\n" % (t,l,b,r) )
-
+	region['crop_str'] = crop(region.get("Coords").get("@points"))
 
     nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
 
@@ -269,7 +261,29 @@ def region(request, collId, docId, page, transcriptId, regionId):
 		'docId': docId,
 		'pageId': page, #NB actually the number for now
 		'transcriptId': transcriptId,
+		'imageUrl' : pagedata.get("url"),
 		})
+def crop(coords):
+    sys.stdout.write("############# COORDS: %s\r\n" % coords )
+   # coords = region.get("Coords").get("@points")
+    points = coords.split()	
+    xmin=ymin=99999999 #TODO durh...
+    xmax=ymax=0
+    points = [map(int, point.split(',')) for point in points]
+    #boo two loops! but I like this one above here...
+    #TODO woops... I actually need this to x-off y-off widt and height...
+    for point in points:
+	if point[1] > ymax : ymax=point[1]
+	if point[1] < ymin : ymin=point[1]
+	if point[0] > xmax : xmax=point[0]
+	if point[0] < xmin : xmin=point[0]
+    crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
+    crop_str = str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
+
+    return crop_str
+#    sys.stdout.write("POINTS: %s\r\n" % (points) )
+#    sys.stdout.write("CROP: %s\r\n" % (crop) )
+
 
 #/library/transcript/{colId}/{docId}/{page}/{tsId}/{regionId}/{lineId}
 # view that lists words in line and some line level metadata
@@ -279,16 +293,22 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    pagedata = services.t_page(request,collId, docId, page) 
-    #we are only using the pagedata to get the pageXML for a particular
+    transcripts = services.t_page(request,collId, docId, page) 
+    #we are only using the transcripts to get the pageXML for a particular
     pageXML_url = None;
-    for x in pagedata:
+    for x in transcripts:
 	if int(x.get("tsId")) == int(transcriptId):
 	    pageXML_url = x.get("url")
 	    break
  
     if pageXML_url:
 	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    #To get the page image url we need the full_doc (we hope it's been cached)
+    full_doc = services.t_document(request, collId, docId, -1)
+    index = int(page)-1
+    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
+    pagedata = full_doc.get('pageList').get('pages')[index]
 
     #This now officially bonkers....
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
@@ -304,10 +324,14 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     if isinstance(lines, dict):
 	lines = [lines]
 
+
     for x in lines:
 	x['key'] = x.get("@id")
 	if(unicode(lineId) == unicode(x.get("@id"))):
 	    line = x
+
+    if(line.get("Coords")):
+	line['crop_str'] = crop(line.get("Coords").get("@points"))
 
     nav = navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
 
@@ -334,6 +358,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 		'transcriptId': transcriptId,
 		'regionId': regionId,
 		'lineId': lineId,
+		'imageUrl' : pagedata.get("url"),
 		})
 
 #/library/transcript/{colId}/{docId}/{page}/{tsId}/{regionId}/{lineId}/{wordId}
@@ -341,16 +366,22 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 @t_login_required
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
-    pagedata = services.t_page(request, collId, docId, page) 
+    transcripts = services.t_page(request, collId, docId, page) 
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
-    for x in pagedata:
+    for x in transcripts:
 	if int(x.get("tsId")) == int(transcriptId):
 	    pageXML_url = x.get("url")
 	    break
  
     if pageXML_url:
 	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+
+    #To get the page image url we need the full_doc (we hope it's been cached)
+    full_doc = services.t_document(request, collId, docId, -1)
+    index = int(page)-1
+    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
+    pagedata = full_doc.get('pageList').get('pages')[index]
 
     #This now officially bonkers....
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
@@ -374,6 +405,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     if isinstance(words, dict):
         words = [words]
 
+
     #parse metadata
     for x in words:
 	x['key'] = x.get("@id")
@@ -381,6 +413,9 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		x['md'] = services.t_metadata(x.get("@custom"))
 		word = x
 		
+    if(word.get("Coords")):
+	word['crop_str'] = crop(word.get("Coords").get("@points"))
+
     nav = navigation.up_next_prev("word",wordId,words,[collId,docId,page,transcriptId,regionId,lineId])
 
     return render(request, 'libraryapp/word.html', {
@@ -394,6 +429,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		'transcriptId': transcriptId,
 		'regionId': regionId,
 		'lineId': lineId,
+		'imageUrl' : pagedata.get("url"),
 		})
 
 # Randomly fetch region/line/word this gives us an awful lot of empty responses
