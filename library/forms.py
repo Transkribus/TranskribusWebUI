@@ -21,4 +21,3 @@ class MetsFileForm(forms.Form):
 
 class LanguageForm(forms.Form):
     language = forms.ChoiceField(label=_('Language'),choices=settings.LANGUAGES)
-

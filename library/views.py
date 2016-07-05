@@ -9,6 +9,7 @@ from django.utils import translation
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .decorators import t_login_required#, profile
 
@@ -18,6 +19,7 @@ import json
 import sys
 import re
 import random
+from django.template.loader import render_to_string
 
 #import urllib2
 #import xmltodict
@@ -563,6 +565,9 @@ def search(request):
 def about(request):
     return render(request, 'libraryapp/about.html')
 
+def message_modal(request):
+    return render(request, 'libraryapp/message_modal.html')
+
 def user_guide(request):
     return render(request, 'libraryapp/user_guide.html')
 
@@ -590,9 +595,14 @@ def collection_noaccess(request, collId):
 @t_login_required
 def ingest_mets_xml(request):
     if request.method == 'POST':
-        #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages?
-        services.t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
-        return HttpResponseRedirect('/thanks/')# TODO Something else!
+        try: 
+            #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages? And validate the file. Note: Django allows form submission, even if no file has been selected.
+            services.t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
+            messages.info(request, 'File is being uploaded.')# TODO i18n,
+            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+        except:
+            messages.error(request, 'Error!')# TODO i18n,
+            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain') 
     else:
         ingest_mets_xml_file_form = MetsFileForm()
         collections = request.session.get("collections")
@@ -602,8 +612,12 @@ def ingest_mets_xml(request):
 def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
-        services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))  
-        return HttpResponseRedirect('/thanks/')# TODO Something else!
+        if (services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
+            messages.info(request, 'URL is being processed.')# TODO i18n,
+            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+        else:
+            messages.error(request, 'URL processing failed.')# TODO i18n,
+            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
     else:
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)

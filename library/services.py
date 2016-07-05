@@ -445,11 +445,7 @@ def t_ingest_mets_url(collId, mets_url):
     sys.stdout.write("Ingesting document from METS XML file URL: %s%% \r\n" % (mets_url) )
     sys.stdout.flush()
     
-    if r.status_code != requests.codes.ok:
-        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
-        sys.stdout.flush()
-        return None
-    # TODO What to do when we're successful?'
+    return r.status_code == requests.codes.ok
 
 def t_create_collection(collection_name):
     url = settings.TRP_URL+'collections/createCollection'
