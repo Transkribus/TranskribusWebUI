@@ -607,10 +607,6 @@ def ingest_mets_xml(request):
 
 @t_login_required
 def ingest_mets_url(request):
-    
-    #sys.stdout.write("REQUEST CONTEXT: %s%% \r\n" % RequestContext(request ))
-    #sys.stdout.flush()
-    
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
         if (services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
