@@ -10,7 +10,7 @@ from django.utils import translation
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from .decorators import t_login_required
+from .decorators import t_login_required#, profile
 
 import services
 import navigation
@@ -54,6 +54,7 @@ def index(request):
 
 #/library/collections
 #view that lists available collections for a user
+#@profile("collections.prof")
 @t_login_required
 def collections(request):
     collections = request.session.get("collections");
@@ -63,6 +64,7 @@ def collections(request):
 #view that 
 # - lists documents
 # - also lists pages for documents
+#@profile("collection.prof")
 @t_login_required
 def collection(request, collId):
     #this is actually a call to collections/{collId}/list and returns only the document objects for a collection
@@ -84,6 +86,7 @@ def collection(request, collId):
     nav = navigation.up_next_prev("collection",collId,collections)
 
     #collection view goes down two levels (ie documents and then pages)
+    # data prepared fro fancytree.js representation
     for doc in docs:
         doc['collId'] = collId
 	doc['key'] = doc['docId']
@@ -107,6 +110,7 @@ def collection(request, collId):
 
 #/library/document/{colId}/{docId}
 # view that lists pages in doc and some doc level metadata
+#@profile("document.prof")
 @t_login_required
 def document(request, collId, docId, page=None):
     collection = services.t_collection(request, collId)
@@ -124,6 +128,7 @@ def document(request, collId, docId, page=None):
 
 #/library/document/{colId}/{docId}/{page}
 # view that lists transcripts in doc and some page level metadata
+#@profile("page.prof")
 @t_login_required
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
@@ -134,7 +139,7 @@ def page(request, collId, docId, page):
     pagedata = full_doc.get('pageList').get('pages')[index]
     transcripts = pagedata.get('tsList').get('transcripts')
 
-    sys.stdout.write("############## PAGEDATA: %s\r\n" % ( pagedata ) )
+#    sys.stdout.write("############## PAGEDATA: %s\r\n" % ( pagedata ) )
 
     # the way xmltodict parses multiple instances of tags means that if there is one <transcripts> we get a dict, 
     # if there is > 1 we get a list. Solution: put dict in list if dict (or get json from transkribus which is
@@ -142,7 +147,7 @@ def page(request, collId, docId, page):
     if isinstance(transcripts, dict):
         transcripts = [transcripts]
 
-    sys.stdout.write("############## PAGEDATA.TRANSCRIPTS: %s\r\n" % ( transcripts ) )
+#    sys.stdout.write("############## PAGEDATA.TRANSCRIPTS: %s\r\n" % ( transcripts ) )
 
     nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
@@ -166,8 +171,6 @@ def transcript(request, collId, docId, page, transcriptId):
 
     pageXML_url = None;
     for x in pagedata:
-	sys.stdout.write("x in pagedata: %s == %s\r\n" % (x.get("tsId"),transcriptId) )
-        sys.stdout.flush()
 	if int(x.get("tsId")) == int(transcriptId):
 	     pageXML_url = x.get("url")
 	     break

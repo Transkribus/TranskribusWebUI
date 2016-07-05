@@ -6,6 +6,8 @@ requests.packages.urllib3.disable_warnings()
 #TODO sudo pip install 'requests[security]'
 #Possibly check for openssl-devel python-devel libffi-devel (yum)
 
+#from decorators import profile #presently circular... but do we need it here anyway or is profiling the views eneough...
+
 #import urllib2
 import xmltodict
 #from lxml import objectify
@@ -15,6 +17,53 @@ import sys
 import json
 import re
 
+
+#tmp to see if profiler is useful here...
+import hotshot
+import os
+import time
+import tempfile
+
+try:
+    PROFILE_LOG_BASE = settings.PROFILE_LOG_BASE
+except:
+    PROFILE_LOG_BASE = tempfile.gettempdir()
+
+
+def profile(log_file):
+    """Profile some callable.
+
+    This decorator uses the hotshot profiler to profile some callable (like
+    a view function or method) and dumps the profile data somewhere sensible
+    for later processing and examination.
+
+    It takes one argument, the profile log name. If it's a relative path, it
+    places it under the PROFILE_LOG_BASE. It also inserts a time stamp into the 
+    file name, such that 'my_view.prof' become 'my_view-20100211T170321.prof', 
+    where the time stamp is in UTC. This makes it easy to run and compare 
+    multiple trials.     
+    """
+    if not os.path.isabs(log_file):
+        log_file = os.path.join(PROFILE_LOG_BASE, log_file)
+
+    def _outer(f):
+        def _inner(*args, **kwargs):
+            # Add a timestamp to the profile output when the callable
+            # is actually called.
+	    sys.stdout.write("############# PROFILING2: %s\r\n" % log_file )
+            (base, ext) = os.path.splitext(log_file)
+            base = base + "-" + time.strftime("%Y%m%dT%H%M%S", time.gmtime())
+            final_log_file = base + ext
+
+            prof = hotshot.Profile(final_log_file)
+            try:
+                ret = prof.runcall(f, *args, **kwargs)
+            finally:
+                prof.close()
+            return ret
+
+        return _inner
+    return _outer
 #TODO rationalise this code
 # - lots of repitition
 # - possible to find or create (UIBK to create) more efficient ways of getting data
@@ -55,6 +104,7 @@ def t_login(user, pw):
     return t_user['trpUserLogin']
 
 #refresh transkribus session (called by t_login_required decorator to test persistence/validity of transkribus session)
+#@profile("refresh.prof")
 def t_refresh():
     url = settings.TRP_URL+'auth/refresh' 
 
@@ -71,6 +121,7 @@ def t_refresh():
     else:
 	return True
 
+#@profile("t_collections.prof")
 def t_collections():
 
     url = settings.TRP_URL+'collections/list'
@@ -102,6 +153,7 @@ def t_collections():
 
     return collections
 
+#@profile("t_collection.prof")
 def t_collection(request,collId):
 
     url = settings.TRP_URL+'collections/'+unicode(collId)+'/list'
@@ -153,6 +205,7 @@ def t_collection(request,collId):
 
     return t_collection
 
+@profile("t_document.prof")
 def t_document(request, collId, docId, nrOfTranscripts=None):
 
     url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/fulldoc'
@@ -439,3 +492,5 @@ def t_kill_job(job_id):
     sys.stdout.flush()
     
     return r.status_code == requests.codes.ok
+
+

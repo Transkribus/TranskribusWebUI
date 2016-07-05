@@ -186,6 +186,8 @@ AUTHENTICATION_BACKENDS = [
 #transkribus rest service
 TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
+PROFILE_LOG_BASE = '/tmp/'
+
 #### offline fallbacks for dev on train
 OFFLINE = False
 ADMIN_LOGIN = 'admin'
