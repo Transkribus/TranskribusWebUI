@@ -40,7 +40,7 @@ Displays the list of collections for the authenticated user. As collections are 
 Displays the collection specified by {collId} and lists the documents *and* the page thumbnails, in that collection. 
 Uses ```services.t_collection``` to collect ```colList```, a list of documents (JSON) for given {collId}
 
-```settings.TRP_URL/collections/{collId}/list```
+ settings.TRP_URL/collections/{collId}/list
 
 As there is currently no transkribus call that returns data for a single collection by ID (eg collection/{collId}). So we loop through the ```collections``` data (from cache) and pick out collection level metadata from there. The same could be achieved using the list of documents (ie pick first/random document data from ```colList``` which has collection data in it too). This may be a preferable approach, especially if there are lots of collections to loop through. A single call to retrieve collection level metadata seems to make more sense, but as we have a list of collections and a list of documents that have the necessary data in them, it may be a surplus request to the WS which we would want to avoid.
 
