@@ -6,7 +6,7 @@ This document assesses how the transkribus document structure is traversed by th
 
 The Transkribus document structure with which we are concerned encompasses the list collections accessible by a given user all the way down to single word item and everythign in between. The Library website in it's current form is a demonstrator of how that structure can be traversed statelessly, using URIs.
 
-In essence we have a view per level (ie collection, document, page, transcript, region, line, word) each with the metadata for that object and a list of child objects. A list of sibling objects is also used to build a navigation interface (up, next, prev). The data is drawn exclusively from the transkribus [https://transkribus.eu/wiki/index.php/REST_Interface](REST service), but as you will see there is some post processing down before we can complete the traversal.
+In essence we have a view per level (ie collection, document, page, transcript, region, line, word) each with the metadata for that object and a list of child objects. A list of sibling objects is also used to build a navigation interface (up, next, prev). The data is drawn exclusively from the transkribus [REST service](https://transkribus.eu/wiki/index.php/REST_Interface), but as you will see there is some post processing down before we can complete the traversal.
 
 In some cases the views may be a bit overloaded, but we hope they prove a useful illustration of what is needed to access all and each of the elements of the transkribus data with single requests.
 
