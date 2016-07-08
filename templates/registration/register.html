@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% load bootstrap3 %}
-
+{% load staticfiles %}
 {% block content %}
 
 
@@ -18,7 +18,7 @@
 	    </div>
 	    <div class="col-lg-8">
 	
-		<form action="register" method="post" role="form">
+		<form action="register" method="post" role="form" id="register_form">
 		    {% csrf_token %}
 		    {% bootstrap_form register_form %}
 		    <button class="btn btn-default" type="submit">{% trans "Register" %}</button>
@@ -26,5 +26,8 @@
 	    </div>
 	</div>
     </div>	
+
+<div id="messages"></div>
+<script src='{% static "js/forms.js" %}'></script>
 
 {% endblock %}
