@@ -11,7 +11,7 @@ So far this is a skeletal website to aid design discussion about the architechtu
 
 Though possibly more apps for smaller bits of functioanilty... 
 
-[https://github.com/Transkribus/TranskribusWebUI/blob/master/library/SYNOPSIS.md](Synopsis of Transkribus WebUI/Library)
+UPDATE: More details can be found in the [Synopsis of Transkribus WebUI/Library](https://github.com/Transkribus/TranskribusWebUI/blob/master/library/SYNOPSIS.md)
 
 ## Building
 Here is a short guide with steps that need to be performed to build Transkribus Web UI.
