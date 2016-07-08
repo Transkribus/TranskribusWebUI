@@ -40,7 +40,7 @@ Displays the list of collections for the authenticated user. As collections are 
 Displays the collection specified by {collId} and lists the documents *and* the page thumbnails, in that collection. 
 Uses `services.t_collection` to collect `colList`, a list of documents (JSON) for given {collId}
 
- settings.TRP_URL/collections/collId/list
+ settings.TRP_URL/collections/{collId}/list
 
 As there is currently no transkribus call that returns data for a single collection by ID (eg collection/{collId}). So we loop through the `collections` data (from cache) and pick out collection level metadata from there. The same could be achieved using the list of documents (ie pick first/random document data from `colList` which has collection data in it too). This may be a preferable approach, especially if there are lots of collections to loop through. A single call to retrieve collection level metadata seems to make more sense, but as we have a list of collections and a list of documents that have the necessary data in them, it may be a surplus request to the WS which we would want to avoid.
 
@@ -57,25 +57,49 @@ This is done only to retrieve the imgFileName for thumbnails.
 Displays the document specified by {docId} and lists the pages in that document.
 
 `services.t_collection` for list of docs for nav object
-`services.t_document` for `fulldoc?nrOfTranscripts=-1`
+`services.t_document` (`fulldoc?nrOfTranscripts=-1`) which returns doc metadata and all transcripts
 
 ### library/page/{collId}/{docId}/{pageNr}
 
-Displays the page specified by {pageNr} and lists the transcripts for that page.
+Displays the page specified by {pageNr} and lists the transcripts for that page we are delaing almost exlusively with data from fulldoc here.
+
+`services.t_document` (`fulldoc?nrOfTranscript=-1`) for all pages (for nav) and all transcripts (for list). 
+
+Page level metadata extracted with equiv of  `//pageList/pages/index(pageNr-1)`. I'd be more comfortable with an abitrary ID for pages rather than the page position.
+
+Transcripts are extracted with equiv of `//trList/transcripts`
+
+Sibling pages with `//pageList/pages` for nav
 
 ### library/transcript/{collId}/{docId}/{pageNr}/{transId}
 
 Displays the transcript specified by {transId} and lists the regions of text for that transcript.
 
+`services.t_page` which returns a list of transcripts that what we get from `collections/{collId}/{docId}/{pageNr}/list` this is used for nav, but also loops through to match the {transId}, extract the pageXML url and request that using `services.t_transcript`.
+
+`services.t_transcript` gives us the pageXML with a request to `https://dbis-thidre.uibk.ac.at/f/Get?id=....` and from there the child regions are extracted for the list.
+
 ### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}
 
 Displays the region specified by {regionId} and lists the lines of text for that region.
 
+Calls `services.t_page` to which returns a list of transcripts and from this the pageXML url is extracted.
+
+Calls `services.t_document` to get the fulldoc (!) from whence it extraces pagedata from `//pagesList/pages/index(pageNr-1)` the pagedata is *only* used to access the image url.
+
+With the pageXML extracted from the `services.t_page` call it then fetches the pageXML with `services.t_transcript` with which it can start parsing out data on the region and thei child lines if available.
+
 ### library/line/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}
+
+As above this needs to call `services.t_documnet` for the fulldoc to extract the pagedata to get the image URL, `services.t_page` to get the transcirpt data which has the pageXML url and `services.t_transcript` for the pageXML from which it can parse out the regions (for the nav), line level metadata and the child words if available.
 
 Displays the line specified by {lineId} and lists the words for that line.
 
 ### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
+
+Displays a single word, and the data associated with it as extraced from the hard won pageXML.
+
+It is the very apex of bonkers by this point. I'm sure we can do this a bit more efficiently.
 
 Displays the word specified by {wordId}.
 
