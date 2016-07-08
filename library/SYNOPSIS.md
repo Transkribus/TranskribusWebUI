@@ -38,17 +38,17 @@ Displays the list of collections for the authenticated user. As collections are 
 ### library/collection/{collId}
 
 Displays the collection specified by {collId} and lists the documents *and* the page thumbnails, in that collection. 
-Uses ```services.t_collection``` to collect ```colList```, a list of documents (JSON) for given {collId}
+Uses `services.t_collection` to collect `colList`, a list of documents (JSON) for given {collId}
 
- settings.TRP_URL/collections/{collId}/list
+ settings.TRP_URL/collections/collId/list
 
-As there is currently no transkribus call that returns data for a single collection by ID (eg collection/{collId}). So we loop through the ```collections``` data (from cache) and pick out collection level metadata from there. The same could be achieved using the list of documents (ie pick first/random document data from ```colList``` which has collection data in it too). This may be a preferable approach, especially if there are lots of collections to loop through. A single call to retrieve collection level metadata seems to make more sense, but as we have a list of collections and a list of documents that have the necessary data in them, it may be a surplus request to the WS which we would want to avoid.
+As there is currently no transkribus call that returns data for a single collection by ID (eg collection/{collId}). So we loop through the `collections` data (from cache) and pick out collection level metadata from there. The same could be achieved using the list of documents (ie pick first/random document data from `colList` which has collection data in it too). This may be a preferable approach, especially if there are lots of collections to loop through. A single call to retrieve collection level metadata seems to make more sense, but as we have a list of collections and a list of documents that have the necessary data in them, it may be a surplus request to the WS which we would want to avoid.
 
-Then nav object is built from ```collections``` data.
+Then nav object is built from `collections` data.
 
-Then we fetch thumbnails for each page in a document (overkill?). To do this loop through the documents (from ```colList```) and for each document get the fulldoc data.
+Then we fetch thumbnails for each page in a document (overkill?). To do this loop through the documents (from `colList`) and for each document get the fulldoc data.
 
-```settings.TRP_URL/collections/{collId}/{docId}/fulldoc?nrOfTranscripts=0```
+`settings.TRP_URL/collections/{collId}/{docId}/fulldoc?nrOfTranscripts=0`
 
 This is done only to retrieve the imgFileName for thumbnails.
 
@@ -56,8 +56,8 @@ This is done only to retrieve the imgFileName for thumbnails.
 
 Displays the document specified by {docId} and lists the pages in that document.
 
-```services.t_collection``` for list of docs for nav object
-```services.t_document`` for ```fulldoc?nrOfTranscripts=-1```
+`services.t_collection` for list of docs for nav object
+`services.t_document` for `fulldoc?nrOfTranscripts=-1`
 
 ### library/page/{collId}/{docId}/{pageNr}
 
