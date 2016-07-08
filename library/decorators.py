@@ -24,9 +24,8 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
 	    # We check here to see if we are still authenticated with transkribus
 	    # a quick post request ti auth/refresh should do?
 	    # If we don't get a 200 we logout
-    	    if not settings.OFFLINE:
-	        if not t_refresh():
-		    return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
+	    if not t_refresh():
+	        return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
             #setting collections data as a session var if no already set
 	    if "collections" not in request.session or request.session['collections'] is None:
 	        request.session['collections'] = t_collections()
