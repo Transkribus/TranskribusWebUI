@@ -115,3 +115,5 @@ Version of django @login_required decorator and is applied to any view that requ
 ## services
 
 We are almost exclusively using the transkribus REST service, for our backend and the services contain our interfaces to that.
+
+more details to follow...
