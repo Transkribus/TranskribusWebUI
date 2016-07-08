@@ -3,5 +3,5 @@ INSTALLED_APPS = [
     # ...
 ]
 
-
+APP_BASEURL = '/library/'
 #APPEND_SLASH = True
