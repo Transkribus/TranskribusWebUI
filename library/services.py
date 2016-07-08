@@ -6,8 +6,6 @@ requests.packages.urllib3.disable_warnings()
 #TODO sudo pip install 'requests[security]'
 #Possibly check for openssl-devel python-devel libffi-devel (yum)
 
-#from decorators import profile #presently circular... but do we need it here anyway or is profiling the views eneough...
-
 #import urllib2
 import xmltodict
 #from lxml import objectify
@@ -16,60 +14,48 @@ from django.conf import settings
 import sys
 import json
 import re
+#from profiler import profile
 
-
-#tmp to see if profiler is useful here...
-import hotshot
-import os
-import time
-import tempfile
-
-try:
-    PROFILE_LOG_BASE = settings.PROFILE_LOG_BASE
-except:
-    PROFILE_LOG_BASE = tempfile.gettempdir()
-
-
-def profile(log_file):
-    """Profile some callable.
-
-    This decorator uses the hotshot profiler to profile some callable (like
-    a view function or method) and dumps the profile data somewhere sensible
-    for later processing and examination.
-
-    It takes one argument, the profile log name. If it's a relative path, it
-    places it under the PROFILE_LOG_BASE. It also inserts a time stamp into the 
-    file name, such that 'my_view.prof' become 'my_view-20100211T170321.prof', 
-    where the time stamp is in UTC. This makes it easy to run and compare 
-    multiple trials.     
-    """
-    if not os.path.isabs(log_file):
-        log_file = os.path.join(PROFILE_LOG_BASE, log_file)
-
-    def _outer(f):
-        def _inner(*args, **kwargs):
-            # Add a timestamp to the profile output when the callable
-            # is actually called.
-	    sys.stdout.write("############# PROFILING2: %s\r\n" % log_file )
-            (base, ext) = os.path.splitext(log_file)
-            base = base + "-" + time.strftime("%Y%m%dT%H%M%S", time.gmtime())
-            final_log_file = base + ext
-
-            prof = hotshot.Profile(final_log_file)
-            try:
-                ret = prof.runcall(f, *args, **kwargs)
-            finally:
-                prof.close()
-            return ret
-
-        return _inner
-    return _outer
 #TODO rationalise this code
 # - lots of repitition
 # - possible to find or create (UIBK to create) more efficient ways of getting data
 # - epecially t_collection (which calls t_document in loop)
 
 s = requests.Session()
+
+def t_register(request):
+
+    url = settings.TRP_URL+'user/register' 
+
+    sys.stdout.write("### IN t_register: %s   \r\n" % (url) )
+    sys.stdout.flush()
+
+    params = {'user': request.POST.get('user'), 	
+		'pw': request.POST.get('pw'), 
+		'firstName': request.POST.get('firstName'), 
+		'lastName': request.POST.get('lastNaame'), 
+#		'email': request.POST.get('email'), 
+#		'gender': request.POST.get('gender'), 
+#		'orcid':request.POST.get('orcid'), 
+		'token': request.POST.get('g-recaptcha-response'), 
+		'application': "TSX"}
+    headers = {'content-type': 'application/x-www-form-urlencoded'}
+
+    sys.stdout.write("### [POST REQUEST] t_register POST to: %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.post(url, params=params, verify=False, headers=headers)
+    sys.stdout.write("### t_register response STATUS_CODE: %s  \r\n" % (r.status_code) )
+    sys.stdout.write("### t_register response CONTENT: %s  \r\n" % (r.content) )
+    sys.stdout.flush()
+    if r.status_code != requests.codes.ok:
+	raise ValueError("Transkribus registration error",str(r.status_code),r.content)
+        return None
+
+    user_xml = r.content
+
+    t_user=xmltodict.parse(user_xml)
+
+    return t_user['trpUserLogin']
 
 def t_login(user, pw):
     url = settings.TRP_URL+'auth/login' 
@@ -82,22 +68,14 @@ def t_login(user, pw):
     #TODO check wadl and use json (it is throwing a 415 at if just switching in the content-type)
 #    headers = {'content-type': 'application/json'}
 
-    #for no connection 
-    if settings.OFFLINE:
-	if settings.ADMIN_PASSWORD == pw:
-		user_xml = settings.TEST_USER_XML
-	else:
-		return None
-    #for connection 
-    else:
-        sys.stdout.write("### [POST REQUEST] t_login POST to: %s with %s \r\n" % (url,'credentials') )
-        sys.stdout.flush()
-    	r = s.post(url, params=params, verify=False, headers=headers)
-        sys.stdout.write("### t_login response STATUS_CODE: %s  \r\n" % (r.status_code) )
-        sys.stdout.flush()
-    	if r.status_code != requests.codes.ok:
-        	return None
-    	user_xml = r.content
+    sys.stdout.write("### [POST REQUEST] t_login POST to: %s with %s \r\n" % (url,'credentials') )
+    sys.stdout.flush()
+    r = s.post(url, params=params, verify=False, headers=headers)
+    sys.stdout.write("### t_login response STATUS_CODE: %s  \r\n" % (r.status_code) )
+    sys.stdout.flush()
+    if r.status_code != requests.codes.ok:
+        return None
+    user_xml = r.content
 
     t_user=xmltodict.parse(user_xml)
 
@@ -131,20 +109,16 @@ def t_collections():
 
     headers = {'content-type': 'application/json'}
     params = {} 
-    #for no connection:
-    if settings.OFFLINE:
-	collections_json = settings.TEST_COLLECTIONS_JSON
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_collectionssss will GET: %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-	if r.status_code != requests.codes.ok:
-	   sys.stdout.write("ERROR CODE: %s \r\n ERROR: %s" % (r.status_code, r.content) )
-	   sys.stdout.flush()
-	   return None
-	collections_json=r.content
-
+    
+    sys.stdout.write("### [GET REQUEST] t_collectionssss will GET: %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        sys.stdout.write("ERROR CODE: %s \r\n ERROR: %s" % (r.status_code, r.content) )
+	sys.stdout.flush()
+	return None
+    
+    collections_json=r.content
     collections = json.loads(collections_json) 
 
     #use common param 'key' for ids
@@ -169,33 +143,17 @@ def t_collection(request,collId):
 
     headers = {'content-type': 'application/json'}
     params = {} 
-    #for no connection:
-    if settings.OFFLINE:
-	collection_json = settings.TEST_COLLECTION_JSON
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_collectionnnnn will GET: %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-	if r.status_code != requests.codes.ok:
-	   sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
-	   sys.stdout.flush()
-	   return r.status_code
-	collection_json=r.content
 
+    sys.stdout.write("### [GET REQUEST] t_collectionnnnn will GET: %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
+	sys.stdout.flush()
+	return r.status_code
+    
+    collection_json=r.content
     t_collection = json.loads(collection_json)
-
-#    for doc in t_collection:
-#        doc['collId'] = collId
-#	doc['key'] = doc['docId']
-#	doc['folder'] = 'true'
-#	#fetch full document data with no transcripts for pages
-#        #TODO avoid this request if possible... actually we should be doing this in the view...
-#	fulldoc  = t_document(request, collId, doc['docId'], 0)
-#	doc['children'] = fulldoc.get('pageList').get("pages")
-#        for x in doc['children']:
-#	   x['title']=x['imgFileName'] 
-#	   x['collId']=collId
 
     #Cache this to reduce calls on subsequent lower level web-pages
     t_collection[0]['cache_url'] = url
@@ -205,14 +163,15 @@ def t_collection(request,collId):
 
     return t_collection
 
-@profile("t_document.prof")
+#@profile("t_document.prof")
 def t_document(request, collId, docId, nrOfTranscripts=None):
 
     url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/fulldoc'
     sys.stdout.write("### IN t_document: %s   \r\n" % (url) )
     sys.stdout.flush()
 
-    #we will keep the current document in the session to decrease the number of calls transkribus.eu
+     # doc caching turned off as was cuasing the transcript counts to be wrong TODO reinstate in a less crap way
+     # we will keep the current document in the session to decrease the number of calls transkribus.eu
 #    if "doc" in request.session :
 #	if request.session.get('doc').get('cache_url') == url :
 #            sys.stdout.write("### [HAVE CACHE] t_doc HAS CACHED doc for: %s \r\n" % (url) )
@@ -225,19 +184,13 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     if not nrOfTranscripts is None:
 	params['nrOfTranscripts'] = nrOfTranscripts
 	
-    #for no connection:
-    if settings.OFFLINE:
-	doc_xml = settings.TEST_FULL_DOC_XML
-	doc_json = settings.TEST_FULL_DOC_JSON
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_document will GET %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-    	if r.status_code != requests.codes.ok:
-        	return None
-    	doc_json = r.content
-
+    sys.stdout.write("### [GET REQUEST] t_document will GET %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        return None
+    	
+    doc_json = r.content
     t_doc = json.loads(doc_json)
 
     pages = t_doc.get("pageList").get("pages")
@@ -271,18 +224,13 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
     headers = {'content-type': 'application/json'}
     params = {}
 	
-    #for no connection:
-    if settings.OFFLINE:
-	page_json = settings.TEST_PAGE_JSON
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_page will GET %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-    	if r.status_code != requests.codes.ok:
-        	return None
-    	page_json = r.content
+    sys.stdout.write("### [GET REQUEST] t_page will GET %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        return None
 
+    page_json = r.content
     t_page = json.loads(page_json)
 
     #TODO would prefer a pageId rather than "page" which is a the page number
@@ -318,18 +266,13 @@ def t_current_transcript(request,collId, docId, page):
     headers = {'content-type': 'application/json'}
     params = {}
 	
-    #for no connection:
-    if settings.OFFLINE:
-	transcript_json = settings.TEST_PAGE_JSON
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_current_transcript will GET %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-    	if r.status_code != requests.codes.ok:
-        	return None
-    	transcript_json = r.content
+    sys.stdout.write("### [GET REQUEST] t_current_transcript will GET %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        return None
 
+    transcript_json = r.content
     t_transcript = json.loads(transcript_json)
 
     t_transcript['key'] = t_transcript.get('tsId')
@@ -359,18 +302,13 @@ def t_transcript(request,transcriptId,url):
     headers = {'content-type': 'application/xml'}
     params = {}
 	
-    #for no connection:
-    if settings.OFFLINE:
-	page_xml = settings.TEST_TRANSCRIPT
-    #for connection 
-    else:
-        sys.stdout.write("### [GET REQUEST] t_transcript will GET %s with %s \r\n" % (url,params) )
-        sys.stdout.flush()
-    	r = s.get(url, params=params, verify=False, headers=headers)
-    	if r.status_code != requests.codes.ok:
-            return None
-    	page_xml = r.content #this just returns the pageXML...
-
+    sys.stdout.write("### [GET REQUEST] t_transcript will GET %s with %s \r\n" % (url,params) )
+    sys.stdout.flush()
+    r = s.get(url, params=params, verify=False, headers=headers)
+    if r.status_code != requests.codes.ok:
+        return None
+    
+    page_xml = r.content #this just returns the pageXML...
     t_transcript=xmltodict.parse(page_xml)
 
     t_transcript['tsId'] = transcriptId
