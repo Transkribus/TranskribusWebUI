@@ -1,33 +1,23 @@
 # Synopsis of Transkribus library
 
-This is a quick doc to assess how the current browsing of the transkribus document structure is traversed. The purpose is elucidation for other partners, but also to identify bottlenecks and other inefficincies.
+This document assesses how the transkribus document structure is traversed by the Transkribus WebUI (aka Transkribus Library). The purpose is elucidation for other partners, but also to identify bottlenecks and other potential inefficiencies.
 
 ## Approach
 
-### Browse
+The Transkribus document structure with which we are concerned encompasses the list collections accessible by a given user all the way down to single word item and everythign in between. The Library website in it's current form is a demonstrator of how that structure can be traversed statelessly, using URIs.
 
-In essence we have a view per level (ie collection, document, page, transcript, region, line, word) each with the metadata for that object and a list of child objects. A list of siblings is also used to build a navigation interface (up, next, prev), this can usually be obtained from cached data.
+In essence we have a view per level (ie collection, document, page, transcript, region, line, word) each with the metadata for that object and a list of child objects. A list of sibling objects is also used to build a navigation interface (up, next, prev). The data is drawn exclusively from the transkribus [https://transkribus.eu/wiki/index.php/REST_Interface](REST service), but as you will see there is some post processing down before we can complete the traversal.
 
-Views are probably a bit overloaded in some cases, but may be a useful illustration of what is needed to present a useful representation of a given part of the system to the user from a single page request. 
+In some cases the views may be a bit overloaded, but we hope they prove a useful illustration of what is needed to access all and each of the elements of the transkribus data with single requests.
 
-### A question to resolve. 
+The overall aim is to provide the maximum *necessary* data in the simplest possible way so that the various clients can access, use and update the resources provided by the Transkribus service.
 
-Whether to...
+## Tech
 
-a. modify the transkribus web service to ensure delivery of the minimal '''necessary''' data with the smallest possible number of requests.
-b. Delegate more of the request management to the client so we have user-triggered requests for data. This was the approach with TSX but that seemed to degrade performance, and would probably still require some modification of the web service anyway.
+The django-python framework is used, and although not presently in the ideal state the aim is to build up a core of functionality within the project such that client apps can be added within the framework to help realise the pink bit of this [https://read02.uibk.ac.at/wiki/images/6/6b/Interfaces_Map.pdf](Interfaces Map). 
 
-Below we describe each of the components, what they are for and provide profiling data for analysis.
+As things stand everything is stuffed in a single app called "library". Below we describe each of the components, what they are for and `#TODO provide profiling data for analysis`.
 
-## Extensions of django 
-
-### library/backends.py/TranskribusBackend/authenticate
-
-Class to override user authrntication, effectively out-sourcing it to the Transkribus web service. The default django user object is extended to store some additional user data from the web service. For django apps using this there is the potential here to combine the user of transkribus as the authentication authority *and* further extend the user object to include useful app related user data (eg crowd-sourcing rewards/badges etc)
-
-### library/decorators.py/t_login_required
-
-Version of django @login_required decorator and is applied to any view that requires authentication. This extends default functionality by adding a call to t_services.collections so that the list of permissable collections is available for any logged in user.
 
 ## Views
 
@@ -112,3 +102,16 @@ It is the very apex of bonkers by this point. I'm sure we can do this a bit more
 ### library/jobs_list_compact
 ### library/kill_job
 
+## Extensions of django 
+
+### library/backends.py/TranskribusBackend/authenticate
+
+Class to override user authrntication, effectively out-sourcing it to the Transkribus web service. The default django user object is extended to store some additional user data from the web service. For django apps using this there is the potential here to combine the user of transkribus as the authentication authority *and* further extend the user object to include useful app related user data (eg crowd-sourcing rewards/badges etc)
+
+### library/decorators.py/t_login_required
+
+Version of django @login_required decorator and is applied to any view that requires authentication. This extends default functionality by adding a call to t_services.collections so that the list of permissable collections is available for any logged in user.
+
+## services
+
+We are almost exclusively using the transkribus REST service, for our backend and the services contain our interfaces to that.
