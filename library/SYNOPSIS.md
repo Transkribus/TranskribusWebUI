@@ -21,11 +21,11 @@ As things stand everything is stuffed in a single app called "library". Below we
 
 ## Views
 
-### library/collections
+#### library/collections
 
 Displays the list of collections for the authenticated user. As collections are cached by t_login_required we just fetch that data from the cache and send to template.
 
-### library/collection/{collId}
+#### library/collection/{collId}
 
 Displays the collection specified by {collId} and lists the documents *and* the page thumbnails, in that collection. 
 Uses `services.t_collection` to collect `colList`, a list of documents (JSON) for given {collId}
@@ -42,14 +42,14 @@ Then we fetch thumbnails for each page in a document (overkill?). To do this loo
 
 This is done only to retrieve the imgFileName for thumbnails.
 
-### library/document/{collId}/{docId}
+#### library/document/{collId}/{docId}
 
 Displays the document specified by {docId} and lists the pages in that document.
 
 `services.t_collection` for list of docs for nav object
 `services.t_document` (`fulldoc?nrOfTranscripts=-1`) which returns doc metadata and all transcripts
 
-### library/page/{collId}/{docId}/{pageNr}
+#### library/page/{collId}/{docId}/{pageNr}
 
 Displays the page specified by {pageNr} and lists the transcripts for that page we are delaing almost exlusively with data from fulldoc here.
 
@@ -59,9 +59,9 @@ Page level metadata extracted with equiv of  `//pageList/pages/index(pageNr-1)`.
 
 Transcripts are extracted with equiv of `//trList/transcripts`
 
-Sibling pages with `//pageList/pages` for nav
+Sibling pages with equiv of `//pageList/pages` for nav
 
-### library/transcript/{collId}/{docId}/{pageNr}/{transId}
+#### library/transcript/{collId}/{docId}/{pageNr}/{transId}
 
 Displays the transcript specified by {transId} and lists the regions of text for that transcript.
 
@@ -69,7 +69,7 @@ Displays the transcript specified by {transId} and lists the regions of text for
 
 `services.t_transcript` gives us the pageXML with a request to `https://dbis-thidre.uibk.ac.at/f/Get?id=....` and from there the child regions are extracted for the list.
 
-### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}
+#### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}
 
 Displays the region specified by {regionId} and lists the lines of text for that region.
 
@@ -79,36 +79,36 @@ Calls `services.t_document` to get the fulldoc (!) from whence it extraces paged
 
 With the pageXML extracted from the `services.t_page` call it then fetches the pageXML with `services.t_transcript` with which it can start parsing out data on the region and thei child lines if available.
 
-### library/line/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}
+#### library/line/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}
 
 As above this needs to call `services.t_documnet` for the fulldoc to extract the pagedata to get the image URL, `services.t_page` to get the transcirpt data which has the pageXML url and `services.t_transcript` for the pageXML from which it can parse out the regions (for the nav), line level metadata and the child words if available.
 
 Displays the line specified by {lineId} and lists the words for that line.
 
-### library/word/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
+#### library/word/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
 
 Displays the word specified by {wordId}. A single word, and the data associated with it as extraced from the hard won pageXML.
 
 It is the very apex of bonkers by this point. I'm sure we can do this a bit more efficiently.
 
 
-### library/ingest_mets_url
-### library/ingest_mets_xml
-### library/collections_dropdown
-### library/jobs_list
-### library/jobs
-### library/job_count
-### library/changed_jobs_modal
-### library/jobs_list_compact
-### library/kill_job
+#### library/ingest_mets_url
+#### library/ingest_mets_xml
+#### library/collections_dropdown
+#### library/jobs_list
+#### library/jobs
+#### library/job_count
+#### library/changed_jobs_modal
+#### library/jobs_list_compact
+#### library/kill_job
 
 ## Extensions of django 
 
-### library/backends.py/TranskribusBackend/authenticate
+#### library/backends.py/TranskribusBackend/authenticate
 
 Class to override user authrntication, effectively out-sourcing it to the Transkribus web service. The default django user object is extended to store some additional user data from the web service. For django apps using this there is the potential here to combine the user of transkribus as the authentication authority *and* further extend the user object to include useful app related user data (eg crowd-sourcing rewards/badges etc)
 
-### library/decorators.py/t_login_required
+#### library/decorators.py/t_login_required
 
 Version of django @login_required decorator and is applied to any view that requires authentication. This extends default functionality by adding a call to t_services.collections so that the list of permissable collections is available for any logged in user.
 
