@@ -97,11 +97,10 @@ Displays the line specified by {lineId} and lists the words for that line.
 
 ### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
 
-Displays a single word, and the data associated with it as extraced from the hard won pageXML.
+Displays the word specified by {wordId}. A single word, and the data associated with it as extraced from the hard won pageXML.
 
 It is the very apex of bonkers by this point. I'm sure we can do this a bit more efficiently.
 
-Displays the word specified by {wordId}.
 
 ### library/ingest_mets_url
 ### library/ingest_mets_xml
