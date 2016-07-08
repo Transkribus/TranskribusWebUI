@@ -2,6 +2,7 @@ import requests
 #import urllib2
 from django.conf import settings
 import sys
+import settings
 
 hierarchy = {'word': 'line',
 	     'line': 'region',
@@ -41,7 +42,8 @@ def up_next_prev(this_level,this_id, data,parent_ids=None):
   #  sys.stdout.write("UP: %s \nNEXT: %s\nPREV: %s  \r\n" % (up, next, prev) )
   #  sys.stdout.flush()
 
-    return {'up':"/library/"+"/".join(up),
+#    return {'up':"/library/"+"/".join(up),
+    return {'up': settings.APP_BASEURL+'/'.join(up),
 		'next':next,
 		'prev':prev}
 
