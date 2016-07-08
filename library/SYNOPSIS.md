@@ -91,16 +91,15 @@ Displays the word specified by {wordId}. A single word, and the data associated 
 
 It is the very apex of bonkers by this point. I'm sure we can do this a bit more efficiently.
 
-
-#### library/ingest_mets_url
-#### library/ingest_mets_xml
-#### library/collections_dropdown
-#### library/jobs_list
-#### library/jobs
-#### library/job_count
-#### library/changed_jobs_modal
-#### library/jobs_list_compact
-#### library/kill_job
+[comment]: # (#### library/ingest_mets_url)
+[comment]: # (#### library/ingest_mets_xml)
+[comment]: # (#### library/collections_dropdown)
+[comment]: # (#### library/jobs_list)
+[comment]: # (#### library/jobs)
+[comment]: # (#### library/job_count)
+[comment]: # (#### library/changed_jobs_modal)
+[comment]: # (#### library/jobs_list_compact)
+[comment]: # (#### library/kill_job)
 
 ## Extensions of django 
 
