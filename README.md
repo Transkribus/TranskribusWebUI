@@ -1,7 +1,7 @@
 # Transkribus Web UI
 Initial rework of [TSX] TSX for the [READ] READ project.
 
-This project uses python [Django] Django
+This project uses python [Django]
 
 So far this is a skeletal website to aid design discussion about the architechture of the WebUI. The basic idea is that the project will have 3 apps for each of the three modules described in the specification
 
@@ -10,6 +10,8 @@ So far this is a skeletal website to aid design discussion about the architechtu
 * Modification module
 
 Though possibly more apps for smaller bits of functioanilty... 
+
+[https://github.com/Transkribus/TranskribusWebUI/blob/master/library/SYNOPSIS.md](Synopsis of Transkribus WebUI/Library)
 
 ## Building
 Here is a short guide with steps that need to be performed to build Transkribus Web UI.
