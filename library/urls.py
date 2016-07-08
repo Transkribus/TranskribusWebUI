@@ -31,6 +31,8 @@ urlpatterns = [
     #oh yes he di' 
     url(r'^rand/([0-9]+)/(word|line|region|transcript|document)$', views.rand, name='rand'),
 
+    url(r'^error$', views.error, name='error'),
+
     url(r'^search$', views.search, name='search'),
     url(r'^about$', views.about, name='about'),
     url(r'^user_guide$', views.user_guide, name='user_guide'),
