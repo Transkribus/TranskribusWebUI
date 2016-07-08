@@ -95,7 +95,7 @@ As above this needs to call `services.t_documnet` for the fulldoc to extract the
 
 Displays the line specified by {lineId} and lists the words for that line.
 
-### library/region/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
+### library/word/{collId}/{docId}/{pageNr}/{transId}/{regionId}/{lineId}/{wordId}
 
 Displays the word specified by {wordId}. A single word, and the data associated with it as extraced from the hard won pageXML.
 
