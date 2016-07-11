@@ -14,7 +14,7 @@ The overall aim is to provide the maximum *necessary* data in the simplest possi
 
 ## Tech
 
-The django-python framework is used, and although not presently in the ideal state the aim is to build up a core of functionality within the project such that client apps can be added within the framework to help realise the pink bit of this [https://read02.uibk.ac.at/wiki/images/6/6b/Interfaces_Map.pdf](Interfaces Map). 
+The django-python framework is used, and although not presently in the ideal state the aim is to build up a core of functionality within the project such that client apps can be added within the framework to help realise the pink bit of this [Interfaces Map] (https://read02.uibk.ac.at/wiki/images/6/6b/Interfaces_Map.pdf). 
 
 As things stand everything is stuffed in a single app called "library". Below we describe each of the components, what they are for and `#TODO provide profiling data for each view for analysis`.
 
