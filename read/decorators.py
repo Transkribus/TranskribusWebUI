@@ -14,7 +14,7 @@ from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 
 import sys
-from services import t_refresh, t_collections
+from .services import t_refresh, t_collections
 
 #override the login_required decorator, mostly so we can call services.t_collecctions at login
 def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=None):

@@ -70,7 +70,7 @@ TEMPLATES = [
     		"library.context_processors.language_form_context_processor",
             ],
 	    'libraries' : {
-		'library_tags': 'library.templatetags',
+		'read_tags': 'read.templatetags',
 	    },
         },
     },

@@ -1,33 +1,33 @@
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-
-from .forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
- 
-from django.utils import translation
-
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
-from django.utils.translation import ugettext_lazy as _
-
-from .decorators import t_login_required
-#from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
-
-import settings
-import services
-import navigation
+#imports of python modules
 import json
 import sys
 import re
 import random
+
+#Imports of django modules
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.http import HttpResponseRedirect 
+from django.utils import translation
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 
-#import urllib2
-#import xmltodict
-#from django.apps import apps
+#Imports pf read modules
+from read.decorators import t_login_required
+from read.services import *
+#t_collection, t_register,
+
+#Imports from app (library)
+import library.settings
+import navigation
+from .forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
+
+#from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
+
 
 def register(request):
 #TODO this is generic guff need to extend form for extra fields, send reg data to transkribus and authticate (which will handle the user creation)
@@ -48,7 +48,7 @@ def register(request):
             # ...
             # redirect to a new URL:
             try: 
-            	services.t_register(request)
+            	t_register(request)
             	return HttpResponseRedirect('/library/profile')
 		#tried out modal here and it is noce (but not really for registration)
 #	        messages.info(request, _('Registration requested please check your email.'))
@@ -86,7 +86,7 @@ def collections(request):
 @t_login_required
 def collection(request, collId):
     #this is actually a call to collections/{collId}/list and returns only the document objects for a collection
-    docs = services.t_collection(request,collId)
+    docs = t_collection(request,collId)
     if(docs == 403): #no access to requested collection
        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
        sys.stdout.flush()
@@ -110,7 +110,7 @@ def collection(request, collId):
 	doc['key'] = doc['docId']
 	doc['folder'] = 'true'
 	#fetch full document data with no transcripts for pages //TODO avoid REST request in loop?
-	fulldoc  = services.t_document(request, collId, doc['docId'], 0)
+	fulldoc  = t_document(request, collId, doc['docId'], 0)
 	doc['children'] = fulldoc.get('pageList').get("pages")
         for x in doc['children']:
 	   x['title']=x['imgFileName'] 
@@ -131,8 +131,8 @@ def collection(request, collId):
 #@profile("document.prof")
 @t_login_required
 def document(request, collId, docId, page=None):
-    collection = services.t_collection(request, collId)
-    full_doc = services.t_document(request, collId, docId,-1)
+    collection = t_collection(request, collId)
+    full_doc = t_document(request, collId, docId,-1)
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
     return render(request, 'libraryapp/document.html', {
@@ -150,7 +150,7 @@ def document(request, collId, docId, page=None):
 @t_login_required
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
-    full_doc = services.t_document(request, collId, docId, -1)
+    full_doc = t_document(request, collId, docId, -1)
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
     #extract page data from full_doc (may be better from a  separate page data request)
@@ -184,7 +184,7 @@ def page(request, collId, docId, page):
 @t_login_required
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
-    pagedata = services.t_page(request, collId, docId, page) 
+    pagedata = t_page(request, collId, docId, page) 
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
 
     pageXML_url = None;
@@ -196,7 +196,7 @@ def transcript(request, collId, docId, page, transcriptId):
     sys.stdout.flush()
 
     if pageXML_url:
-	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+	transcript = t_transcript(request,transcriptId,pageXML_url)
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
 
@@ -207,7 +207,7 @@ def transcript(request, collId, docId, page, transcriptId):
         for x in regions:
             sys.stdout.write("CUSTOM : %s \r\n" % (x.get("@custom")) )
             sys.stdout.flush()
-	    x['md'] = services.t_metadata(x.get("@custom"))
+	    x['md'] = t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/transcript.html', {
 		'transcript' : transcript,
@@ -228,10 +228,10 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    transcripts = services.t_page(request,collId, docId, page) 
+    transcripts = t_page(request,collId, docId, page) 
 
     #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = services.t_document(request, collId, docId, -1)
+    full_doc = t_document(request, collId, docId, -1)
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
@@ -245,7 +245,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+	transcript = t_transcript(request,transcriptId,pageXML_url)
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
     if isinstance(regions, dict):
@@ -270,7 +270,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
     #parse metadata
     if lines:
         for x in lines:
-	     x['md'] = services.t_metadata(x.get("@custom"))
+	     x['md'] = t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/region.html', {
 		'region' : region,
@@ -314,7 +314,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     # here there is no need for anything over than the pageXML really
     # we could get one transcript from ...{page}/curr, but for completeness would 
     # rather use transciptId to target a particular transcript
-    transcripts = services.t_page(request,collId, docId, page) 
+    transcripts = t_page(request,collId, docId, page) 
     #we are only using the transcripts to get the pageXML for a particular
     pageXML_url = None;
     for x in transcripts:
@@ -323,10 +323,10 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+	transcript = t_transcript(request,transcriptId,pageXML_url)
 
     #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = services.t_document(request, collId, docId, -1)
+    full_doc = t_document(request, collId, docId, -1)
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
@@ -365,7 +365,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     #parse metadata
     if words:
         for x in words:
-	    x['md'] = services.t_metadata(x.get("@custom"))
+	    x['md'] = t_metadata(x.get("@custom"))
 
     return render(request, 'libraryapp/line.html', {
 		'line' : line,
@@ -387,7 +387,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 @t_login_required
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
-    transcripts = services.t_page(request, collId, docId, page) 
+    transcripts = t_page(request, collId, docId, page) 
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
     for x in transcripts:
@@ -396,10 +396,10 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 	    break
  
     if pageXML_url:
-	transcript = services.t_transcript(request,transcriptId,pageXML_url)
+	transcript = t_transcript(request,transcriptId,pageXML_url)
 
     #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = services.t_document(request, collId, docId, -1)
+    full_doc = t_document(request, collId, docId, -1)
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
@@ -431,7 +431,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     for x in words:
 	x['key'] = x.get("@id")
 	if(unicode(wordId) == unicode(x.get("@id"))):
-		x['md'] = services.t_metadata(x.get("@custom"))
+		x['md'] = t_metadata(x.get("@custom"))
 		word = x
 		
     if(word.get("Coords")):
@@ -458,7 +458,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 # This may be as simple as isPublished(), rather than any analysis on the content
 @t_login_required
 def rand(request, collId, element):
-    collection = services.t_collection(request,collId)
+    collection = t_collection(request,collId)
     if(collection == 403): #no access to requested collection
        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
        sys.stdout.flush()
@@ -476,15 +476,15 @@ def rand(request, collId, element):
     sys.stdout.write("RANDOM DOC: %s\r\n" % (doc.get("docId")) )
     sys.stdout.flush()
    
-    pages  = services.t_document(request, collId, doc.get("docId"), 0)
+    pages  = t_document(request, collId, doc.get("docId"), 0)
     page = random.choice(pages.get("pageList").get("pages"))
 
     sys.stdout.write("RANDOM PAGE: %s\r\n" % (page.get("pageNr")) )
     sys.stdout.flush()
 
     #best to avoid a random transcript, so we'll go for the current in the hope that it is best....
-    current_transcript = services.t_current_transcript(request, collId, doc.get("docId"), page.get("pageNr"))
-    transcript = services.t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
+    current_transcript = t_current_transcript(request, collId, doc.get("docId"), page.get("pageNr"))
+    transcript = t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
  
     word = None
     line = None
@@ -620,7 +620,7 @@ def ingest_mets_xml(request):
     if request.method == 'POST':
         try: 
             #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages? And validate the file. Note: Django allows form submission, even if no file has been selected.
-            services.t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
+            t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
             messages.info(request, 'File is being uploaded.')# TODO i18n,
             return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
         except:
@@ -635,7 +635,7 @@ def ingest_mets_xml(request):
 def ingest_mets_url(request):
     if request.method == 'POST':
         # What should be checked here and what can be left up to Transkribus?
-        if (services.t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
+        if (t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
             messages.info(request, 'URL is being processed.')# TODO i18n,
             return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
         else:
@@ -649,12 +649,12 @@ def ingest_mets_url(request):
 
 @t_login_required
 def collections_dropdown(request):
-    collections = services.t_collections()
+    collections = t_collections()
     return render(request, 'libraryapp/collections_dropdown.html', {'collections': collections})
 
 @t_login_required
 def create_collection_modal(request):
-    if (services.t_create_collection(request.POST.get('collection_name'))):
+    if (t_create_collection(request.POST.get('collection_name'))):
         return HttpResponse("New collection created successfully!", content_type="text/plain")
     #else:
            # TODO Handle failures... 
@@ -662,16 +662,16 @@ def create_collection_modal(request):
 @t_login_required           
 def jobs_list(request):
     if ('true' == request.POST.get('only_unfinished')):# TODO Consider making a form instead for persistence?
-        jobs = services.t_jobs('INCOMPLETE')
+        jobs = t_jobs('INCOMPLETE')
         only_unfinished = 'checked'
     else:
-        jobs = services.t_jobs()
+        jobs = t_jobs()
         only_unfinished = ''
     return render(request, 'libraryapp/jobs_list.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
 
 @t_login_required
 def jobs(request):
-    jobs = services.t_jobs('INCOMPLETE')
+    jobs = t_jobs('INCOMPLETE')
     only_unfinished = 'checked'
     return render(request, 'libraryapp/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
 
@@ -682,23 +682,23 @@ def job_count(request):# TODO Consider how much of a DOS risk these queries cons
     #sys.stdout.write("COOKIES: %s%% \r\n" % request.COOKIES)
     #sys.stdout.flush() 
     
-    #return  JsonResponse({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')});
-    #return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='application/json')
-    return HttpResponse(json.dumps({'CREATED': services.t_job_count('CREATED'), 'FAILED': services.t_job_count('FAILED'), 'FINISHED': services.t_job_count('FINISHED'),'WAITING': services.t_job_count('WAITING'), 'RUNNING': services.t_job_count('RUNNING'), 'CANCELED': services.t_job_count('CANCELED'), 'INCOMPLETE': services.t_job_count('INCOMPLETE')}), content_type='text/plain')
+    #return  JsonResponse({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')});
+    #return HttpResponse(json.dumps({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')}), content_type='application/json')
+    return HttpResponse(json.dumps({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')}), content_type='text/plain')
 
 @t_login_required
 def changed_jobs_modal(request):
-    jobs = services.t_jobs()
+    jobs = t_jobs()
     return render(request, 'libraryapp/changed_jobs_modal.html', {'jobs': jobs})
 
 @t_login_required           
 def jobs_list_compact(request):
-    jobs = services.t_jobs()
+    jobs = t_jobs()
     return render(request, 'libraryapp/jobs_list_compact.html', {'jobs': jobs})# TODO Decide what should be shown in the compact view. Only jobs which have changed since some "acknowledgement"? Since the last login? Since...?
 
 @t_login_required
 def kill_job(request):
-    if (services.t_kill_job(request.POST.get('job_id'))):
+    if (t_kill_job(request.POST.get('job_id'))):
         return jobs_list(request)
     else:
         return jobs_list(request) # test
