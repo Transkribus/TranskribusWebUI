@@ -14,7 +14,6 @@ from django.conf import settings
 import sys
 import json
 import re
-#from profiler import profile
 
 #TODO rationalise this code
 # - lots of repitition
@@ -82,7 +81,6 @@ def t_login(user, pw):
     return t_user['trpUserLogin']
 
 #refresh transkribus session (called by t_login_required decorator to test persistence/validity of transkribus session)
-#@profile("refresh.prof")
 def t_refresh():
     url = settings.TRP_URL+'auth/refresh' 
 
@@ -99,7 +97,6 @@ def t_refresh():
     else:
 	return True
 
-#@profile("t_collections.prof")
 def t_collections():
 
     url = settings.TRP_URL+'collections/list'
@@ -127,7 +124,6 @@ def t_collections():
 
     return collections
 
-#@profile("t_collection.prof")
 def t_collection(request,collId):
 
     url = settings.TRP_URL+'collections/'+unicode(collId)+'/list'
@@ -163,7 +159,6 @@ def t_collection(request,collId):
 
     return t_collection
 
-#@profile("t_document.prof")
 def t_document(request, collId, docId, nrOfTranscripts=None):
 
     url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/fulldoc'

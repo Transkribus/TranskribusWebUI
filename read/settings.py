@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'library',
     'nocaptcha_recaptcha',
+    'yet_another_django_profiler',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -52,6 +53,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'
