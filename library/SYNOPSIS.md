@@ -4,7 +4,7 @@ This document assesses how the transkribus document structure is traversed by th
 
 ## Approach
 
-The Transkribus document structure with which we are concerned encompasses the list collections accessible by a given user all the way down to single word item and everythign in between. The Library website in it's current form is a demonstrator of how that structure can be traversed statelessly, using URIs.
+The Transkribus document structure with which we are concerned encompasses the list collections accessible by a given user all the way down to single word item and everything in between. The Library website in its current form is a demonstrator of how that structure can be traversed statelessly, using URIs.
 
 In essence we have a view per level (ie collection, document, page, transcript, region, line, word) each with the metadata for that object and a list of child objects. A list of sibling objects is also used to build a navigation interface (up, next, prev). The data is drawn exclusively from the transkribus [REST service](https://transkribus.eu/wiki/index.php/REST_Interface), but as you will see there is some post processing down before we can complete the traversal.
 
@@ -14,7 +14,7 @@ The overall aim is to provide the maximum *necessary* data in the simplest possi
 
 ## Tech
 
-The django-python framework is used, and although not presently in the ideal state the aim is to build up a core of functionality within the project such that client apps can be added within the framework to help realise the pink bit of this [https://read02.uibk.ac.at/wiki/images/6/6b/Interfaces_Map.pdf](Interfaces Map). 
+The django-python framework is used, and although not presently in the ideal state the aim is to build up a core of functionality within the project such that client apps can be added within the framework to help realise the pink bit of this [Interfaces Map] (https://read02.uibk.ac.at/wiki/images/6/6b/Interfaces_Map.pdf). 
 
 As things stand everything is stuffed in a single app called "library". Below we describe each of the components, what they are for and `#TODO provide profiling data for each view for analysis`.
 
@@ -113,7 +113,7 @@ It is the very apex of bonkers by this point. I'm sure we can do this a bit more
 
 #### library/backends.py/TranskribusBackend/authenticate
 
-Class to override user authrntication, effectively out-sourcing it to the Transkribus web service. The default django user object is extended to store some additional user data from the web service. For django apps using this there is the potential here to combine the user of transkribus as the authentication authority *and* further extend the user object to include useful app related user data (eg crowd-sourcing rewards/badges etc)
+Class to override user authentication, effectively out-sourcing it to the Transkribus web service. The default django user object is extended to store some additional user data from the web service. For django apps using this there is the potential here to combine the user of transkribus as the authentication authority *and* further extend the user object to include useful app related user data (eg crowd-sourcing rewards/badges etc)
 
 #### library/decorators.py/t_login_required
 

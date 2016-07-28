@@ -2,23 +2,34 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 
-import services
+from read.services import t_login
 from models import TSData
 import sys
+
+"""
+This backend will 
+
+a) override authenticate so that it uses read.services.t_login to authenticate against transkcribus REST
+b) on success pass back username
+c) match username to existing django user OR create a new dango user
+b) set any data that is extra to default django user from
+	1) user data retirned by TS REST
+	2) user data that is local to the app
+"""
 
 class TranskribusBackend(object):
 
     def authenticate(self, username=None, password=None):
 
-        t_user = services.t_login(username, password)
+        t_user = t_login(username, password)
 	#We are using the colections data to set group permissions... somehow
 
 	if t_user:
            try:
                 user = User.objects.get(username=t_user['userName'])
+		#TODO need to update the TSdata if changed (affiliation, gender etc)
            except User.DoesNotExist:
                 # Create a new user. password is not chekced so we don't store it here
-#                user = User(username=t_user['userName'], password="PASSWORD_NOT_USED")
                 user = User(username=t_user['userName'])
 	   #Transkribus has authority here so update the user data each time...
 	   user.email = t_user['email']
@@ -34,6 +45,11 @@ class TranskribusBackend(object):
    	   	tsdata = TSData.objects.create(user=user)
 	   tsdata.gender=t_user['gender']
 	   tsdata.affiliation=t_user['affiliation']
+
+	   ######
+	   # If we have some local user data that we need to update dependent on whatever TS-REST returns do so here
+	   ######
+
            tsdata.save()
 	   #services.t_collections()
   
