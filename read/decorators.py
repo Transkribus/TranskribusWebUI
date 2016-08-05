@@ -31,7 +31,7 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
 	        request.session['collections'] = t_collections()
             return function(request, *args, **kw)
         else:
-	    path = request.build_absolute_uri()
+            path = request.build_absolute_uri()
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url. #TODO fix this after port from django source....
