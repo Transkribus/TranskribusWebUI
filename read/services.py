@@ -8,6 +8,7 @@ requests.packages.urllib3.disable_warnings()
 
 #import urllib2
 import xmltodict
+import dicttoxml
 #from lxml import objectify
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -177,7 +178,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
 
     params = {}
     if not nrOfTranscripts is None:
-	params['nrOfTranscripts'] = nrOfTranscripts
+        params['nrOfTranscripts'] = nrOfTranscripts
 	
     sys.stdout.write("### [GET REQUEST] t_document will GET %s with %s \r\n" % (url,params) )
     sys.stdout.flush()
@@ -211,7 +212,7 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
 
     #we will keep the current page in the session to decrease the number of calls to transkribus
     if "page" in request.session :
-	if request.session.get('page')[0].get('cache_url') == url :
+    	if request.session.get('page')[0].get('cache_url') == url :
             sys.stdout.write("### [HAVE CACHE] t_page HAS CACHED page for: %s \r\n" % (url) )
     	    sys.stdout.flush()
             return request.session['page']
@@ -253,7 +254,7 @@ def t_current_transcript(request,collId, docId, page):
 
     #we will keep the current page in the session to decrease the number of calls to transkribus
     if "current_transcript" in request.session :
-	if request.session.get('current_transcript').get('cache_url') == url :
+    	if request.session.get('current_transcript').get('cache_url') == url :
             sys.stdout.write("### [HAVE CACHE] t_current_transcript HAS CACHED current_transcript for: %s \r\n" % (url) )
     	    sys.stdout.flush()
             return request.session['current_transcript']
@@ -287,12 +288,13 @@ def t_transcript(request,transcriptId,url):
     sys.stdout.write("### IN t_transcript: %s   \r\n" % (url) )
     sys.stdout.flush()
 
+    # TODO Re-enable caching when the work is finished.
     #we will keep the current transcript in the session to decrease the number of calls to retirve and parse pageXML
-    if "transcript" in request.session :
-	if request.session.get('transcript').get('cache_url') == url :
-            sys.stdout.write("### [HAVE CACHE] t_transcript HAS CACHED transcript for: %s \r\n" % (url) )
-    	    sys.stdout.flush()
-            return request.session['transcript']
+    #if "transcript" in request.session :
+	#if request.session.get('transcript').get('cache_url') == url :
+       #     sys.stdout.write("### [HAVE CACHE] t_transcript HAS CACHED transcript for: %s \r\n" % (url) )
+    	  #  sys.stdout.flush()
+            #return request.session['transcript']
 
     headers = {'content-type': 'application/xml'}
     params = {}
@@ -314,7 +316,45 @@ def t_transcript(request,transcriptId,url):
     sys.stdout.flush()
     request.session['transcript'] = t_transcript
 
+
+
+
     return t_transcript
+
+def t_update_transcript():# TODO id, id, id...
+    # Should this method use the one below to iterate over all changed lines? Efficiency?  
+    return None
+    
+def t_save_transcript(transcript):
+    return None
+
+def t_update_transcript_line():
+    
+    # PREPARING A SAVE METHOD BY MESSING HERE...
+    #sys.stdout.write("### TEXT CONTENT %s \r\n" % t_transcript['PcGts']['Page']['TextRegion'][0]['TextLine'][1]['TextEquiv'])
+    sys.stdout.flush()
+    #t_transcript['PcGts']['Page']['TextRegion'][0]['TextLine'][1]['TextEquiv'] = 'asdfasdfasdfasdfasd'
+    #sys.stdout.write("### CHANGED CONTENT %s \r\n" % t_transcript['PcGts']['Page']['TextRegion'][0]['TextLine'][1]['TextEquiv'])
+    sys.stdout.flush()
+    #sys.stdout.write("### XML CONTENT %s \r\n" % dicttoxml. dicttoxml(t_transcript))
+    #sys.stdout.flush()
+
+    url = settings.TRP_URL+'collections/2550/5414/1/text'# TODO This is hardcoded just to avoid messing with other collections. Change when the rest works.
+
+    
+    sys.stdout.write("### URL %s \r\n" % url)
+    sys.stdout.flush()
+    
+    
+    params = {"status": "NEW"}
+    headers = {"content-type": "application/xml"}
+
+    #r = s.post(url, verify=False, headers=headers)dicttoxml.dicttoxml(t_transcript)
+    r = s.post(url, data='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><PcGts xmlns="http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15 http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15/pagecontent.xsd"><Metadata><Creator></Creator><Created>2016-02-24T16:25:42.278+02:00</Created><LastChange>2016-07-15T08:55:53.430+02:00</LastChange></Metadata><Page imageFilename="Birgerin suojeluskirje.jpg" imageWidth="5900" imageHeight="3722"><ReadingOrder><OrderedGroup id="ro_1468565753087" caption="Regions reading order"><RegionRefIndexed index="0" regionRef="region_1456323999573_3"/></OrderedGroup></ReadingOrder><TextRegion id="region_1456323999573_3" custom="readingOrder {index:0;}"><Coords points="591,426 5320,426 5320,2340 591,2340"/><TextLine id="line_1456324195173_7" custom="readingOrder {index:0;}"><Coords points="169,458 4674,458 4674,642 169,642"/><TextEquiv><Unicode></Unicode></TextEquiv></TextLine></TextRegion></Page></PcGts>', verify=False, headers=headers, params=params)
+    sys.stdout.write("### CONTENT %s \r\n" % r.content)
+    sys.stdout.flush()
+    
+    return None# TODO Implement!
 
 def quote_value(m):
     return ':"'+m.group(1)+'",'
