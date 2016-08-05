@@ -1,0 +1,50 @@
+{% extends "navi_base.html" %}
+{% load i18n %}
+
+{% load staticfiles %}
+
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Content -->
+<div class="container">
+    <!-- row 1 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>
+                {% trans "Proofread Region" %}
+                {{ request.session.current_transcript }}
+            </h1>
+    </div>
+    <div class="col-md-12 expandable">
+    	<script>
+			var lineData = {};
+		</script>
+		{% if lines|length > 0 %}
+			{% for line in lines %}
+				{% include "review/pr_line.html"  %}
+			{% endfor %}
+		{%endif%}
+	</div>
+</div>
+
+{% include "review/edit_line_modal.html"  %}
+
+<!-- /.row -->
+<script>
+         $(function() {
+            $( ".edit" ).click(function(p) {
+            	//alert($('#' + p.target.id).html());
+            	$(".line-content").html($('#' + p.target.id).html());
+            });
+         });
+ </script>
+ 
+{% endblock %}

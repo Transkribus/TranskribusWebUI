@@ -1,0 +1,21 @@
+{% load i18n %}
+<table class="table">
+<tr>
+<td>
+{# UNNECESSARY SLOWDOWN DURING TESTING<img class="img-responsive" src="{{imageUrl}}&crop={{ line|get_item:"crop_str"}}"/> #}
+<img class="img-responsive" src="{{imageUrl}}&crop={{ line|get_item:"crop_str"}}"/> 
+</td>
+</tr>
+<tr>
+<td>
+<div class="form-group">
+	<div id="{{ line|get_item:"id"}}">
+		{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}
+	</div>
+	<input class="form-control" type="text" id="{{ line|get_item:"id"}}"  value="{{ line|get_item:"TextEquiv"|get_item:"Unicode" }}" />
+	{# TODO Figure out if we want to use this or edit in-line: <a href="#editLineModal" role="button" class="btn btn-large btn-primary edit" data-toggle="modal" id="{{ line|get_item:"id"}}">{% trans "Edit line" %}</a> #}
+	<!-- <a href="#editLineModal" role="button" class="btn btn-large btn-primary edit" data-toggle="modal" id="{{ line|get_item:"id"}}">{% trans "Edit line" %}</a>-->
+</div>
+</td>
+</tr>
+</table>
