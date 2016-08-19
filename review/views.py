@@ -3,6 +3,7 @@ import json
 import sys
 import re
 import random
+from  xml.etree import ElementTree
 
 #Imports of django modules
 from django.http import HttpResponse
@@ -15,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
+from django.utils.html import escape
 
 #Imports pf read modules
 from read.decorators import t_login_required
@@ -25,62 +27,50 @@ from read.services import *
 import library.settings
 import library.navigation# TODO Fix this import!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 from library.forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
+from dicttoxml import dicttoxml
 
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
 
 # TODO Crop. It's broken now and should be reused anyway.
 # TODO Consider overlap with region view etc.
 @t_login_required
-def proofread(request, collId, docId, page, transcriptId, regionId):
-    # We need to be able to target a transcript (as mentioned elsewhere)
-    # here there is no need for anything over than the pageXML really
-    # we could get one transcript from ...{page}/curr, but for completeness would 
-    # rather use transciptId to target a particular transcript
-    transcripts = t_page(request,collId, docId, page) 
+def proofread(request, collId, docId, page, transcriptId, regionId):# TODO Decide how to select which transcript to work with unless it should always be the newest?
 
-    #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = t_document(request, collId, docId, -1)
-    index = int(page)-1
-    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
-    pagedata = full_doc.get('pageList').get('pages')[index]
-    
-    sys.stdout.write("############# PAGEDATA: %s\r\n" % pagedata )
-    #we are only using the transcripts to get the pageXML for a particular transcript...
-    pageXML_url = None;
-    for x in transcripts:
-        if int(x.get("tsId")) == int(transcriptId):
-            pageXML_url = x.get("url")
-            break
- 
-    if pageXML_url:
-        transcript = t_transcript(request,transcriptId,pageXML_url)
+    current_transcript = t_current_transcript(request, collId, docId, page)
 
-    # TODO ...
-    #sys.stdout.write("############# XML: %s\r\n" % transcript )
-    #sys.stdout.flush()
-    
-    
+    if request.method == 'POST':# OK to assume that if we get a post request, it means that we don't need to do the sort of checking as when first showing the transcript?
+        transcript_xml = t_transcript_xml(request, transcriptId, current_transcript.get("url"))
+        transcript_root = ElementTree.fromstring(transcript_xml)
+        for text_region in transcript_root.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextRegion'):# We have to have the namespace...
+            if text_region.attrib['id'] == regionId:
+                for line in text_region.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextLine'):
+                    modified_text = escape(request.POST.get(line.attrib['id']))
+                    line.text = modified_text
+                    line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
+        t_save_transcript(request, ElementTree.tostring(transcript_root), collId, docId, page)
+        current_transcript = t_current_transcript(request, collId, docId, page)# We want the updated transcript now.
+
+    transcript = t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
+    transcriptId = str(transcript.get("tsId"))    
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    
     if isinstance(regions, dict):
         regions = [regions]
-
+        
     for x in regions:
         x['key'] = x.get("@id")
         if(unicode(regionId) == unicode(x.get("@id"))):
             region = x
-
-    if(region.get("Coords")):
+            
+    if region.get("Coords"):
         region['crop_str'] = crop(region.get("Coords").get("@points"))
-
+        
     nav = library.navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
-
-#    sys.stdout.write("REGION: %s\r\n" % (region) )
-#    sys.stdout.flush()
-
     lines = region.get("TextLine")
+    
     if isinstance(lines, dict):
         lines = [lines]
-    #parse metadata
+    
     if lines:
         for x in lines:
             x['md'] = t_metadata(x.get("@custom"))
@@ -97,84 +87,13 @@ def proofread(request, collId, docId, page, transcriptId, regionId):
         'docId': docId,
         'pageId': page, #NB actually the number for now
         'transcriptId': transcriptId,
-        'imageUrl' : pagedata.get("url"),
+        'imageUrl' : t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
         })
-        
-# TODO Merge this as well when it's working as intended.
+
 @t_login_required
-def pr_line(request, collId, docId, page, transcriptId, regionId, lineId):
-    # We need to be able to target a transcript (as mentioned elsewhere)
-    # here there is no need for anything over than the pageXML really
-    # we could get one transcript from ...{page}/curr, but for completeness would 
-    # rather use transciptId to target a particular transcript
-    transcripts = t_page(request,collId, docId, page) 
-    #we are only using the transcripts to get the pageXML for a particular
-    pageXML_url = None;
-    for x in transcripts:
-        if int(x.get("tsId")) == int(transcriptId):
-            pageXML_url = x.get("url")
-            break
- 
-    if pageXML_url:
-        transcript = t_transcript(request,transcriptId,pageXML_url)
+def pr_line():
+    return render(request, 'review/pr_line.html')
 
-    #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = t_document(request, collId, docId, -1)
-    index = int(page)-1
-    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
-    pagedata = full_doc.get('pageList').get('pages')[index]
-
-    #This now officially bonkers....
-    regions=transcript.get("PcGts").get("Page").get("TextRegion");
-    if isinstance(regions, dict):
-        regions = [regions]
-
-    for x in regions:
-        if(unicode(regionId) == unicode(x.get("@id"))):
-            region = x
-
-    lines=region.get("TextLine");
-
-    if isinstance(lines, dict):
-        lines = [lines]
-
-
-    for x in lines:
-        x['key'] = x.get("@id")
-        if(unicode(lineId) == unicode(x.get("@id"))):
-            line = x
-
-    if(line.get("Coords")):
-        line['crop_str'] = crop(line.get("Coords").get("@points"))
-
-    nav = library.navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
-
-#    sys.stdout.write("REGION: %s\r\n" % (region) )
-#    sys.stdout.flush()
-
-    words = line.get("Word")
-    if isinstance(words, dict):
-        words = [words]
-    #parse metadata
-    if words:
-        for x in words:
-            x['md'] = t_metadata(x.get("@custom"))
-
-    return render(request, 'review/pr_line.html', {
-        'line' : line,
-        'words' : words,
-        'up': nav['up'],
-        'next': nav['next'],
-        'prev': nav['prev'],
-        'collId': collId,
-        'docId': docId,
-        'pageId': page, #NB actually the number for now
-        'transcriptId': transcriptId,
-        'regionId': regionId,
-        'lineId': lineId,
-        'imageUrl' : pagedata.get("url"),
-        })
-    
 def crop(coords):
     sys.stdout.write("############# COORDS: %s\r\n" % coords )
    # coords = region.get("Coords").get("@points")
@@ -195,84 +114,3 @@ def crop(coords):
     return crop_str
 #    sys.stdout.write("POINTS: %s\r\n" % (points) )
 #    sys.stdout.write("CROP: %s\r\n" % (crop) )
-
-# TODO Merge this as well when it's working as intended.
-@t_login_required
-def pr_line(request, collId, docId, page, transcriptId, regionId, lineId):
-    # We need to be able to target a transcript (as mentioned elsewhere)
-    # here there is no need for anything over than the pageXML really
-    # we could get one transcript from ...{page}/curr, but for completeness would 
-    # rather use transciptId to target a particular transcript
-    transcripts = services.t_page(request,collId, docId, page) 
-    #we are only using the transcripts to get the pageXML for a particular
-    pageXML_url = None;
-    for x in transcripts:
-        if int(x.get("tsId")) == int(transcriptId):
-            pageXML_url = x.get("url")
-            break
- 
-    if pageXML_url:
-        transcript = services.t_transcript(request,transcriptId,pageXML_url)
-
-    #To get the page image url we need the full_doc (we hope it's been cached)
-    full_doc = services.t_document(request, collId, docId, -1)
-    index = int(page)-1
-    # and then extract the correct page from full_doc (may be better from a  separate page data request??)
-    pagedata = full_doc.get('pageList').get('pages')[index]
-
-    #This now officially bonkers....
-    regions=transcript.get("PcGts").get("Page").get("TextRegion");
-    if isinstance(regions, dict):
-        regions = [regions]
-
-    for x in regions:
-        if(unicode(regionId) == unicode(x.get("@id"))):
-            region = x
-
-    lines=region.get("TextLine");
-
-    if isinstance(lines, dict):
-        lines = [lines]
-
-
-    for x in lines:
-        x['key'] = x.get("@id")
-        if(unicode(lineId) == unicode(x.get("@id"))):
-            line = x
-
-    if(line.get("Coords")):
-        line['crop_str'] = crop(line.get("Coords").get("@points"))
-
-    nav = library.navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
-
-#    sys.stdout.write("REGION: %s\r\n" % (region) )
-#    sys.stdout.flush()
-
-    words = line.get("Word")
-    if isinstance(words, dict):
-        words = [words]
-    #parse metadata
-    if words:
-        for x in words:
-            x['md'] = services.t_metadata(x.get("@custom"))
-
-    return render(request, 'review/pr_line.html', {
-        'line' : line,
-        'words' : words,
-        'up': nav['up'],
-        'next': nav['next'],
-        'prev': nav['prev'],
-        'collId': collId,
-        'docId': docId,
-        'pageId': page, #NB actually the number for now
-        'transcriptId': transcriptId,
-        'regionId': regionId,
-        'lineId': lineId,
-        'imageUrl' : pagedata.get("url"),
-        })
-    return None # TODO Something
-
-@t_login_required    
-def save_line(request):
-    # TODO Get some magic parameters from the modal.
-    return None # TODO Something
