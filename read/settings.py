@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
-    'library',
     'nocaptcha_recaptcha',
+    'read',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -181,7 +181,7 @@ LOGIN_REDIRECT_URL = 'profile'
 
 ### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
-    'library.backends.TranskribusBackend',
+    'read.backends.TranskribusBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 ]
 
