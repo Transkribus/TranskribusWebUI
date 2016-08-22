@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^library/', include('library.urls')),    
     url(r'^crowd/', include('crowd.urls')),    
     url(r'^admin/', admin.site.urls),
+    url(r'^review/', include('review.urls')),
 ]

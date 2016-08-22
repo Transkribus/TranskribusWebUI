@@ -1,0 +1,63 @@
+{# TODO Replace all of this according to Bolli's new UX design? #}
+{% extends "navi_base.html" %}
+{% load i18n %}
+
+{% load staticfiles %}
+
+{% block nav_buttons_out %}
+{% include "libraryapp/nav_buttons.html" with out=True %}
+{% endblock %}
+
+{% block nav_buttons_in %}
+{% include "libraryapp/nav_buttons.html" with out=False %}
+{% endblock %}
+
+{% block content %}
+
+	<div class="container">
+	    <div class="row">
+	        <h1>
+	            {% trans "Proofread Region" %}
+	        </h1>
+		</div>
+		<form action="" method="post" role="form">
+		    <div class="row">
+			    {% csrf_token %}
+				<div class="col-lg-12">
+					<div class="form-group">
+						<input class="btn btn-large btn-primary" type="submit" value="Save changes" />
+					</div>	    
+				</div>
+			</div>
+	    	<script>
+				var modifiedLines = [];
+				var registerInput;
+			</script>
+			{% if lines|length > 0 %}
+				{% for line in lines %}
+					{% include "review/pr_line.html"  %}
+				{% endfor %}
+			{%endif%}
+		</form>
+	</div>
+	{# DUH! TODO Remove the stuff below, we submit the entire form now. #}
+	<script>
+		 $(function() {
+		 	$( ".transcription" ).on('click', function() {
+				registerInput = true; {# We use this to detect input only once when the user has clicked on a text input and ignore other keypresses. #}
+		 	});
+		    $( ".transcription" ).on('input', function(p) {
+		    	if (registerInput) { 
+				    var alreadyIn = false;
+				    for ( var i = 0, j = modifiedLines.length; !alreadyIn && i < j; i++ ) {
+						alreadyIn = p.target.id == modifiedLines[i];
+					}
+				    if (!alreadyIn)
+				    	modifiedLines.push(p.target.id);
+		    		registerInput = false;
+	    		}
+		    });
+		 });
+	 </script>
+ 
+{% endblock %}

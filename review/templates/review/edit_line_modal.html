@@ -1,0 +1,41 @@
+{# TODO Remove this, unless there's something usable. #}
+{% load i18n %}
+
+<div id="editLineModal" class="modal fade" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans "Edit line" %}</h4>
+            </div>
+            <div class="modal-body line-content">
+				<!-- TODO... -->
+            </div>
+            <div class="modal-footer create-dialog">
+                <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a>
+            </div>
+            <div class="modal-body message collapse">
+				<div id="message"></div>
+            </div>
+            <div class="modal-footer message collapse">
+                <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+         $(function() {
+         	$('#editLineModal').draggable({
+		        handle: $('.modal-header'), 
+		        drag: function(event, ui) {
+					ui.position.top = ui.position.top;        
+					ui.position.left = ui.position.left * 2;// Bootstrap and jQuery have a bug/feature which necessitates this when making a modal draggable.
+		        },
+         	});
+			$('#editLineModal').on('hidden.bs.modal', function (e) {
+				$("#editLineModal").css({top: '0', left: '0'});// We reset the position since we always want to show a new modal in the same location. Additionally, this solves issues with dragging it.
+			});
+         });
+ </script>

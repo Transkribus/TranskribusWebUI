@@ -257,7 +257,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    region = x
 
     if(region.get("Coords")):
-	region['crop_str'] = crop(region.get("Coords").get("@points"))
+        region['crop_str'] = crop(region.get("Coords").get("@points"))
 
     nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
 
@@ -703,4 +703,3 @@ def kill_job(request):
     else:
         return jobs_list(request) # test
     # Leave as is or return an error message? The javascript could also handle the error...
-    

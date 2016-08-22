@@ -8,6 +8,7 @@ requests.packages.urllib3.disable_warnings()
 
 #import urllib2
 import xmltodict
+import dicttoxml
 #from lxml import objectify
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -177,7 +178,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
 
     params = {}
     if not nrOfTranscripts is None:
-	params['nrOfTranscripts'] = nrOfTranscripts
+        params['nrOfTranscripts'] = nrOfTranscripts
 	
     sys.stdout.write("### [GET REQUEST] t_document will GET %s with %s \r\n" % (url,params) )
     sys.stdout.flush()
@@ -211,7 +212,7 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
 
     #we will keep the current page in the session to decrease the number of calls to transkribus
     if "page" in request.session :
-	if request.session.get('page')[0].get('cache_url') == url :
+    	if request.session.get('page')[0].get('cache_url') == url :
             sys.stdout.write("### [HAVE CACHE] t_page HAS CACHED page for: %s \r\n" % (url) )
     	    sys.stdout.flush()
             return request.session['page']
@@ -253,7 +254,7 @@ def t_current_transcript(request,collId, docId, page):
 
     #we will keep the current page in the session to decrease the number of calls to transkribus
     if "current_transcript" in request.session :
-	if request.session.get('current_transcript').get('cache_url') == url :
+    	if request.session.get('current_transcript').get('cache_url') == url :
             sys.stdout.write("### [HAVE CACHE] t_current_transcript HAS CACHED current_transcript for: %s \r\n" % (url) )
     	    sys.stdout.flush()
             return request.session['current_transcript']
@@ -287,9 +288,9 @@ def t_transcript(request,transcriptId,url):
     sys.stdout.write("### IN t_transcript: %s   \r\n" % (url) )
     sys.stdout.flush()
 
-    #we will keep the current transcript in the session to decrease the number of calls to retirve and parse pageXML
+    # we will keep the current transcript in the session to decrease the number of calls to retirve and parse pageXML
     if "transcript" in request.session :
-	if request.session.get('transcript').get('cache_url') == url :
+    	if request.session.get('transcript').get('cache_url') == url :
             sys.stdout.write("### [HAVE CACHE] t_transcript HAS CACHED transcript for: %s \r\n" % (url) )
     	    sys.stdout.flush()
             return request.session['transcript']
@@ -315,6 +316,33 @@ def t_transcript(request,transcriptId,url):
     request.session['transcript'] = t_transcript
 
     return t_transcript
+
+# TODO Decide what not to duplicate.
+def t_transcript_xml(request,transcriptId,url):
+    if "transcript_xml" in request.session: # TODO Remove this? The xml is only used when saving after which the cache must be refreshed anyway...
+        if request.session.get('transcript_xml').get('cache_url') == url :
+            return request.session['transcript_xml']
+        
+    headers = {'content-type': 'application/xml'}
+    params = {}
+    r = s.get(url, params=params, verify=False, headers=headers)
+    
+    if r.status_code != requests.codes.ok:
+        return None
+    return r.content
+
+# Saves transcripts. TODO Statuses...    
+def t_save_transcript(request, transcript_xml, collId, docId, page):
+    params = {"status": "NEW"}
+    headers = {"content-type": "application/xml"}
+    
+    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/text'
+    r = s.post(url, verify=False, headers=headers, params=params, data=transcript_xml)
+    
+    # Remove the old version from cache.
+    del request.session['current_transcript']
+    
+    return None
 
 def quote_value(m):
     return ':"'+m.group(1)+'",'

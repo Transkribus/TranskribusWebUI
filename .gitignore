@@ -8,3 +8,9 @@ db.sqlite3
 # Make your own messages
 *.html.py
 *.mo
+/.directory
+/.project
+/.pydevproject
+# Eclipse didn't add these
+/org.eclipse.core.resources.prefs
+/.gitignore
