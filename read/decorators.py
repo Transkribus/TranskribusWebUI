@@ -25,13 +25,14 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
 	    # a quick post request ti auth/refresh should do?
 	    # If we don't get a 200 we logout
 	    if not t_refresh():
+		#TODO there is no logout view in library... though maybe a project level logout makes more sense
 	        return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
             #setting collections data as a session var if no already set
 	    if "collections" not in request.session or request.session['collections'] is None:
 	        request.session['collections'] = t_collections()
             return function(request, *args, **kw)
         else:
-	    path = request.build_absolute_uri()
+            path = request.build_absolute_uri()
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url. #TODO fix this after port from django source....
