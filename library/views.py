@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 
+from read.utils import crop
 #Imports pf read modules
 from read.decorators import t_login_required
 from read.services import *
@@ -236,14 +237,23 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
     
-    sys.stdout.write("############# PAGEDATA: %s\r\n" % pagedata )
+#    sys.stdout.write("############# PAGEDATA: %s\r\n" % pagedata )
+    sys.stdout.write("############# TRANSCRIPTS: %s\r\n" % transcripts )
+
     #we are only using the transcripts to get the pageXML for a particular transcript...
     pageXML_url = None;
     for x in transcripts:
-	if int(x.get("tsId")) == int(transcriptId):
+#        sys.stdout.write("############# transcript id comp: %s \r\n" % x.get("tsId") )
+#        sys.stdout.write("############# transcript id comp: %s \r\n" % transcriptId )
+
+        if int(x.get("tsId")) == int(transcriptId):
+            sys.stdout.write("############# transcript id comp: %s \r\n" % x.get("tsId") )
+            sys.stdout.write("############# transcript id comp: %s \r\n" % transcriptId )
 	    pageXML_url = x.get("url")
-	    break
+            break
  
+    sys.stdout.write("############# PAGEXML_url: %s\r\n" % pageXML_url )
+
     if pageXML_url:
 	transcript = t_transcript(request,transcriptId,pageXML_url)
 
@@ -284,26 +294,6 @@ def region(request, collId, docId, page, transcriptId, regionId):
 		'transcriptId': transcriptId,
 		'imageUrl' : pagedata.get("url"),
 		})
-def crop(coords):
-    sys.stdout.write("############# COORDS: %s\r\n" % coords )
-   # coords = region.get("Coords").get("@points")
-    points = coords.split()	
-    xmin=ymin=99999999 #TODO durh...
-    xmax=ymax=0
-    points = [map(int, point.split(',')) for point in points]
-    #boo two loops! but I like this one above here...
-    #TODO woops... I actually need this to x-off y-off widt and height...
-    for point in points:
-	if point[1] > ymax : ymax=point[1]
-	if point[1] < ymin : ymin=point[1]
-	if point[0] > xmax : xmax=point[0]
-	if point[0] < xmin : xmin=point[0]
-    crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
-    crop_str = str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
-
-    return crop_str
-#    sys.stdout.write("POINTS: %s\r\n" % (points) )
-#    sys.stdout.write("CROP: %s\r\n" % (crop) )
 
 
 #/library/transcript/{colId}/{docId}/{page}/{tsId}/{regionId}/{lineId}

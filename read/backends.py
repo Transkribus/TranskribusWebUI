@@ -51,7 +51,6 @@ class TranskribusBackend(object):
 	   ######
 
            tsdata.save()
-	   #services.t_collections()
   
            return user
         return None

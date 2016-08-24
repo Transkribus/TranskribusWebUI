@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'nocaptcha_recaptcha',
-    'library',
+    #'library',
+    'read',
     'review',
 ]
 
@@ -54,7 +55,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 #pip install yet_another_django_profiler and uncomment below then read https://pypi.python.org/pypi/yet-another-django-profiler/ for use
-#    'yet_another_django_profiler.middleware.ProfilerMiddleware',
+    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'
@@ -182,7 +183,7 @@ LOGIN_REDIRECT_URL = 'profile'
 
 ### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
-    'library.backends.TranskribusBackend',
+    'read.backends.TranskribusBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 ]
 
