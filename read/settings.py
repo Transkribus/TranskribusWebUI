@@ -55,7 +55,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 #pip install yet_another_django_profiler and uncomment below then read https://pypi.python.org/pypi/yet-another-django-profiler/ for use
-#    'yet_another_django_profiler.middleware.ProfilerMiddleware',
+    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'

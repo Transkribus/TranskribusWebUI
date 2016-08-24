@@ -21,6 +21,7 @@ from django.utils.html import escape
 #Imports pf read modules
 from read.decorators import t_login_required
 from read.services import *
+from read.utils import crop
 #t_collection, t_register,
 
 #Imports from app (library)
@@ -94,23 +95,23 @@ def proofread(request, collId, docId, page, transcriptId, regionId):# TODO Decid
 def pr_line():
     return render(request, 'review/pr_line.html')
 
-def crop(coords):
-    sys.stdout.write("############# COORDS: %s\r\n" % coords )
-   # coords = region.get("Coords").get("@points")
-    points = coords.split()    
-    xmin=ymin=99999999 #TODO durh...
-    xmax=ymax=0
-    points = [map(int, point.split(',')) for point in points]
-    #boo two loops! but I like this one above here...
+#def crop(coords):
+#    sys.stdout.write("############# COORDS: %s\r\n" % coords )
+#   # coords = region.get("Coords").get("@points")
+#    points = coords.split()    
+#    xmin=ymin=99999999 #TODO durh...
+#    xmax=ymax=0
+#    points = [map(int, point.split(',')) for point in points]
+#    #boo two loops! but I like this one above here...
     #TODO woops... I actually need this to x-off y-off widt and height...
-    for point in points:
-        if point[1] > ymax : ymax=point[1]
-        if point[1] < ymin : ymin=point[1]
-        if point[0] > xmax : xmax=point[0]
-        if point[0] < xmin : xmin=point[0]
-        crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
-        crop_str = str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
-
-    return crop_str
+##    for point in points:
+#        if point[1] > ymax : ymax=point[1]
+#        if point[1] < ymin : ymin=point[1]
+#        if point[0] > xmax : xmax=point[0]
+#        if point[0] < xmin : xmin=point[0]
+#        crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
+#        crop_str = str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
+#
+#    return crop_str
 #    sys.stdout.write("POINTS: %s\r\n" % (points) )
-#    sys.stdout.write("CROP: %s\r\n" % (crop) )
+##    sys.stdout.write("CROP: %s\r\n" % (crop) )

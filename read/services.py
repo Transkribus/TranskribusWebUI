@@ -166,7 +166,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     sys.stdout.write("### IN t_document: %s   \r\n" % (url) )
     sys.stdout.flush()
 
-     # doc caching turned off as was cuasing the transcript counts to be wrong TODO reinstate in a less crap way
+     # doc caching turned off as was causing the transcript counts to be wrong TODO reinstate in a less crap way
      # we will keep the current document in the session to decrease the number of calls transkribus.eu
 #    if "doc" in request.session :
 #	if request.session.get('doc').get('cache_url') == url :
@@ -285,8 +285,8 @@ def t_current_transcript(request,collId, docId, page):
 def t_transcript(request,transcriptId,url):
 
     #transcript metadata for this page ie the pageXML
-    sys.stdout.write("### IN t_transcript: %s   \r\n" % (url) )
-    sys.stdout.flush()
+#    sys.stdout.write("### IN t_transcript: %s   \r\n" % (url) )
+#    sys.stdout.flush()
 
     # we will keep the current transcript in the session to decrease the number of calls to retirve and parse pageXML
     if "transcript" in request.session :
@@ -295,16 +295,7 @@ def t_transcript(request,transcriptId,url):
     	    sys.stdout.flush()
             return request.session['transcript']
 
-    headers = {'content-type': 'application/xml'}
-    params = {}
-	
-    sys.stdout.write("### [GET REQUEST] t_transcript will GET %s with %s \r\n" % (url,params) )
-    sys.stdout.flush()
-    r = s.get(url, params=params, verify=False, headers=headers)
-    if r.status_code != requests.codes.ok:
-        return None
-    
-    page_xml = r.content #this just returns the pageXML...
+    page_xml = t_transcript_xml(request,transcriptId,url)
     t_transcript=xmltodict.parse(page_xml)
 
     t_transcript['tsId'] = transcriptId
