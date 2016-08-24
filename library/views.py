@@ -267,7 +267,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    region = x
 
     if(region.get("Coords")):
-        region['crop'] = crop(region.get("Coords").get("@points"))
+        region['crop'] = crop(region.get("Coords").get("@points"),True)
 
     nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
 
@@ -342,7 +342,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 	    line = x
 
     if(line.get("Coords")):
-        line['crop'] = crop(line.get("Coords").get("@points"))
+        line['crop'] = crop(line.get("Coords").get("@points"),True)
 
 
     nav = navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
@@ -426,7 +426,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		word = x
 		
     if(word.get("Coords")):
-	word['crop'] = crop(word.get("Coords").get("@points"))
+	word['crop'] = crop(word.get("Coords").get("@points"),True)
 
     nav = navigation.up_next_prev("word",wordId,words,[collId,docId,page,transcriptId,regionId,lineId])
 
