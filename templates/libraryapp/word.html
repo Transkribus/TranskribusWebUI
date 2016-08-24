@@ -31,7 +31,7 @@
 		<dt>{% trans "ID" %}</dt><dd>{{ word|get_item:"@id" }}</dd>
 		<dt>{% trans "Text" %}</dt><dd>{{ word|get_item:"TextEquiv"|get_item:"Unicode" }}</dd>
 		<dt>{% trans "Language" %}</dt><dd>{{ word|get_item:"@PrimaryLanguage" }}</dd>
-		<dt>{% trans "Image" %}</dt><dd><img class="img_snip word" src="{{imageUrl}}&crop={{ word|get_item:"crop_str"}}"/></dd>
+		<dt>{% trans "Image" %}</dt><dd><img class="img_snip word" src="{{imageUrl}}&crop={{ word|get_item:"crop"|coords_for_fimagestore}}"/></dd>
 
 		</dl>
 

@@ -13,7 +13,6 @@ def crop(coords):
 	if point[0] > xmax : xmax=point[0]
 	if point[0] < xmin : xmin=point[0]
     crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
-    crop_str = str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
 
-    return crop_str
+    return crop
 

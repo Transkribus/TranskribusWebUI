@@ -24,3 +24,12 @@ def get_item(dictionary, key):
 def index(List, i):
     return List[int(i)]
 
+@register.filter
+def coords_for_fimagestore(crop):
+    return str(crop.get('x'))+"x"+str(crop.get('y'))+"x"+str(crop.get('w'))+"x"+str(crop.get('h'))
+
+@register.filter
+def coords_for_imagemap(coords):
+    return coords.replace(" ",",")
+
+

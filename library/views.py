@@ -111,17 +111,17 @@ def collection(request, collId):
 	doc['key'] = doc['docId']
 	doc['folder'] = 'true'
 	#fetch full document data with no transcripts for pages //TODO avoid REST request in loop?
-	fulldoc  = t_document(request, collId, doc['docId'], 0)
-	doc['children'] = fulldoc.get('pageList').get("pages")
-        for x in doc['children']:
-	   x['title']=x['imgFileName'] 
-	   x['collId']=collId
+#	fulldoc  = t_document(request, collId, doc['docId'], 0)
+#	doc['children'] = fulldoc.get('pageList').get("pages")
+#        for x in doc['children']:
+#	   x['title']=x['imgFileName'] 
+#	   x['collId']=collId
 
     return render(request, 'libraryapp/collection.html', {
         'collId': collId, 
         'collection': collection,
         'documents': docs,
-        'documents_json': json.dumps(docs),
+#        'documents_json': json.dumps(docs),
         'up': nav['up'], 
         'next': nav['next'],
         'prev': nav['prev'],
@@ -267,7 +267,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 	    region = x
 
     if(region.get("Coords")):
-        region['crop_str'] = crop(region.get("Coords").get("@points"))
+        region['crop'] = crop(region.get("Coords").get("@points"))
 
     nav = navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
 
@@ -342,7 +342,8 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 	    line = x
 
     if(line.get("Coords")):
-	line['crop_str'] = crop(line.get("Coords").get("@points"))
+        line['crop'] = crop(line.get("Coords").get("@points"))
+
 
     nav = navigation.up_next_prev("line",lineId,lines,[collId,docId,page,transcriptId,regionId])
 
@@ -425,7 +426,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 		word = x
 		
     if(word.get("Coords")):
-	word['crop_str'] = crop(word.get("Coords").get("@points"))
+	word['crop'] = crop(word.get("Coords").get("@points"))
 
     nav = navigation.up_next_prev("word",wordId,words,[collId,docId,page,transcriptId,regionId,lineId])
 
