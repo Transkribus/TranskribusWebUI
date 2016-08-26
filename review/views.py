@@ -32,6 +32,10 @@ from dicttoxml import dicttoxml
 
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
 
+
+def index(request):
+    return render(request, 'review/homepage.html' )
+
 # TODO Crop. It's broken now and should be reused anyway.
 # TODO Consider overlap with region view etc.
 @t_login_required
