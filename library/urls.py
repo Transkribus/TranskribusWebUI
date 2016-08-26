@@ -41,5 +41,5 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^profile$', views.profile, name='profile'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
-    url('^', include('django.contrib.auth.urls')),
+    #url('^', include('django.contrib.auth.urls')),
 ]

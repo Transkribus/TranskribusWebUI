@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #'library',
     'read',
     'review',
+    'dashboard',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -26,7 +26,9 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
 	    # If we don't get a 200 we logout
 	    if not t_refresh():
 		#TODO there is no logout view in library... though maybe a project level logout makes more sense
-	        return HttpResponseRedirect('/library/logout?next='+request.get_full_path())
+#                app_root = request.path
+#		sys.stdout.write("### request: %s \r\n" % request.path )
+	        return HttpResponseRedirect('/logout?next='+request.get_full_path())
             #setting collections data as a session var if no already set
 	    if "collections" not in request.session or request.session['collections'] is None:
 	        request.session['collections'] = t_collections()
