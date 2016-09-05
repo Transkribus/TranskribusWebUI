@@ -190,7 +190,7 @@ AUTHENTICATION_BACKENDS = [
 
 ### parameters for services
 #transkribus rest service
-TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
+TRP_URL = TRANSKRIBUS_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
 
