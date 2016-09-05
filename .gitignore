@@ -1,16 +1,14 @@
-# Migrate your own
 db.sqlite3
 */migrations/*
-# Compile your own
 *.pyc
-# Read your own logs
 *.log
-# Make your own messages
 *.html.py
 *.mo
 /.directory
 /.project
 /.pydevproject
-# Eclipse didn't add these
 /org.eclipse.core.resources.prefs
 /.gitignore
+#*#
+*~
+.bak
