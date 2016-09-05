@@ -1,4 +1,4 @@
-var JOB_COUNT_POLL = 1000 * 60 * 60;
+var JOB_COUNT_POLL = 1000 * 60;
 
 function getCookie(cookieName) {
     var cookieArray = document.cookie.split(';');
