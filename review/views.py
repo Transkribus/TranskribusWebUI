@@ -64,7 +64,7 @@ def proofread(request, collId, docId, page, transcriptId, regionId):# TODO Decid
 
     for x in regions:
         x['key'] = x.get("@id")
-        if(unicode(regionId) == unicode(x.get("@id"))):
+        if(str(regionId) == str(x.get("@id"))):
             region = x
 
     if region.get("Coords"):
