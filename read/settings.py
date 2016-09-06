@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'read',
     'review',
     'dashboard',
+
+    'transkribus'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -72,11 +74,11 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-    		"library.context_processors.language_form_context_processor",
+                "library.context_processors.language_form_context_processor",
             ],
-	    'libraries' : {
-		'read_tags': 'read.templatetags',
-	    },
+            'libraries' : {
+                'read_tags': 'read.templatetags',
+            },
         },
     },
 ]
@@ -123,30 +125,30 @@ LOCALE_PATHS = [
 LANGUAGE_CODE = 'en'
 from django.utils.translation import ugettext_lazy as _
 LANGUAGES = [
-	('bg', _('Bulgarian')),
-	('hr', _('Croatian')),
-	('cs', _('Czech')),
-	('da', _('Danish')),
-	('nl', _('Dutch')),
-	('en', _('English')),
-	('et', _('Estonian')),
-	('fi', _('Finnish')),
-	('fr', _('French')),
-	('de', _('German')),
-	('el', _('Greek')),
-	('hu', _('Hungarian')),
-	('ga', _('Irish')),
-	('it', _('Italian')),
-	('lv', _('Latvian')),
-	('lt', _('Lithuanian')),
-#	('mt', _('Maltese')), NO MALTESE IN DJANGO
-	('pl', _('Polish')),
-	('pt', _('Portuguese')),
-	('ro', _('Romanian')),
-	('sk', _('Slovak')),
-	('sl', _('Slovenian')),
-	('es', _('Spanish')),
-	('sv', _('Swedish')),
+        ('bg', _('Bulgarian')),
+        ('hr', _('Croatian')),
+        ('cs', _('Czech')),
+        ('da', _('Danish')),
+        ('nl', _('Dutch')),
+        ('en', _('English')),
+        ('et', _('Estonian')),
+        ('fi', _('Finnish')),
+        ('fr', _('French')),
+        ('de', _('German')),
+        ('el', _('Greek')),
+        ('hu', _('Hungarian')),
+        ('ga', _('Irish')),
+        ('it', _('Italian')),
+        ('lv', _('Latvian')),
+        ('lt', _('Lithuanian')),
+#       ('mt', _('Maltese')), NO MALTESE IN DJANGO
+        ('pl', _('Polish')),
+        ('pt', _('Portuguese')),
+        ('ro', _('Romanian')),
+        ('sk', _('Slovak')),
+        ('sl', _('Slovenian')),
+        ('es', _('Spanish')),
+        ('sv', _('Swedish')),
 ];
 
 TIME_ZONE = 'UTC'
@@ -184,13 +186,14 @@ LOGIN_REDIRECT_URL = 'profile'
 
 ### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
-    'read.backends.TranskribusBackend',
-#    'django.contrib.auth.backends.ModelBackend',
+    # 'read.backends.TranskribusBackend',
+    'transkribus.auth_backends.TranskribusBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
 ]
 
 ### parameters for services
 #transkribus rest service
-TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
+TRP_URL = TRANSKRIBUS_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
 

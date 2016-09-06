@@ -1,3 +1,5 @@
+var JOB_COUNT_POLL = 1000 * 60;
+
 function getCookie(cookieName) {
     var cookieArray = document.cookie.split(';');
     for(var i = 0; i < cookieArray.length; i++) {
@@ -32,7 +34,7 @@ function jobCountsPoll() {
 			jobCountsChanged(json);
 			jobCountsPoll();
 		}});
-	}, 5000);// How frequent?
+	}, JOB_COUNT_POLL);// How frequent?
 }
 
 function jobStatusAlert() {

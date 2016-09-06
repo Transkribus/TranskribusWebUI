@@ -1,4 +1,4 @@
-# Transkribus Web UI
+# FORK Transkribus Web UI FORK
 Initial rework of [TSX] TSX for the [READ] READ project.
 
 This project uses python [Django]
