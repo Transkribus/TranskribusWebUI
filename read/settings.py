@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'read',
     'review',
     'dashboard',
+
+    'transkribus'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -184,8 +186,9 @@ LOGIN_REDIRECT_URL = 'profile'
 
 ### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
-    'read.backends.TranskribusBackend',
-#    'django.contrib.auth.backends.ModelBackend',
+    # 'read.backends.TranskribusBackend',
+    'transkribus.auth_backends.TranskribusBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
 ]
 
 ### parameters for services
