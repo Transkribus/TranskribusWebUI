@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^review/', include('review.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
 
+    url(r'^transkribus/', include('transkribus.urls')),
+
     url('^', include('django.contrib.auth.urls')),
 
 ]
