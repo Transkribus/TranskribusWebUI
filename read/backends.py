@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 
 from read.services import t_login
-from models import TSData
+from .models import TSData
 import sys
 
 """

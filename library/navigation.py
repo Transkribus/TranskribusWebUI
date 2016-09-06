@@ -2,7 +2,7 @@ import requests
 #import urllib2
 from django.conf import settings
 import sys
-import settings
+from . import settings
 
 hierarchy = {'word': 'line',
              'line': 'region',

@@ -127,7 +127,7 @@ def t_collections():
 
 def t_collection(request,collId):
 
-    url = settings.TRP_URL+'collections/'+unicode(collId)+'/list'
+    url = settings.TRP_URL+'collections/'+str(collId)+'/list'
     sys.stdout.write("### IN t_collectionnnn: %s   \r\n" % (url) )
     sys.stdout.flush()
 
@@ -162,7 +162,7 @@ def t_collection(request,collId):
 
 def t_document(request, collId, docId, nrOfTranscripts=None):
 
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/fulldoc'
+    url = settings.TRP_URL+'collections/'+collId+'/'+str(docId)+'/fulldoc'
     sys.stdout.write("### IN t_document: %s   \r\n" % (url) )
     sys.stdout.flush()
 
@@ -205,7 +205,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
 def t_page(request,collId, docId, page, nrOfTranscripts=None):
 
     #list of transcripts for this page
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/list'
+    url = settings.TRP_URL+'collections/'+collId+'/'+str(docId)+'/'+str(page)+'/list'
 
     sys.stdout.write("### IN t_page: %s   \r\n" % (url) )
     sys.stdout.flush()
@@ -247,7 +247,7 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
 def t_current_transcript(request,collId, docId, page):
 
     #list of transcripts for this page
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/curr'
+    url = settings.TRP_URL+'collections/'+collId+'/'+str(docId)+'/'+str(page)+'/curr'
 
     sys.stdout.write("### IN t_current_transcript: %s   \r\n" % (url) )
     sys.stdout.flush()
@@ -327,7 +327,7 @@ def t_save_transcript(request, transcript_xml, collId, docId, page):
     params = {"status": "NEW"}
     headers = {"content-type": "application/xml"}
 
-    url = settings.TRP_URL+'collections/'+collId+'/'+unicode(docId)+'/'+unicode(page)+'/text'
+    url = settings.TRP_URL+'collections/'+collId+'/'+str(docId)+'/'+str(page)+'/text'
     r = s.post(url, verify=False, headers=headers, params=params, data=transcript_xml)
 
     # Remove the old version from cache.

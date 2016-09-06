@@ -24,7 +24,7 @@ from read.services import *
 
 #Imports from app (library)
 import library.settings
-import navigation
+from . import navigation
 from .forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
 
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
@@ -99,7 +99,7 @@ def collection(request, collId):
     # The same could be achieved using the list of documents (ie pick first doc match collId with member of colList)
     collection = None
     for x in collections:
-        if unicode(x.get("colId")) == unicode(collId):
+        if str(x.get("colId")) == str(collId):
             collection = x
 
     nav = navigation.up_next_prev("collection",collId,collections)
@@ -263,7 +263,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 
     for x in regions:
         x['key'] = x.get("@id")
-        if(unicode(regionId) == unicode(x.get("@id"))):
+        if(str(regionId) == str(x.get("@id"))):
             region = x
 
     if(region.get("Coords")):
@@ -327,7 +327,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
         regions = [regions]
 
     for x in regions:
-        if(unicode(regionId) == unicode(x.get("@id"))):
+        if(str(regionId) == str(x.get("@id"))):
             region = x
 
     lines=region.get("TextLine");
@@ -338,7 +338,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 
     for x in lines:
         x['key'] = x.get("@id")
-        if(unicode(lineId) == unicode(x.get("@id"))):
+        if(str(lineId) == str(x.get("@id"))):
             line = x
 
     if(line.get("Coords")):
@@ -401,7 +401,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
         regions = [regions]
 
     for x in regions:
-        if(unicode(regionId) == unicode(x.get("@id"))):
+        if(str(regionId) == str(x.get("@id"))):
             region = x
 
     lines=region.get("TextLine");
@@ -410,7 +410,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
         lines = [lines]
 
     for x in lines:
-        if(unicode(lineId) == unicode(x.get("@id"))):
+        if(str(lineId) == str(x.get("@id"))):
             line = x
 
     words = line.get("Word")
@@ -421,7 +421,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     #parse metadata
     for x in words:
         x['key'] = x.get("@id")
-        if(unicode(wordId) == unicode(x.get("@id"))):
+        if(str(wordId) == str(x.get("@id"))):
             x['md'] = t_metadata(x.get("@custom"))
             word = x
 
@@ -461,7 +461,7 @@ def rand(request, collId, element):
 
     collection = None
     for x in doc.get("collectionList").get("colList"):
-        if unicode(x.get("colId")) == unicode(collId):
+        if str(x.get("colId")) == str(collId):
             collection = x
 
     sys.stdout.write("RANDOM DOC: %s\r\n" % (doc.get("docId")) )
@@ -555,7 +555,7 @@ def display_random(request,level,data, collection, doc, page):
         text = {}
     elif data.get("TextEquiv"):
         if data.get("TextEquiv").get("Unicode"):
-            text = unicode(data.get("TextEquiv").get("Unicode"))
+            text = str(data.get("TextEquiv").get("Unicode"))
 
     return render(request, 'library/random.html', {
                 "level": level,
