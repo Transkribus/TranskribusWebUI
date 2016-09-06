@@ -1,13 +1,17 @@
 import requests
 import pickle
+import logging
 
 from django.conf import settings
 
+from xmltodict import parse as parse_xml
+
 from . import utils
 
+logger = logging.getLogger('auth')
 
 TRANSKRIBUS_API_SESSION_KEY = KEY = '_TRANSKRIBUS_API_SESSION_KEY'
-
+TRANSKRIBUS_API_USER_AGENT = USER_AGENT = 'TranskribusWebUI'
 
 # import xmltodict
 # import json
@@ -68,7 +72,7 @@ class Client:
 
 class RequestsClient(Client):
 
-    OPTIONS = {'verify': True, 'stream': True}
+    OPTIONS = {'verify': True, 'stream': True, 'headers': {'User-Agent': USER_AGENT}}
 
     def __init__(self, session=None, *args, **kwargs):
 
@@ -130,7 +134,10 @@ class TranskribusAPI(RequestsAPI):
             data=data
         )
 
-        self._session_cookies = r.cookies.get_dict()
+        cookies = r.cookies.get_dict()
+
+        self._session_cookies = cookies
+        self.client.options.update(cookies=cookies)
 
         return r
 
@@ -244,6 +251,63 @@ class TranskribusAPI(RequestsAPI):
         return self.client.get(
             self.murl('jobs', job_id, 'kill').url)
 
+
+def boolean(value):
+    if value == 'true':
+        return True
+    elif value == '1':
+        return True
+    elif value == '0':
+        return False
+    else:
+        return False
+
+_FIELDS = {
+    'userName': ('username', str),
+    'firstname': ('first_name', str),
+    'lastname': ('last_name', str),
+    'isAdmin': ('is_superuser', boolean),
+    'sessionId': ('session_id', str),
+    'loginTime': ('login_time', str),
+    'userAgent': ('user_agent', str),
+    'userId': ('user_id', int),
+    'isActive': ('is_active', boolean),
+    # 'ip': ('ip', str)
+    # 'email': ('email', str),
+
+}
+
+def _serialize(fileobj):
+
+    data = parse_xml(fileobj)
+
+    data = data.pop('trpUserLogin', {})
+
+    for field_name in _FIELDS:
+        value = data.pop(field_name, None)
+        if value is not None:
+            mapped_field_name, serialize = _FIELDS[field_name]
+            data[mapped_field_name] = serialize(value)
+
+    return data
+
+def login(username, password):
+    url = "{host}/auth/login".format(
+        host=settings.TRANSKRIBUS_URL.rstrip('/'))
+
+    r = requests.post(
+        url,
+        data={'user': username, 'pw': password},
+        headers={'User-Agent': USER_AGENT},
+    )
+
+    if r.status_code == 200:
+        if r.headers['Content-Type'].lower().startswith('application/xml'):
+            return _serialize(r.content)
+        else:
+            raise NotImplementedError("Unknown content type encountered: {!s}".format(r.headers['Content-Type']))
+
+    return {}
 
 def dump(api, request):
     request.session[KEY] = api._session_cookies
