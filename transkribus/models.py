@@ -28,7 +28,7 @@ class UserProxy(User):
 
 class UserInfo(models.Model):
     # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='info')
+    user = models.OneToOneField(UserProxy, on_delete=models.CASCADE, related_name='info')
     gender = models.CharField(max_length=100)
     affiliation = models.CharField(max_length=100)
     # ip = models.IPAddressField()
