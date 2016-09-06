@@ -1,7 +1,11 @@
+from unittest import mock
+
 from django.test import TestCase
 
 from . import utils
 from . import services
+from .models import UserProxy as User, UserInfo
+from .auth_backends import TranskribusBackend
 
 
 class TestUtilsMurl(TestCase):
@@ -42,20 +46,167 @@ class TestUtilsMurl(TestCase):
         self.assertEqual(str(m.a.a['a']), 'a/a/aa')
 
 
-class TestTranskribusAPI(TestCase):
+class TestTranskribusBackend(TestCase):
 
-    def usage_example(self):
+    @mock.patch('transkribus.services.login')
+    def test_authenticate_fails(self, login):
 
-        api = services.TranskribusAPI()
+        login.return_value = {}
 
-        r = api.login(
-            username='',
-            password=''
+        backend = TranskribusBackend()
+
+        user = backend.authenticate(username='some', password='thing')
+
+        self.assertIsNone(user)
+        self.assertEqual(User.objects.count(), 0)
+
+    @mock.patch('transkribus.services.login')
+    def test_creates_user(self, login):
+
+        login.return_value = {
+            'username': 'some',
+            'password': 'thing',
+            'first_name': 'some',
+            'last_name': 'thing',
+            'is_superuser': False,
+            'gender': 'unknown',
+            'affiliation': 'unknown',
+            'email': 'some@thing.org',
+            'session_id': 'deadbeef',
+        }
+
+        backend = TranskribusBackend()
+
+        user = backend.authenticate(username='some', password='thing')
+
+        self.assertIsNotNone(user)
+        expected = User.objects.all().first().pk
+        self.assertEqual(expected, user.pk)
+
+    @mock.patch('transkribus.services.login')
+    def test_creates_user_info(self, login):
+
+        expected = User.objects.create(username='some')
+
+        login.return_value = {
+            'username': 'some',
+            'password': 'thing',
+            'first_name': 'some',
+            'last_name': 'thing',
+            'is_superuser': False,
+            'gender': 'neuter',
+            'affiliation': 'nouns',
+            'email': 'some@thing.org',
+            'session_id': 'deadbeef',
+        }
+
+        backend = TranskribusBackend()
+
+        user = backend.authenticate(username='some', password='thing')
+
+
+        self.assertEqual(expected.pk, user.pk)
+
+        self.assertIsInstance(expected.info, UserInfo)
+
+        self.assertEqual(user.first_name, 'some')
+        self.assertEqual(user.last_name, 'thing')
+
+        self.assertEqual(user.info.affiliation, 'nouns')
+        self.assertEqual(user.info.gender, 'neuter')
+
+    @mock.patch('transkribus.services.login')
+    def test_updates_user_data(self, login):
+
+        data_1 = {
+            'username': 'some',
+            'password': 'thing',
+            'first_name': 'some',
+            'last_name': 'thing',
+            'is_superuser': False,
+            'email': 'some@thing.org',
+        }
+
+        data_2 = {
+            'gender': 'neuter',
+            'affiliation': 'nouns',
+            'session_id': 'deadbeef',
+        }
+
+        user = User.objects.create(**data_1)
+        info = UserInfo.objects.create(user=user, **data_2)
+
+        user_pk = user.pk
+        info_pk = info.pk
+
+        data = {}
+
+        data_1['last_name'] = 'how'
+        data_2['affiliation'] = 'adverb'
+        data_2['gender'] = 'n/a'
+
+        data.update(data_1)
+        data.update(data_2)
+
+        login.return_value = data
+
+        backend = TranskribusBackend()
+
+        user = backend.authenticate(username='some', password='thing')
+
+        self.assertEqual(user.pk, user_pk)
+        self.assertEqual(info.pk, info_pk)
+        self.assertIsInstance(user.info, UserInfo)
+
+        self.assertEqual(user.first_name, 'some')
+        self.assertEqual(user.last_name, 'how')
+
+        self.assertEqual(user.info.affiliation, 'adverb')
+        self.assertEqual(user.info.gender, 'n/a')
+
+
+class TestServices(TestCase):
+
+    data = b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><trpUserLogin><userId>1</userId><userName>some@thing.org</userName><email>some@thing.org</email><affiliation>nouns</affiliation><firstname>some</firstname><lastname>thing</lastname><gender>neuter</gender><isActive>1</isActive><isAdmin>true</isAdmin><created><nanos>0</nanos></created><loginTime>1776-07-04T02:55:09.625+02:00</loginTime><sessionId>1AF785265C5FEA0F0B2ED78BEB0F6E0A</sessionId><userAgent>TranskribusWebUI</userAgent><ip>80.110.80.189</ip></trpUserLogin>'
+
+    @mock.patch('requests.post')
+    def test_login_succeeds(self, post):
+
+        import io
+
+        post.return_value = mock.Mock(
+            status_code=200,
+            headers={'Content-Type': 'application/xml;charset=utf-8'},
+            content=self.data,
         )
 
-        # cookies = r.cookies.get_dict()
-        cookies = api._session_cookies
+        data = services.login(
+            username='some',
+            password='thing',
+        )
 
-        api = services.TranskribusAPI(cookies=cookies)
+        self.assertEqual(data['first_name'], 'some')
+        self.assertEqual(data['last_name'], 'thing')
+        self.assertEqual(data['is_superuser'], True)
+        self.assertEqual(data['is_active'], True)
 
-        self.fail(api.list_collections())
+    @mock.patch('requests.post')
+    def test_login_fails(self, post):
+
+        import io
+
+        post.return_value = mock.Mock(
+            status_code=401,
+            headers={},
+            content=b'',
+        )
+
+        data = services.login(
+            username='some',
+            password='thing',
+        )
+
+        self.assertDictEqual(data, {})
+
+    def test_serialize(self):
+        self.fail("Implement _serialize test case")
