@@ -45,13 +45,13 @@ def t_register(request):
     sys.stdout.flush()
     r = s.post(url, params=params, verify=False, headers=headers)
     sys.stdout.write("### t_register response STATUS_CODE: %s  \r\n" % (r.status_code) )
-    sys.stdout.write("### t_register response CONTENT: %s  \r\n" % (r.content) )
+    sys.stdout.write("### t_register response CONTENT: %s  \r\n" % (r.text) )
     sys.stdout.flush()
     if r.status_code != requests.codes.ok:
-        raise ValueError("Transkribus registration error",str(r.status_code),r.content)
+        raise ValueError("Transkribus registration error",str(r.status_code),r.text)
         return None
 
-    user_xml = r.content
+    user_xml = r.text
 
     t_user=xmltodict.parse(user_xml)
 
@@ -75,7 +75,7 @@ def t_login(user, pw):
     sys.stdout.flush()
     if r.status_code != requests.codes.ok:
         return None
-    user_xml = r.content
+    user_xml = r.text
 
     t_user=xmltodict.parse(user_xml)
 
@@ -112,11 +112,11 @@ def t_collections():
     sys.stdout.flush()
     r = s.get(url, params=params, verify=False, headers=headers)
     if r.status_code != requests.codes.ok:
-        sys.stdout.write("ERROR CODE: %s \r\n ERROR: %s" % (r.status_code, r.content) )
+        sys.stdout.write("ERROR CODE: %s \r\n ERROR: %s" % (r.status_code, r.text) )
         sys.stdout.flush()
         return None
 
-    collections_json=r.content
+    collections_json=r.text
     collections = json.loads(collections_json)
 
     #use common param 'key' for ids
@@ -145,11 +145,11 @@ def t_collection(request,collId):
     sys.stdout.flush()
     r = s.get(url, params=params, verify=False, headers=headers)
     if r.status_code != requests.codes.ok:
-        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.text) )
         sys.stdout.flush()
         return r.status_code
 
-    collection_json=r.content
+    collection_json=r.text
     t_collection = json.loads(collection_json)
 
     #Cache this to reduce calls on subsequent lower level web-pages
@@ -186,7 +186,7 @@ def t_document(request, collId, docId, nrOfTranscripts=None):
     if r.status_code != requests.codes.ok:
         return None
 
-    doc_json = r.content
+    doc_json = r.text
     t_doc = json.loads(doc_json)
 
     pages = t_doc.get("pageList").get("pages")
@@ -226,7 +226,7 @@ def t_page(request,collId, docId, page, nrOfTranscripts=None):
     if r.status_code != requests.codes.ok:
         return None
 
-    page_json = r.content
+    page_json = r.text
     t_page = json.loads(page_json)
 
     #TODO would prefer a pageId rather than "page" which is a the page number
@@ -268,7 +268,7 @@ def t_current_transcript(request,collId, docId, page):
     if r.status_code != requests.codes.ok:
         return None
 
-    transcript_json = r.content
+    transcript_json = r.text
     t_transcript = json.loads(transcript_json)
 
     t_transcript['key'] = t_transcript.get('tsId')
@@ -320,7 +320,7 @@ def t_transcript_xml(request,transcriptId,url):
 
     if r.status_code != requests.codes.ok:
         return None
-    return r.content
+    return r.text
 
 # Saves transcripts. TODO Statuses...
 def t_save_transcript(request, transcript_xml, collId, docId, page):
@@ -383,7 +383,7 @@ def t_ingest_mets_xml(collId, mets_file):
     r = s.post(url, files=files, verify=False)
 
     if r.status_code != requests.codes.ok:
-        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.content) )
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.text) )
         sys.stdout.flush()
         return None
     # TODO What to do when we're successful?'
@@ -414,10 +414,10 @@ def t_jobs(status = ''):
     params = {'status': status}
     r = s.get(url, params=params, verify=False)
     if r.status_code != requests.codes.ok:
-        sys.stdout.write("Error getting jobs: %s \r\n ERROR: %s" % (r.status_code, r.content))
+        sys.stdout.write("Error getting jobs: %s \r\n ERROR: %s" % (r.status_code, r.text))
         sys.stdout.flush()
         return None
-    jobs_json=r.content
+    jobs_json=r.text
     jobs = json.loads(jobs_json)
     return jobs
 
@@ -426,10 +426,10 @@ def t_job_count(status = ''):
     params = {'status': status}
     r = s.get(url, params=params, verify=False)
     if r.status_code != requests.codes.ok:
-        sys.stdout.write("Error getting job count: %s \r\n ERROR: %s" % (r.status_code, r.content))
+        sys.stdout.write("Error getting job count: %s \r\n ERROR: %s" % (r.status_code, r.text))
         sys.stdout.flush()
         return None
-    count=r.content
+    count=r.text
     return count
 
 def t_kill_job(job_id):
