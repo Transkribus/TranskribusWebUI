@@ -277,6 +277,10 @@ _FIELDS = {
 
 }
 
+_OPTIONS = {
+    'verify': False
+}
+
 def _serialize(fileobj):
 
     data = parse_xml(fileobj)
@@ -299,6 +303,7 @@ def login(username, password):
         url,
         data={'user': username, 'pw': password},
         headers={'User-Agent': USER_AGENT},
+        **_OPTIONS
     )
 
     if r.status_code == 200:
