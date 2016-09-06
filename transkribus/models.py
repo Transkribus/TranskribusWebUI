@@ -1,11 +1,11 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as _User
 
 from . import helpers
 
 
-class UserProxy(User):
+class User(_User):
     class Meta:
         proxy = True
 
@@ -27,12 +27,12 @@ class UserProxy(User):
 
 
 class UserInfo(models.Model):
-    # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    user = models.OneToOneField(UserProxy, on_delete=models.CASCADE, related_name='info')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='info')
     gender = models.CharField(max_length=100)
     affiliation = models.CharField(max_length=100)
+    session_id = models.CharField(max_length=32) # NOTE: use this for API
     # ip = models.IPAddressField()
-    session_id = models.CharField(max_length=32)
+
 
     @classmethod
     def create(self, **data):

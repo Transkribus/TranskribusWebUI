@@ -5,7 +5,7 @@ from django.test import TestCase
 from . import utils
 from . import services
 
-from .models import UserProxy as User, UserInfo
+from .models import User, UserInfo
 from .auth_backends import TranskribusBackend
 
 

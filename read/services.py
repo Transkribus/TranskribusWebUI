@@ -21,6 +21,9 @@ import re
 # - possible to find or create (UIBK to create) more efficient ways of getting data
 # - epecially t_collection (which calls t_document in loop)
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 s = requests.Session()
 
 def t_register(request):
@@ -111,6 +114,7 @@ def t_collections():
     sys.stdout.write("### [GET REQUEST] t_collectionssss will GET: %s with %s \r\n" % (url,params) )
     sys.stdout.flush()
     r = s.get(url, params=params, verify=False, headers=headers)
+    r.raise_for_status()
     if r.status_code != requests.codes.ok:
         sys.stdout.write("ERROR CODE: %s \r\n ERROR: %s" % (r.status_code, r.content) )
         sys.stdout.flush()

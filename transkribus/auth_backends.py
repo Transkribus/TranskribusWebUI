@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from . import services
 from . import helpers
 
-from .models import UserInfo, UserProxy as User
+from .models import UserInfo, User
 
 
 logger = logging.getLogger('transkribus.auth_backends')
@@ -17,7 +17,7 @@ logger = logging.getLogger('transkribus.auth_backends')
 # a refactored version of the backend implementation created for
 # TranskribusWebUI: https://github.com/Transkribus/TranskribusWebUI
 # Creates user if it does not already exists. Updates fields for
-# exising users. Also, associates and updatses extra information.
+# exising users. Also, associates and updates extra information.
 
 class TranskribusBackend(ModelBackend):
     """
@@ -27,6 +27,7 @@ class TranskribusBackend(ModelBackend):
 
     def authenticate(self, username=None, password=None):
 
+        # XXX Is this really needed??
         if not username or not password:
             # logger.debug("Discarding invalid username or password for user %s", username)
             return None
