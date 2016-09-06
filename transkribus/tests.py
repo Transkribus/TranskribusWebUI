@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from . import utils
 from . import services
+
 from .models import UserProxy as User, UserInfo
 from .auth_backends import TranskribusBackend
 
@@ -210,3 +211,58 @@ class TestServices(TestCase):
 
     def test_serialize(self):
         self.fail("Implement _serialize test case")
+
+
+class TestLoginRequired(TestCase):
+
+    @mock.patch('transkribus.services.login')
+    def test_retrieve_test_view_works_when_logged_in(self, login):
+
+        test_url = '/transkribus/test/'
+
+        user = User.objects.create_user(username='some', password='thing', email='some@thing.org')
+
+        # NOTE: patching backend did not work, so patching login
+        login.return_value = {
+            'username': 'some',
+            'password': 'thing',
+            'first_name': 'some',
+            'last_name': 'thing',
+            'is_superuser': False,
+            'gender': 'unknown',
+            'affiliation': 'unknown',
+            'email': 'some@thing.org',
+            'session_id': 'deadbeef',
+        }
+
+        is_logged_in = self.client.login(username='some', password='thing')
+
+        self.assertTrue(is_logged_in)
+
+        r = self.client.get(test_url)
+
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, b'OK')
+
+    @mock.patch('transkribus.auth_backends.TranskribusBackend')
+    def test_logged_in_fails(self, backend):
+        import logging
+
+        test_url = '/transkribus/test/'
+
+        user = User.objects.create_user(username='some', password='thing', email='some@thing.org', is_active=True)
+
+        backend.return_value = mock.Mock(authenticate=lambda **_: None)
+
+        is_logged_in = self.client.login(username='some', password='thing', follow=True)
+
+        self.assertFalse(is_logged_in)
+
+    def test_redirect_if_no_login(self):
+
+        test_url = '/transkribus/test/'
+        expected_url = "{}/?next={}".format('/login', test_url)
+
+        response = self.client.get(test_url, follow=True)
+
+        self.assertRedirects(response, expected_url)
