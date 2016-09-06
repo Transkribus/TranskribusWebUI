@@ -1,4 +1,4 @@
-{% extends "libraryapp/navi_base.html" %}
+{% extends "library/navi_base.html" %}
 {% load i18n %}
 
 {% block content %}
@@ -24,7 +24,7 @@
 		   <dt>{% trans "Affiliation" %}</dt><dd>{{ user.tsdata.affiliation }}</dd>
 		   {% endif %}
 		</dl>
-		{% include "libraryapp/collections_table.html" with collections=collections %}
+		{% include "library/collections_table.html" with collections=collections %}
 	    </div>
 	</div>
     </div>	

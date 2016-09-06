@@ -1,4 +1,4 @@
-{% extends "libraryapp/navi_base.html" %}
+{% extends "library/navi_base.html" %}
 {% load i18n %}
 
 {% block content %}
@@ -15,7 +15,7 @@
                 </h1>
 	    </div>
             <div class="col-md-8">
-	   {% include "libraryapp/collections_table.html" with collections=collections %}
+	   {% include "library/collections_table.html" with collections=collections %}
             </div>
 
         </div>

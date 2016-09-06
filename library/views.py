@@ -53,7 +53,7 @@ def register(request):
             	return HttpResponseRedirect('/library/profile')
 		#tried out modal here and it is noce (but not really for registration)
 #	        messages.info(request, _('Registration requested please check your email.'))
-#                return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+#                return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
 	    except ValueError as err:
 		sys.stdout.write("### t_register response ERROR RAISED: %s  \r\n" % (err) )
 #		return render(request, 'registration/register.html', {'register_form': form} )
@@ -68,7 +68,7 @@ def register(request):
     return render(request, 'registration/register.html', {'register_form': form} )
 
 def index(request):
-    return render(request, 'libraryapp/homepage.html' )
+    return render(request, 'library/homepage.html' )
 
 
 #/library/collections
@@ -77,7 +77,7 @@ def index(request):
 @t_login_required
 def collections(request):
     collections = request.session.get("collections");
-    return render(request, 'libraryapp/collections.html', {'collections': collections} )
+    return render(request, 'library/collections.html', {'collections': collections} )
 
 #/library/collection/{colId}
 #view that 
@@ -117,7 +117,7 @@ def collection(request, collId):
 #	   x['title']=x['imgFileName'] 
 #	   x['collId']=collId
 
-    return render(request, 'libraryapp/collection.html', {
+    return render(request, 'library/collection.html', {
         'collId': collId, 
         'collection': collection,
         'documents': docs,
@@ -136,7 +136,7 @@ def document(request, collId, docId, page=None):
     full_doc = t_document(request, collId, docId,-1)
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
-    return render(request, 'libraryapp/document.html', {
+    return render(request, 'library/document.html', {
         'metadata': full_doc.get('md'), 
         'pageList': full_doc.get('pageList'),
         'collId': int(collId),
@@ -170,7 +170,7 @@ def page(request, collId, docId, page):
 
     nav = navigation.up_next_prev("page",page,full_doc.get("pageList").get("pages"),[collId,docId])
 
-    return render(request, 'libraryapp/page.html', {
+    return render(request, 'library/page.html', {
         'pagedata': pagedata,
         'transcripts': transcripts,
         'up': nav['up'],
@@ -210,7 +210,7 @@ def transcript(request, collId, docId, page, transcriptId):
             sys.stdout.flush()
 	    x['md'] = t_metadata(x.get("@custom"))
 
-    return render(request, 'libraryapp/transcript.html', {
+    return render(request, 'library/transcript.html', {
 		'transcript' : transcript,
 		'regions' : regions,
 		'up': nav['up'],
@@ -282,7 +282,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
         for x in lines:
 	     x['md'] = t_metadata(x.get("@custom"))
 
-    return render(request, 'libraryapp/region.html', {
+    return render(request, 'library/region.html', {
 		'region' : region,
 		'lines' : lines,
 		'up': nav['up'],
@@ -358,7 +358,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
         for x in words:
 	    x['md'] = t_metadata(x.get("@custom"))
 
-    return render(request, 'libraryapp/line.html', {
+    return render(request, 'library/line.html', {
 		'line' : line,
 		'words' : words,
 		'up': nav['up'],
@@ -430,7 +430,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 
     nav = navigation.up_next_prev("word",wordId,words,[collId,docId,page,transcriptId,regionId,lineId])
 
-    return render(request, 'libraryapp/word.html', {
+    return render(request, 'library/word.html', {
 		'word' : word,
 		'up': nav['up'],
 		'next': nav['next'],
@@ -498,7 +498,7 @@ def rand(request, collId, element):
 	    lines = transcript.get("PcGts").get("Page").get("TextLine")
 	else:
     	    sys.stdout.write("NO TEXT IN REGION\r\n" )
-    	    return render(request, 'libraryapp/random.html', {
+    	    return render(request, 'library/random.html', {
 			"level": element, 
 			"text": {},
 			"collection" : collection,
@@ -514,7 +514,7 @@ def rand(request, collId, element):
 	    if lines:
 		line = random.choice(lines);
 	    else:
-		return render(request, 'libraryapp/random.html', {
+		return render(request, 'library/random.html', {
 				"level": element, 
 				"text": {},
 				"collection" : collection,
@@ -532,7 +532,7 @@ def rand(request, collId, element):
 		    if words:
 			word = random.choice(words);
 		    else:
-			return render(request, 'libraryapp/random.html', {
+			return render(request, 'library/random.html', {
 					"level": element, 
 					"text": {},
 					"collection" : collection,
@@ -557,7 +557,7 @@ def display_random(request,level,data, collection, doc, page):
 	if data.get("TextEquiv").get("Unicode"):
 	    text = unicode(data.get("TextEquiv").get("Unicode"))
 
-    return render(request, 'libraryapp/random.html', {
+    return render(request, 'library/random.html', {
 		"level": level, 
 		"text": text,
 		"collection" : collection,
@@ -567,25 +567,25 @@ def display_random(request,level,data, collection, doc, page):
 
 @t_login_required
 def search(request):
-    return render(request, 'libraryapp/search.html')
+    return render(request, 'library/search.html')
 
 def about(request):
-    return render(request, 'libraryapp/about.html')
+    return render(request, 'library/about.html')
 
 def message_modal(request):
-    return render(request, 'libraryapp/message_modal.html')
+    return render(request, 'library/message_modal.html')
 
 def user_guide(request):
-    return render(request, 'libraryapp/user_guide.html')
+    return render(request, 'library/user_guide.html')
 
 @t_login_required
 def users(request, collId, userId):
-    return render(request, 'libraryapp/users.html')
+    return render(request, 'library/users.html')
 
 @t_login_required
 def profile(request):
     collections = request.session.get("collections");
-    return render(request, 'libraryapp/profile.html', {'collections': collections})
+    return render(request, 'library/profile.html', {'collections': collections})
 
 #error pages (where not handled by modals
 def collection_noaccess(request, collId):
@@ -594,14 +594,14 @@ def collection_noaccess(request, collId):
     else:
         back = request.META.get("HTTP_REFERER") #request.GET.get("back")
 
-    return render(request, 'libraryapp/error.html', {
+    return render(request, 'library/error.html', {
                 'msg' : _("I'm afraid you are not allowed to access this collection"),
                 'back' : back,
             })
 def error(request):
     back = settings.APP_BASEURL+"/register"
 
-    return render(request, 'libraryapp/error.html', {
+    return render(request, 'library/error.html', {
                 'msg' : messages,
                 'back' : back,
             })
@@ -613,14 +613,14 @@ def ingest_mets_xml(request):
             #if ingest_mets_xml_file_form.is_valid(): #  TODO Check something for better error messages? And validate the file. Note: Django allows form submission, even if no file has been selected.
             t_ingest_mets_xml(request.POST.get('collection'), request.FILES['mets_file'])
             messages.info(request, 'File is being uploaded.')# TODO i18n,
-            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
         except:
             messages.error(request, 'Error!')# TODO i18n,
-            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain') 
+            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain') 
     else:
         ingest_mets_xml_file_form = MetsFileForm()
         collections = request.session.get("collections")
-        return render(request, 'libraryapp/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
+        return render(request, 'library/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
 
 @t_login_required
 def ingest_mets_url(request):
@@ -628,20 +628,20 @@ def ingest_mets_url(request):
         # What should be checked here and what can be left up to Transkribus?
         if (t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
             messages.info(request, 'URL is being processed.')# TODO i18n,
-            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+            return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
         else:
             messages.error(request, 'URL processing failed.')# TODO i18n,
-            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('libraryapp/message_modal.html', request=request)}), content_type='text/plain')
+            return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
     else:
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)
         collections = request.session.get("collections")
-        return render(request, 'libraryapp/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
+        return render(request, 'library/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
 
 @t_login_required
 def collections_dropdown(request):
     collections = t_collections()
-    return render(request, 'libraryapp/collections_dropdown.html', {'collections': collections})
+    return render(request, 'library/collections_dropdown.html', {'collections': collections})
 
 @t_login_required
 def create_collection_modal(request):
@@ -658,13 +658,13 @@ def jobs_list(request):
     else:
         jobs = t_jobs()
         only_unfinished = ''
-    return render(request, 'libraryapp/jobs_list.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
+    return render(request, 'library/jobs_list.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
 
 @t_login_required
 def jobs(request):
     jobs = t_jobs('INCOMPLETE')
     only_unfinished = 'checked'
-    return render(request, 'libraryapp/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
+    return render(request, 'library/jobs.html', {'jobs': jobs, 'only_unfinished': only_unfinished})
 
 @t_login_required
 def job_count(request):# TODO Consider how much of a DOS risk these queries constitute.
@@ -680,12 +680,12 @@ def job_count(request):# TODO Consider how much of a DOS risk these queries cons
 @t_login_required
 def changed_jobs_modal(request):
     jobs = t_jobs()
-    return render(request, 'libraryapp/changed_jobs_modal.html', {'jobs': jobs})
+    return render(request, 'library/changed_jobs_modal.html', {'jobs': jobs})
 
 @t_login_required           
 def jobs_list_compact(request):
     jobs = t_jobs()
-    return render(request, 'libraryapp/jobs_list_compact.html', {'jobs': jobs})# TODO Decide what should be shown in the compact view. Only jobs which have changed since some "acknowledgement"? Since the last login? Since...?
+    return render(request, 'library/jobs_list_compact.html', {'jobs': jobs})# TODO Decide what should be shown in the compact view. Only jobs which have changed since some "acknowledgement"? Since the last login? Since...?
 
 @t_login_required
 def kill_job(request):
