@@ -19,19 +19,19 @@ from .services import t_refresh, t_collections
 #override the login_required decorator, mostly so we can call services.t_collecctions at login
 def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=None):
     @wraps(function)
-    def wrapper(request, *args, **kw):	
+    def wrapper(request, *args, **kw):
         if request.user.is_authenticated():
-	    # We check here to see if we are still authenticated with transkribus
-	    # a quick post request ti auth/refresh should do?
-	    # If we don't get a 200 we logout
-	    if not t_refresh():
-		#TODO there is no logout view in library... though maybe a project level logout makes more sense
+            # We check here to see if we are still authenticated with transkribus
+            # a quick post request ti auth/refresh should do?
+            # If we don't get a 200 we logout
+            if not t_refresh():
+                #TODO there is no logout view in library... though maybe a project level logout makes more sense
 #                app_root = request.path
-#		sys.stdout.write("### request: %s \r\n" % request.path )
-	        return HttpResponseRedirect('/logout?next='+request.get_full_path())
+#               sys.stdout.write("### request: %s \r\n" % request.path )
+                return HttpResponseRedirect('/logout?next='+request.get_full_path())
             #setting collections data as a session var if no already set
-	    if "collections" not in request.session or request.session['collections'] is None:
-	        request.session['collections'] = t_collections()
+            if "collections" not in request.session or request.session['collections'] is None:
+                request.session['collections'] = t_collections()
             return function(request, *args, **kw)
         else:
             path = request.build_absolute_uri()
@@ -47,4 +47,3 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
             return redirect_to_login(
                 path, resolved_login_url, redirect_field_name)
     return wrapper
-

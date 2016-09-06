@@ -9,7 +9,7 @@ from  xml.etree import ElementTree
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponseRedirect 
+from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -56,26 +56,26 @@ def proofread(request, collId, docId, page, transcriptId, regionId):# TODO Decid
         current_transcript = t_current_transcript(request, collId, docId, page)# We want the updated transcript now.
 
     transcript = t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
-    transcriptId = str(transcript.get("tsId"))    
+    transcriptId = str(transcript.get("tsId"))
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
-    
+
     if isinstance(regions, dict):
         regions = [regions]
-        
+
     for x in regions:
         x['key'] = x.get("@id")
         if(unicode(regionId) == unicode(x.get("@id"))):
             region = x
-            
+
     if region.get("Coords"):
         region['crop_str'] = crop(region.get("Coords").get("@points"))
-        
+
     nav = library.navigation.up_next_prev("region",regionId,regions,[collId,docId,page,transcriptId])
     lines = region.get("TextLine")
-    
+
     if isinstance(lines, dict):
         lines = [lines]
-    
+
     if lines:
         for x in lines:
             x['md'] = t_metadata(x.get("@custom"))
@@ -102,7 +102,7 @@ def pr_line():
 #def crop(coords):
 #    sys.stdout.write("############# COORDS: %s\r\n" % coords )
 #   # coords = region.get("Coords").get("@points")
-#    points = coords.split()    
+#    points = coords.split()
 #    xmin=ymin=99999999 #TODO durh...
 #    xmax=ymax=0
 #    points = [map(int, point.split(',')) for point in points]

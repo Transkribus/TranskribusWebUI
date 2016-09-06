@@ -10,6 +10,3 @@ from read.decorators import t_login_required
 @t_login_required
 def index(request):
     return render(request, 'dashboard/homepage.html' )
-
-
-

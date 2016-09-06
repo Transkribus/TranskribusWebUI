@@ -8,4 +8,3 @@ from read.decorators import t_login_required
 #@t_login_required
 def index(request):
     return render(request, 'search/homepage.html' )
-
