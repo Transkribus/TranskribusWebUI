@@ -70,7 +70,7 @@ MIDDLEWARE_CLASSES = [
     #    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
-ROOT_URLCONF = 'read.urls'
+ROOT_URLCONF = 'read.urls.e_learning'
 
 TEMPLATES = [
     {
@@ -215,5 +215,5 @@ NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'norsun'
 
-from e_learning import settings
-settings.extend(globals())
+from e_learning.settings import default
+default.extend(globals())
