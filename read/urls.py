@@ -18,12 +18,14 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^library/', include('library.urls')),
-#    url(r'^crowd/', include('crowd.urls')),
+    #    url(r'^crowd/', include('crowd.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^review/', include('review.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
 
-    url(r'^transkribus/', include('transkribus.urls')),
+    url(r'^transkribus/', include('temp_transkribus.urls')),
+
+    url(r'^elearning/', include('e_learning.urls')),
 
     url('^', include('django.contrib.auth.urls')),
 

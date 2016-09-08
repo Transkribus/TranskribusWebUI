@@ -44,7 +44,16 @@ INSTALLED_APPS = [
     'review',
     'dashboard',
 
-    'transkribus'
+    'e_learning',
+    'e_learning.minimal',
+    'e_learning.learning_resources',
+    'e_learning.transkribus',
+    'e_learning.api',
+    'e_learning.app',
+    'e_learning.blueprints',
+    'e_learning.state_machine',
+
+    'temp_transkribus'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -57,8 +66,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-#pip install yet_another_django_profiler and uncomment below then read https://pypi.python.org/pypi/yet-another-django-profiler/ for use
-#    'yet_another_django_profiler.middleware.ProfilerMiddleware',
+    # pip install yet_another_django_profiler and uncomment below then read https://pypi.python.org/pypi/yet-another-django-profiler/ for use
+    #    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'
@@ -66,7 +75,7 @@ ROOT_URLCONF = 'read.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,7 +85,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 "library.context_processors.language_form_context_processor",
             ],
-            'libraries' : {
+            'libraries': {
                 'read_tags': 'read.templatetags',
             },
         },
@@ -125,31 +134,31 @@ LOCALE_PATHS = [
 LANGUAGE_CODE = 'en'
 from django.utils.translation import ugettext_lazy as _
 LANGUAGES = [
-        ('bg', _('Bulgarian')),
-        ('hr', _('Croatian')),
-        ('cs', _('Czech')),
-        ('da', _('Danish')),
-        ('nl', _('Dutch')),
-        ('en', _('English')),
-        ('et', _('Estonian')),
-        ('fi', _('Finnish')),
-        ('fr', _('French')),
-        ('de', _('German')),
-        ('el', _('Greek')),
-        ('hu', _('Hungarian')),
-        ('ga', _('Irish')),
-        ('it', _('Italian')),
-        ('lv', _('Latvian')),
-        ('lt', _('Lithuanian')),
-#       ('mt', _('Maltese')), NO MALTESE IN DJANGO
-        ('pl', _('Polish')),
-        ('pt', _('Portuguese')),
-        ('ro', _('Romanian')),
-        ('sk', _('Slovak')),
-        ('sl', _('Slovenian')),
-        ('es', _('Spanish')),
-        ('sv', _('Swedish')),
-];
+    ('bg', _('Bulgarian')),
+    ('hr', _('Croatian')),
+    ('cs', _('Czech')),
+    ('da', _('Danish')),
+    ('nl', _('Dutch')),
+    ('en', _('English')),
+    ('et', _('Estonian')),
+    ('fi', _('Finnish')),
+    ('fr', _('French')),
+    ('de', _('German')),
+    ('el', _('Greek')),
+    ('hu', _('Hungarian')),
+    ('ga', _('Irish')),
+    ('it', _('Italian')),
+    ('lv', _('Latvian')),
+    ('lt', _('Lithuanian')),
+    #       ('mt', _('Maltese')), NO MALTESE IN DJANGO
+    ('pl', _('Polish')),
+    ('pt', _('Portuguese')),
+    ('ro', _('Romanian')),
+    ('sk', _('Slovak')),
+    ('sl', _('Slovenian')),
+    ('es', _('Spanish')),
+    ('sv', _('Swedish')),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -169,30 +178,32 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-#TODO for when use is heavier use memcached
-#Enable cache
-#CACHES = {
+# TODO for when use is heavier use memcached
+# Enable cache
+# CACHES = {
 #    'default': {
 #        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 #        'LOCATION': '127.0.0.1:11211',
 #    }
 #}
-#and cache session
+# and cache session
 #SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-# This assumes per app view for these... may promote this sttuff to their own app...??
+# This assumes per app view for these... may promote this sttuff to their
+# own app...??
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
 
-### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
+# Auth backend that logs in to transkribus.eu and extends the
+# django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
     # 'read.backends.TranskribusBackend',
-    'transkribus.auth_backends.TranskribusBackend',
+    'temp_transkribus.auth_backends.TranskribusBackend',
     # 'django.contrib.auth.backends.ModelBackend',
 ]
 
-### parameters for services
-#transkribus rest service
+# parameters for services
+# transkribus rest service
 TRP_URL = TRANSKRIBUS_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
@@ -200,6 +211,9 @@ PROFILE_LOG_BASE = '/tmp/'
 NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
 NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
 
-#not used...
+# not used...
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'norsun'
+
+from e_learning import settings
+settings.extend(globals())
