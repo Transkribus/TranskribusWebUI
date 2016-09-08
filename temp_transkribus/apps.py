@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class TranskribusConfig(AppConfig):
-    name = 'transkribus'
+class TempTranskribusConfig(AppConfig):
+    name = 'temp_transkribus'
