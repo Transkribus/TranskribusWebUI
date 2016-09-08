@@ -7,6 +7,7 @@ from django.conf import settings
 from xmltodict import parse as parse_xml
 
 from . import utils
+from . import serializers
 
 logger = logging.getLogger('auth')
 
@@ -17,15 +18,15 @@ TRANSKRIBUS_API_USER_AGENT = USER_AGENT = 'TranskribusWebUI'
 # import json
 # from lxml import objectify
 
-# def serialize(parse):
-#     def wrapper(func):
-#         def wrapped(*args, **kwargs):
-#             response = func(*args, **kwargs)
-#             # NOTE: must use stream=True keyword for this to work
-#             response.raw.decode_content = True
-#             return parse(response.raw)
-#         return wrapped
-#     return wrapper
+def serialize(parse):
+    def wrapper(func):
+        def wrapped(*args, **kwargs):
+            response = func(*args, **kwargs)
+            # NOTE: must use stream=True keyword for this to work
+            response.raw.decode_content = True
+            return parse(response.raw)
+        return wrapped
+    return wrapper
 
 # def to_camelcase(string):
 #     return ''.join(
@@ -146,11 +147,13 @@ class TranskribusAPI(RequestsAPI):
             self.murl('auth', 'refresh').url
         )
 
+    @serialize(serializers.CollectionSerializer)
     def list_collections(self):
         return self.client.get(
             self.murl('collections', 'list.xml').url
         )
 
+    @serialize(serializers.DocumentSerializer)
     def list_docs_by_collection_id(self, collection_id):
         # XXX FIXTHIS cache this somehow
         return self.client.get(

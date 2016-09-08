@@ -1,38 +1,57 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from . import serializers
 from . import mixins
 
 
+# XXX use model serializer as base
+# define model equivalence relations, etc.
+# https://github.com/tomchristie/django-rest-framework/blob/master/rest_framework/serializers.py#L776
+
+# like so:
+
+# class MySerializer(SpecialSerializerWhatever):
+#    class Meta:
+#        model = TheXmlSerializerThing
+
+   
+# XXX FIXTHIS should not be here, but serializers.py already contains
+#     XML serializers with same name ...
+
+from rest_framework import serializers
+
+class CollectionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    role = serializers.CharField()
+    description = serializers.CharField()        
+
+
+class DocumentSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    num_pages = serializers.IntegerField()
+    uploader = serializers.CharField()
+    # uploaded_at = serializers.IntegerField()
+
+
 class CollectionViewSet(mixins.ApiMixin, viewsets.ViewSet):
-    serializer_class = serializers.CollectionSerializer
+    serializer_class = CollectionSerializer
 
     def list(self, request):
 
-        collections = self.api.get_collections_for_user()
+        collections = self.api.list_collections()
 
-        serializer = serializers.CollectionSerializer(collections,
-                                                      many=True)
+        serializer = CollectionSerializer(collections, many=True)
 
         return Response(serializer.data)
 
 
 class DocumentViewSet(mixins.ApiMixin, viewsets.ViewSet):
-    serializer_class = serializers.DocumentSerializer
+    serializer_class = DocumentSerializer
 
     def list(self, request, collection_id):
 
-        documents = self.api.get_documents_for_collection(collection_id)
-        serializer = serializers.DocumentSerializer(documents, many=True)
-
+        documents = self.api.list_docs_by_collection_id(collection_id)
+        serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
-
-        # documents = self.api.get_collections_for_document(collection_id)
-        # document_list = self.api.collections(collection_id).documents.get()
-        # serializer_list = serializers.DocumentSerializer(
-        #     documents,
-        #     many=True
-        # )
-
-        # return Response(serializer.data)

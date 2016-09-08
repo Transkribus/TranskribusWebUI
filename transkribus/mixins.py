@@ -12,4 +12,5 @@ class ApiMixin(object):
         self.initialize_client(request)
 
     def initialize_client(self, request):
-        self.api = services.get_or_create_api_client(request)
+        session_id = request.user.info.session_id
+        self.api = services.TranskribusAPI(cookies={'JSESSIONID': session_id})

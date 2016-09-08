@@ -1,3 +1,5 @@
+# XXX FIXTHIS use rest_framework-like Serializers here
+
 import functools
 
 from eulxml import xmlmap
