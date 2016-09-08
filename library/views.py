@@ -20,7 +20,7 @@ from django.template.loader import render_to_string
 
 from read.utils import crop
 # Imports pf read modules
-from temp_transkribus.decorators import login_required
+from transkribus.decorators import login_required
 from read.services import *
 from read.decorators import t_login_required
 #t_collection, t_register,
