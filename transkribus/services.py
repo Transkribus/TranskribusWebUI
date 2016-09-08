@@ -324,3 +324,5 @@ def load(request):
     else:
         kwargs = {}
     return TranskribusAPI(**kwargs)
+
+client = RequestsClient()

@@ -4,5 +4,5 @@ from django.shortcuts import render
 from .decorators import login_required
 
 @login_required
-def test(request):
+def test_view(request):
     return HttpResponse("OK")
