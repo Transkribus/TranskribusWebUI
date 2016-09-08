@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^review/', include('review.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
 
-    url(r'^transkribus/', include('temp_transkribus.urls')),
+    url(r'^transkribus/', include('transkribus.urls')),
 
     url(r'^elearning/', include('e_learning.urls')),
 

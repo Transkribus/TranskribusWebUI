@@ -47,13 +47,13 @@ INSTALLED_APPS = [
     'e_learning',
     'e_learning.minimal',
     'e_learning.learning_resources',
-    'e_learning.transkribus',
+    # 'e_learning.transkribus',
     'e_learning.api',
     'e_learning.app',
     'e_learning.blueprints',
     'e_learning.state_machine',
 
-    'temp_transkribus'
+    'transkribus'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -198,7 +198,7 @@ LOGIN_REDIRECT_URL = 'profile'
 # django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
     # 'read.backends.TranskribusBackend',
-    'temp_transkribus.auth_backends.TranskribusBackend',
+    'transkribus.auth_backends.TranskribusBackend',
     # 'django.contrib.auth.backends.ModelBackend',
 ]
 
