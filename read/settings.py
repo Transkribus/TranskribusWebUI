@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'read',
     'review',
     'dashboard',
+    'edit',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -1,4 +1,4 @@
-
+import sys
 def crop(coords, offset=None):
    # coords = region.get("Coords").get("@points")
     points = coords.split()	
@@ -15,7 +15,7 @@ def crop(coords, offset=None):
     if offset:
         crop = {'x':xmin, 'y':ymin, 'w':(xmax-xmin), 'h': (ymax-ymin)}
     else:
-        crop = {'tl':[xmin,ymin], 'tr': [xmin,ymax], 'br': [xmax,ymax], 'bl': [xmax,ymin]}
+        crop = {'tl':[xmin,ymin], 'tr': [xmax,ymin], 'br': [xmax,ymax], 'bl': [xmin,ymax]}
 
     return crop
 

@@ -79,8 +79,8 @@ def proofread(request, collId, docId, page, transcriptId, regionId):# TODO Decid
     if lines:
         for x in lines:
             x['md'] = t_metadata(x.get("@custom"))
-            x['crop_str'] = crop(x.get("Coords").get("@points"))
             x['id'] = x.get("@id")
+            x['crop'] = crop(x.get("Coords").get("@points"),True)
 
     return render(request, 'review/proofread.html', {
         'region' : region,
@@ -123,16 +123,16 @@ def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide 
     lineList = []
     for x in regions:
         lines = x.get("TextLine")
-        sys.stdout.write("Processing region, x is: %s \r\n" % x)
-        sys.stdout.flush()
+        #sys.stdout.write("Processing region, x is: %s \r\n" % x)
+        #sys.stdout.flush()
         if isinstance(lines, dict):
-            sys.stdout.write("### Line to line list. %s \r\n" % [lines])
+            #sys.stdout.write("### Line to line list. \r\n")
             sys.stdout.flush()
             lineList.extend([lines])
         else: # Assume that lines is a list of lines
             for line in lines:
-                sys.stdout.write("### Line to line list. %s \r\n" % line)
-                sys.stdout.flush()
+                #sys.stdout.write("### List of lines to line list. \r\n")
+                #sys.stdout.flush()
                 lineList.extend([line])
         
     if lineList:

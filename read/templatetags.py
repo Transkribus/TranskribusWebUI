@@ -39,3 +39,6 @@ def coords_for_imagemap(crop):
         str(crop.get('br')[0])+","+str(crop.get('br')[1])+","+
         str(crop.get('bl')[0])+","+str(crop.get('bl')[1]))
 
+@register.filter
+def y_for_typewriterline(crop):
+    return str(crop.get('tl')[1])

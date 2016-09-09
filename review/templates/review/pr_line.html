@@ -4,7 +4,8 @@
 	<div class="col-lg-12">
 		<div>
 			{# UNNECESSARY SLOWDOWN DURING TESTING<img class="img-responsive" src="{{imageUrl}}&crop={{ line|get_item:"crop_str"}}"/> #}
-			<img class="img-responsive" src="{{imageUrl}}&crop={{ line|get_item:"crop_str"}}"/>
+			<img class="img-responsive" src="{{imageUrl}}&crop={{ line|get_item:"crop"|coords_for_fimagestore}}"/>
+			src="{{imageUrl}}&crop={{ line|get_item:"crop"|coords_for_fimagestore}}"
 		</div>
 	</div>
 </div>
