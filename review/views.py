@@ -154,8 +154,8 @@ def correct_iframe(request):
 def pr_line():
     return render(request, 'review/pr_line.html')
 
-<<<<<<< HEAD
-=======
+
+
 #def crop(coords):
 #    sys.stdout.write("############# COORDS: %s\r\n" % coords )
 #   # coords = region.get("Coords").get("@points")
@@ -176,4 +176,3 @@ def pr_line():
 #    return crop_str
 #    sys.stdout.write("POINTS: %s\r\n" % (points) )
 ##    sys.stdout.write("CROP: %s\r\n" % (crop) )
->>>>>>> refs/remotes/origin/master
