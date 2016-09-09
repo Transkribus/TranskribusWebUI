@@ -4,11 +4,11 @@
 {% load staticfiles %}
 
 {% block nav_buttons_out %}
-{% include "libraryapp/nav_buttons.html" with out=True %}
+{% include "nav_buttons.html" with out=True %}
 {% endblock %}
 
 {% block nav_buttons_in %}
-{% include "libraryapp/nav_buttons.html" with out=False %}
+{% include "nav_buttons.html" with out=False %}
 {% endblock %}
 
 {% block content %}
