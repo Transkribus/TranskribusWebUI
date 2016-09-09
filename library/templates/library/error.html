@@ -1,4 +1,4 @@
-{% extends "libraryapp/navi_base.html" %}
+{% extends "library/navi_base.html" %}
 {% load i18n %}
 
 {% block content %}
@@ -11,10 +11,14 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    {% trans "Search" %}
+			We have a slight problem
                 </h1>
+		<p>{{ msg }}</p>
+		{% if back %}<p>{% trans "Return to the " %}<a href="{{back}}">{% trans "previous page" %}</a></p>{% endif %}
+		<p>{% trans "Or to the READ WebUI " %}<a href="{% url 'index' %}">{% trans "home page" %}</a></p>
 	    </div>
 	</div>
     </div>	
 
 {% endblock %}
+

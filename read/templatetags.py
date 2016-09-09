@@ -38,7 +38,10 @@ def coords_for_imagemap(crop):
         str(crop.get('tr')[0])+","+str(crop.get('tr')[1])+","+
         str(crop.get('br')[0])+","+str(crop.get('br')[1])+","+
         str(crop.get('bl')[0])+","+str(crop.get('bl')[1]))
+<<<<<<< HEAD
 
 @register.filter
 def y_for_typewriterline(crop):
     return str(crop.get('tl')[1])
+=======
+>>>>>>> refs/remotes/origin/master
