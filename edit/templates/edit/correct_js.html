@@ -141,6 +141,9 @@
 		$('#correctModal').draggable({
 	       handle: $('.modal-header')
 		});
+		$('.transcript-map-div').draggable({
+
+		});
 		$('#correctModal').on('hidden.bs.modal', function () {
 			$('area').mapster('set', false);
 			$(".line-list").html('');
