@@ -19,11 +19,19 @@
             {% trans "Correction Interface, Line by Line (working title)" %}
         </h1>
 	</div>
-    <div class="row map">
-        <h1>
-            <a class="scroll-up" href="#">scroll up </a><a class="scroll-down" href="#">scroll down</a><br/>
-            <a class="zoom-in" href="#">zoom in </a><a class="zoom-out" href="#">zoom out</a>
-        </h1>
+    <div class="row row-centered">
+		<div class="col-md-3">		
+	    	<a class="scroll-up" href="#">scroll up </a><a class="scroll-down" href="#">scroll down</a><br/>
+		</div>
+	    <div class="col-md-3">
+	    	<a class="zoom-in" href="#">zoom in </a><a class="zoom-out" href="#">zoom out</a>
+		</div>
+	    <div class="col-md-3">
+			<div id="message"></div>
+		</div>
+		<div class="col-md-3">
+			<a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a>
+		</div>
 	</div>
 	<div class="transcript-div">
 		<div class="transcript-map-div">
@@ -45,19 +53,29 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">{% trans "Edit line" %}</h4>
             </div>
-            <div class="modal-body line-content">
-            	<a class="add-line" href="#">plus</a>
-            	<a class="remove-line" href="#">minus</a>
-            	<ul class="line-list">
-            	
-            	</ul>
-            	<div id="lineText"></div>
-            </div>
+			<div class="modal-body line-content">
+	            <table>
+		            <tr style="vertical-align: top;">
+		            	<td style="padding: 5px;">
+			            	<a class="add-line" href="#"><span class="glyphicon glyphicon-plus"></span></a><br/>
+			            	<a class="remove-line" href="#"><span class="glyphicon glyphicon-minus"></span></a>
+			           	</td>
+						<td style="width: 100%; padding: 0px;">
+			            	<ul class="line-list">
+			            	</ul>
+		            		<div id="lineText"></div>
+			            </td>
+		            	<td style="padding: 5px;">
+				            <a class="typewriter-up" href="#"><span class="glyphicon glyphicon-arrow-up"></span</a><br/>
+				            <a class="typewriter-down" href="#"><span class="glyphicon glyphicon-arrow-down"></span</a>
+			           	</td>
+		            </tr>
+				</table>
+			</div>
             <div class="modal-footer create-dialog">
                 <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
-                <a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a>
             </div>
-            <div class="modal-body message collapse">
+            <div class="modal-body message collapse">{# TODO Remove, if this isn't used. #}
 				<div id="message"></div>
             </div>
             <div class="modal-footer message collapse">
@@ -78,7 +96,7 @@
 .modal-dialog{
     margin-right: 0;
     margin-left: 0;
-    width: 500;{# A percentage here causes problems when the modal is dragged. #}
+    width: 1000px;{# A percentage here causes problems when the modal is dragged. #}
 }
 
 {# We crop the image like this... #}
@@ -107,127 +125,6 @@ ul {
     padding:0; 
 }
 </style>
-{# We use ImageMapster for the map and to resize the image. #}
-<script src="{% static "js/jquery.imagemapster.min.js" %}"></script>
-<script>
-	var lineArray= [['',0]{# This is needed because the top of the page is a "line" in the "typewriter" #}
-		{% for line in lines %}
-			,['{{ line|get_item:"id"}}', {{line|get_item:"crop"| y_for_typewriterline}}]
-		{% endfor %}
-	];  
-	var line_index = 0;
-	var line_top_spacing = 50;{# TODO Set this to an appropriate value automagically? Or just a default? And configurable? The line polygons are too small anyway. #}
-	var zoom =  0;
-	var initial_width;
-	var scroll_factor;
-	var content = {{ content|safe}};
-	
-	function selectLine(lineId) {
-			$("[line-key$=" + lineId + "]").mapster('set', true);
-	}
-	function deselectLine(lineId) {
-			$("[line-key$=" + lineId + "]").mapster('set', false);
-	}
-	function appendLine(lineId) {
-		$(".line-list").append('<li><input class="form-control added-line" type="text" id="' + lineId +'" value="' + content[lineId] + '"  /></li>');
-	}
-	function getLineContent(lineId) {
-		return content[lineId];
-	}
-	function getNextLineId(currentLineId) {
-		var i = 0
-		while (i < lineArray.length) {
-			if (lineArray[i][0] == currentLineId)
-				break;
-			i++;
-		}{# TODO No match....!? #}
-		return lineArray[i+1][0];
-	}
-	function vScrollDown() {
-		line_index++;
-		if (lineArray. length == line_index)
-			line_index--;
-		$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
-	}
-	function vScrollUp() {
-			line_index--;
-			if (0 > line_index)
-				line_index = 0;
-			$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
-	}
-	function updateZoom() {
-		var zoom_factor = zoom / 100;
-		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
-		scroll_factor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;
-		$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
-	}
-	function focusToLastLine() { {# This should be a faster way to find the last input. #}
-		inputs = document.querySelectorAll('.added-line'); 
-		inputs[inputs.length - 1].focus();
-	}
-	$(function() {
-		$('#correctModal').draggable({
-	       handle: $('.modal-header')
-		});
-		$('#correctModal').on('hidden.bs.modal', function () {
-			$('area').mapster('set', false);
-			$(".line-list").html('');
-		});
-		$('#correctModal').on('shown.bs.modal', function (e) {
-			focusToLastLine();
-		});
-		$( "#transcriptMap  area" ).on('click', function(p) {	
-			lineId = $(this).attr("line-key");
-			$("#correctModal").modal();
-			appendLine(lineId);
-		});
-		$( ".scroll-up" ).on('click', function(p) {
-			vScrollUp();
-		});
-		$( ".scroll-down" ).on('click', function(p) {
-			vScrollDown();
-		});
-		$( ".zoom-in" ).on('click', function(p) {
-			zoom += 10;
-			updateZoom();
-		});
-		$( ".zoom-out" ).on('click', function(p) {
-			zoom -= 10;
-			updateZoom();
-		});
-		$( ".add-line" ).on('click', function(p) {
-			lineId = getNextLineId($('.line-list input').last().attr("id"))
-			appendLine(lineId);
-			selectLine(lineId);
-			focusToLastLine();
-		});
-		$( ".remove-line" ).on('click', function(p) {
-			if ($('.added-line').size() > 1) { {# TODO Remove the minus button when only one line is shown? For aesthetic reasons... #}
-				line = $('.added-line').last();
-				deselectLine(line.attr("id"));
-				line.remove();
-			}
-			focusToLastLine();
-		});
-	});
-	$(document).ready(function() {
-		$('#transcriptImage').mapster({
-			mapKey: 'line-key',
-	        render_highlight: {
-		        fade: false,
-	            fillColor: 'ffffff',
-	            fillOpacity: 0.1
-	        },
-		    render_select: {
-            	fillColor: 'ffffff',
-            	fillOpacity: 0.1   
-	        }
-		});;
-		$('#transcriptImage').one("load", function() {
-			initial_width = $('#transcriptImage').width();
-			scroll_factor = initial_width / $('#transcriptImage').get(0).naturalWidth;
-		});
-	});
-</script>
+ {% include "edit/correct_js.html" %}
  
 {% endblock %}
