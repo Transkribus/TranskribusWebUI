@@ -66,9 +66,8 @@
 			deselectLine(lastLine.attr("id"));
 			lastLine.remove();
 
-			// THIS IS WRONG!
+			{# TODO Figure out if this is still wrong? #}
 			saveFocusId(getNextLineId(enterLineId));{# The line in the same _location_  in which enter was pressed should be focused. #}
-			
 			
 			$("[id$=" + savedFocusId + "]").focus();{# We set focus to the line following the one the user was working on when "typewriter scrolling" so that the line in the same location is focused. #}
 			vScrollUp(); {# TODO Request feedback. Do we want the scrolling to be according to the "page position" or assume that the user wants the highlighted line to be on top? The user can get it like this but also (confusingly?) other offsets... #}
@@ -125,7 +124,10 @@
 		var zoom_factor = zoom / 100;
 		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
 		scroll_factor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;
-		$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
+		if (0 == line_index)
+			$( ".transcript-map-div" ).css("top", '0px');{# TODO This is needed elsewhere as well, separate the scrolling! #}
+		else
+			$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
 	}
 	
 	$("a[data-target=#saveChanges]").click(function(event) {
@@ -184,6 +186,14 @@
 		$( ".remove-line" ).on('click', function(e) {
 			removeLastLine();
 		});
+        $('.transcript-map-div').on('mousewheel DOMMouseScroll', function(e) {
+        	e.preventDefault();
+        	if (e.originalEvent.detail > 0)
+				zoom -= 10;        	
+			else
+				zoom += 10;
+			updateZoom();
+        });
 	});
 	$(document).ready(function() {
 		$('#transcriptImage').mapster({
