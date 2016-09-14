@@ -20,6 +20,7 @@
 	var enterLineId;
 	var changed = false;
 	var isDragged = false;
+	var transcriptDivHeightString;
 	
 	function hasChanged() {
 		if (!changed)
@@ -138,7 +139,8 @@
 	function updateZoom() {
 		var zoom_factor = zoom / 100;
 		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
-		$( ".transcript-map-div" ).css("width", $('#transcriptImage').width() + 'px');
+		$( ".transcript-map-div" ).css("width", $('#transcriptImage').width() + 'px');{# If the image is offset so that it can grow within the div, we let it. #}
+		$( ".transcript-div" ).css("height", transcriptDivHeight);{# We wish to preserve this. #}
 		scroll_factor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;
 	}
 	
@@ -213,7 +215,7 @@
 		$( ".remove-line" ).on('click', function(e) {
 			removeLastLine();
 		});
-        $('.transcript-map-div').on('mousewheel DOMMouseScroll', function(e) {
+        $('.transcript-div').on('mousewheel DOMMouseScroll', function(e) {
         	e.preventDefault();
         	if (e.originalEvent.detail > 0)
 				zoom -= 10;        	
@@ -238,6 +240,7 @@
 		$('#transcriptImage').one("load", function() {
 			initial_width = $('#transcriptImage').width();
 			scroll_factor = initial_width / $('#transcriptImage').get(0).naturalWidth;
+			transcriptDivHeight = $( ".transcript-div" ).css("height");
 		});
 		$('#correctModal').keydown(function(e){
 		    if (e.keyCode == 13) {
