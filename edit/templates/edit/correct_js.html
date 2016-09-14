@@ -20,6 +20,7 @@
 	var savedFocusId;{# TODO Consider a getter? #}
 	var enterLineId;
 	var changed = false;
+	var isDragged = false;
 	
 	function hasChanged() {
 		if (!changed)
@@ -120,6 +121,21 @@
 		} else 
 			$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
 	}
+	{# Call this after dragging to so to get an appropriate line_index for stepwise scrolling again. #}
+	function adaptLineIndex() {
+		dragToComparable =  line_top_spacing -parseInt($( ".transcript-map-div" ).css("top"), 10)/scroll_factor;
+		length = lineArray.length;
+		if (dragToComparable > lineArray[length - 1][1])
+			line_index = length - 1;
+		else {
+			for (i = 0; i < length; i++) {
+				if (dragToComparable < lineArray[i][1]) {
+					line_index = Math.max(0, i - 1);
+					i = length;{# Exit the loop. #}
+				}
+			}
+		}
+	}
 	function updateZoom() {
 		var zoom_factor = zoom / 100;
 		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
@@ -142,7 +158,17 @@
 	       handle: $('.modal-header')
 		});
 		$('.transcript-map-div').draggable({
-
+			start: function() {
+				isDragged = true;
+				$('area').mapster('set', false); {# We assume that the user does not want to select a region. #}
+			},
+			stop: function() {
+				adaptLineIndex();
+				setTimeout(function() { {# A hack to avoid triggering clicks on the map if clicking a region when dragging. #}
+					isDragged = false;
+					$('area').mapster('set', false);
+				}, 250);
+			}
 		});
 		$('#correctModal').on('hidden.bs.modal', function () {
 			$('area').mapster('set', false);
@@ -153,6 +179,8 @@
 			$("[id$=" + savedFocusId + "]").focus();
 		});
 		$( "#transcriptMap  area" ).on('click', function(e) {	
+			if (isDragged) {# We ignore clicks if the user has been dragging the image, we assume that that's what the user wants. #}
+				return;
 			lineId = $(this).attr("line-key");
 			saveFocusId(lineId);
 			$("#correctModal").modal();
