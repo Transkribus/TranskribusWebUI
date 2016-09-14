@@ -1,11 +1,10 @@
 {% load staticfiles %}
+{% load i18n %}
 
 {# We use ImageMapster for the map and to resize the image. #}
 <script src="{% static "js/jquery.imagemapster.min.js" %}"></script>
 <script>
 // TODO JSON vs. map vs. whatever!??????
-
-
 	var lineArray= [['',0]{# This is needed because the top of the page is a "line" in the "typewriter" #}
 		{% for line in lines %}
 			,['{{ line|get_item:"id"}}', {{line|get_item:"crop"| y_for_typewriterline}}]
@@ -24,7 +23,7 @@
 	
 	function hasChanged() {
 		if (!changed)
-			setMessage("Trans blah... you have unsaved changes.");
+			setMessage("<div class='alert alert-warning'>{% trans "You have unsaved changes." %}</div>");
 		changed = true;
 	}
 	function setMessage(message) {
@@ -250,7 +249,8 @@
 		    }
 		});
 		$('#correctModal').focusout(function(e) { {# When a line being edited loses focus, we preserve the content and thus update the array. #}
-			setLineContent(e.target.id, e.target.value);
+			if (e.target.type == 'text') {# Not just the text inputs in the modal can lose focus and we don't want to trigger "unsaved changes" falsely. #}
+				setLineContent(e.target.id, e.target.value);
 		});
 	});
 </script>

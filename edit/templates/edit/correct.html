@@ -13,18 +13,20 @@
 
 {% block content %}
 
+<link href="{% static "css/correct.css" %}" rel="stylesheet">
+
 <div class="container">
     <div class="row">
         <h1>
             {% trans "Correction Interface, Line by Line (working title)" %}
         </h1>
 	</div>
-    <div class="row row-centered" style="margin-bottom: 10px;">
+    <div class="row row-centered">
 		<div class="col-md-3">		
-	    	<a class="scroll-up" href="#">scroll up </a><a class="scroll-down" href="#">scroll down</a><br/>
+	    	<a class="scroll-up" href="#">scroll up </a><a class="scroll-down" href="#">scroll down</a> (dragging with the mouse works too)
 		</div>
 	    <div class="col-md-3">
-	    	<a class="zoom-in" href="#">zoom in </a><a class="zoom-out" href="#">zoom out</a>
+	    	<a class="zoom-in" href="#">zoom in </a><a class="zoom-out" href="#">zoom out</a>  (scrolling with the mouse also works)
 		</div>
 	    <div class="col-md-3">
 			<div id="message"></div>
@@ -46,85 +48,7 @@
 	</div>
 </div>
  
-<div id="correctModal" class="modal fade" >
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">{% trans "Edit line" %}</h4>
-            </div>
-			<div class="modal-body line-content">
-	            <table>
-		            <tr style="vertical-align: top;">
-		            	<td style="padding: 5px;">
-			            	<a class="add-line" href="#"><span class="glyphicon glyphicon-plus"></span></a><br/>
-			            	<a class="remove-line" href="#"><span class="glyphicon glyphicon-minus"></span></a>
-			           	</td>
-						<td style="width: 100%; padding: 0px;">
-			            	<ul class="line-list">
-			            	</ul>
-		            		<div id="lineText"></div>
-			            </td>
-		            	<td style="padding: 5px;">
-				            <a class="typewriter-up" href="#"><span class="glyphicon glyphicon-arrow-up"></span</a><br/>
-				            <a class="typewriter-down" href="#"><span class="glyphicon glyphicon-arrow-down"></span</a>
-			           	</td>
-		            </tr>
-				</table>
-			</div>
-            <div class="modal-footer create-dialog">
-                <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
-            </div>
-            <div class="modal-body message collapse">{# TODO Remove, if this isn't used. #}
-				<div id="message"></div>
-            </div>
-            <div class="modal-footer message collapse">
-                <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-{# Draggable modal: #}
-.modal {
-    overflow: hidden;
-    top: 40%;
-    left: 25%;
-}
-
-.modal-dialog{
-    margin-right: 0;
-    margin-left: 0;
-    width: 1000px;{# A percentage here causes problems when the modal is dragged. #}
-}
-
-{# We crop the image like this... #}
-.transcript-div {
-	overflow: hidden;
-}
-
-{# And in order to move the map along with the image, we have this div... #}
-.transcript-map-div {
-	overflow: hidden;
-	position: relative;
-}
-
-{# We make the transcript fit neatly... #}
-.transcript-img {
-	max-width: 100% !important;
-}
-
-.modal-backdrop {
-	background: none;
-}
-
-ul {
-    list-style-type: none;
-    margin:0;
-    padding:0; 
-}
-</style>
- {% include "edit/correct_js.html" %}
+{% include "edit/correct_modal.html" %}
+{% include "edit/correct_js.html" %}
  
 {% endblock %}

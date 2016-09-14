@@ -1,0 +1,38 @@
+/* Draggable modal: */
+.modal {
+    overflow: hidden;
+    top: 40%;
+    left: 25%;
+}
+
+.modal-dialog{
+    margin-right: 0;
+    margin-left: 0;
+    width: 1000px;/* A percentage here causes problems when the modal is dragged. TODO Change with JavaScript when loading? */
+}
+
+/* We crop the image like this... */
+.transcript-div {
+	overflow: hidden;
+}
+
+/* And in order to move the map along with the image, we have this div... */
+.transcript-map-div {
+	overflow: hidden;
+	position: relative;
+}
+
+/* We make the transcript fit neatly... */
+.transcript-img {
+	max-width: 100% !important;
+}
+
+.modal-backdrop {
+	background: none;
+}
+
+ul {
+    list-style-type: none;
+    margin:0;
+    padding:0; 
+}

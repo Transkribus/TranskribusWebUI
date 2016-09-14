@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <div id="correctModal" class="modal fade" >
     <div class="modal-dialog">
         <div class="modal-content">
@@ -5,17 +7,26 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">{% trans "Edit line" %}</h4>
             </div>
-            <div class="modal-body line-content">
-            	<div id="lineText"></div>
-            </div>
+			<div class="modal-body line-content">
+	            <table>
+		            <tr style="vertical-align: top;">
+		            	<td style="padding: 5px;">
+			            	<a class="add-line" href="#"><span class="glyphicon glyphicon-plus"></span></a><br/>
+			            	<a class="remove-line" href="#"><span class="glyphicon glyphicon-minus"></span></a>
+			           	</td>
+						<td style="width: 100%; padding: 0px;">
+			            	<ul class="line-list">
+			            	</ul>
+		            		<div id="lineText"></div>
+			            </td>
+		            	<td style="padding: 5px;">
+				            <a class="typewriter-up" href="#"><span class="glyphicon glyphicon-arrow-up"></span</a><br/>
+				            <a class="typewriter-down" href="#"><span class="glyphicon glyphicon-arrow-down"></span</a>
+			           	</td>
+		            </tr>
+				</table>
+			</div>
             <div class="modal-footer create-dialog">
-                <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
-                <a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a>
-            </div>
-            <div class="modal-body message collapse">
-				<div id="message"></div>
-            </div>
-            <div class="modal-footer message collapse">
                 <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
             </div>
         </div>
