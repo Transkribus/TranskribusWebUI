@@ -31,7 +31,7 @@
 		</dl>
 		<p>This transcript has {{ regions|length }} region{% if regions|length != 1 %}s{% endif %}:</p>
 		{% if regions|length > 0 %}
-		<a href="{% url 'correct' collId docId pageId transcript.tsId %}">{% trans "Correct this transcript." %}</a>
+		<a href="{% url 'correct' collId docId pageId transcript.tsId %}">{% trans "Correct this transcript." %}</a>(Regardless of the ID, it's the "current transcript" at the moment.)
 		<table class="table table-striped">
 		   <thead>
 			<tr><th>{% trans "ID" %}</th><th>{% trans "TYPE" %}</th><th>{% trans "TEXTLINES" %}</th><th>{% trans "COORDS" %}</th><th>{% trans "TEXT" %}</th><th>{% trans "METADATA" %}</th></tr>

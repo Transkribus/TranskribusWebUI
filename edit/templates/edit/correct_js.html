@@ -138,11 +138,8 @@
 	function updateZoom() {
 		var zoom_factor = zoom / 100;
 		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
+		$( ".transcript-map-div" ).css("width", $('#transcriptImage').width() + 'px');
 		scroll_factor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;
-		if (0 == line_index)
-			$( ".transcript-map-div" ).css("top", '0px');{# TODO This is needed elsewhere as well, separate the scrolling! #}
-		else
-			$( ".transcript-map-div" ).css("top", Math.round(scroll_factor*(-lineArray[line_index][1] + line_top_spacing)) + 'px');
 	}
 	
 	$("a[data-target=#saveChanges]").click(function(event) {

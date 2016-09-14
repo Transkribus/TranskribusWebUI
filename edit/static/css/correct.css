@@ -13,6 +13,7 @@
 
 /* We crop the image like this... */
 .transcript-div {
+	background-color: gray;
 	overflow: hidden;
 }
 
