@@ -12,7 +12,6 @@
 	];  
 	var line_index = 0;
 	var line_top_spacing = 50;{# TODO Set this to an appropriate value automagically? Or just a default? And configurable? The line polygons are too small anyway. #}
-	var zoom =  0;
 	var initial_width;
 	var scroll_factor;
 	var content = {{ content|safe}};
@@ -21,6 +20,7 @@
 	var changed = false;
 	var isDragged = false;
 	var transcriptDivHeightString;
+	var savedZoom = 0;
 	
 	function hasChanged() {
 		if (!changed)
@@ -136,20 +136,26 @@
 			}
 		}
 	}
-	function updateZoom() {
-		var zoom_factor = zoom / 100;
-		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor))); 
+	function setZoom(zoom, x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2, y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2) { {# TODO: Remove the zoom buttons altogether or set default to center? #}
+		savedZoom += zoom;
+		var zoom_factor = savedZoom / 100;
+		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor)));
+		widthBefore = parseInt($( ".transcript-map-div" ).css("width"), 10);
+		heightBefore = $('#transcriptImage').height();
 		$( ".transcript-map-div" ).css("width", $('#transcriptImage').width() + 'px');{# If the image is offset so that it can grow within the div, we let it. #}
-		$( ".transcript-div" ).css("height", transcriptDivHeight);{# We wish to preserve this. #}
+		$( ".transcript-div" ).css("height", transcriptDivHeight);{# We wish to preserve the height. #}
+		ratio = parseInt($( ".transcript-map-div" ).css("width"), 10)/widthBefore - 1;
+		newLeftOffset = $( ".transcript-map-div" ).offset().left - x * ratio;
+		newTopOffset = $( "#transcriptImage" ).offset().top - y * ratio;
+    	$( ".transcript-map-div" ).offset({top: newTopOffset, left: newLeftOffset}); 
 		scroll_factor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;
 	}
-	
 	$("a[data-target=#saveChanges]").click(function(event) {
     	event.preventDefault();
     	$.post('correct', {content: JSON.stringify(content), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
     		setMessage(data); 
 		});
-    	// TODO Handle failures here or are we happy with the current solution?
+    	{# TODO Handle failures here or are we happy with the current solution? #}
 	});
 	$(function() {
 		$('#correctModal').draggable({
@@ -199,12 +205,10 @@
 			oneLineUp();
 		});
 		$( ".zoom-in" ).on('click', function(e) {
-			zoom += 10;
-			updateZoom();
+			setZoom(10);
 		});
 		$( ".zoom-out" ).on('click', function(e) {
-			zoom -= 10;
-			updateZoom();
+			setZoom(-10);
 		});
 		$( ".add-line" ).on('click', function(e) {
 			lineId = getNextLineId($('.line-list input').last().attr("id"))
@@ -217,11 +221,12 @@
 		});
         $('.transcript-div').on('mousewheel DOMMouseScroll', function(e) {
         	e.preventDefault();
+        	var mouseZoom;
         	if (e.originalEvent.detail > 0)
-				zoom -= 10;        	
+				mouseZoom = -10;        	
 			else
-				zoom += 10;
-			updateZoom();
+				mouseZoom = 10;
+        	setZoom(mouseZoom, e.originalEvent.pageX - $( ".transcript-map-div" ).offset().left, e.originalEvent.pageY - $( ".transcript-map-div" ).offset().top);
         });
 	});
 	$(document).ready(function() {
