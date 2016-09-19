@@ -194,3 +194,69 @@ def PageSerializer(fileobj):
         fileobj, xmlclass=Page
     )
     return page
+
+
+class CollectionSerializer_(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    role = serializers.CharField()
+    # description = serializers.CharField()        
+
+
+class DocumentSerializer_(serializers.Serializer):
+    id = serializers.IntegerField()
+    # collection_id = serializers.IntegerField()
+    title = serializers.CharField()
+    num_pages = serializers.IntegerField()
+    uploader = serializers.CharField()
+    # uploaded_at = serializers.IntegerField()
+
+
+def get_cropped_image_url(url, rect):
+    crop = "{x}x{y}x{width}x{height}".format(**rect.as_dict())
+    return "{url}&crop={crop}".format(url=url, crop=crop)
+
+
+class CoordsField(serializers.Field):
+    def to_representation(self, value):
+        return list(list(item.as_tuple()) for item in value)
+
+
+class RectField(serializers.Field):
+    def to_representation(self, value):
+        return value.as_dict()
+
+
+class ItemIdentifierSerializer(serializers.Serializer):
+    collection_id = serializers.IntegerField()
+    document_id = serializers.IntegerField()
+    page_id = serializers.IntegerField()
+    region_id = serializers.CharField(required=False)
+    line_id = serializers.CharField()
+    word_id = serializers.CharField()
+
+
+class LineSerializer(serializers.Serializer):
+    # baseline = CoordsField()
+    rect = RectField(required=False)
+    url = serializers.CharField()
+    # url = serializers.SerializerMethodField()
+
+    # def get_url(self, obj):
+    #     return get_cropped_image_url(obj.url, obj.rect)
+
+
+class WordSerializer(serializers.Serializer):
+    item_id = ItemIdentifierSerializer(source='id')
+    expected = serializers.IntegerField(source='index')
+    image = LineSerializer(source='line')
+    text = serializers.CharField(source='line.text')
+    tokens = serializers.ListSerializer(
+        source='line.tokens',
+         child=serializers.CharField()
+    )
+    # tokens = serializers.DictField()
+    expected_token = serializers.SerializerMethodField()
+
+    def get_expected_token(self, obj):
+        return obj.line.tokens[obj.index]
