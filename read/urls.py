@@ -24,6 +24,6 @@ urlpatterns = [
     url(r'^dashboard/', include('dashboard.urls')),
     url(r'^edit/', include('edit.urls')),
     url(r'^search/', include('search.urls')),
-    url('^', include('django.contrib.auth.urls')),
+    url('', include('django.contrib.auth.urls')),
 
 ]
