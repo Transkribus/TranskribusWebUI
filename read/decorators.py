@@ -12,27 +12,37 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout
 
 from django.http import HttpResponseRedirect
+from urllib2 import HTTPError
 
 import sys
-from .services import t_refresh, t_collections
+from .services import t_refresh, t_collections, t_log
 
 #override the login_required decorator, mostly so we can call services.t_collecctions at login
 def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=None):
     @wraps(function)
     def wrapper(request, *args, **kw):
         if request.user.is_authenticated():
-            # We check here to see if we are still authenticated with transkribus
-            # a quick post request ti auth/refresh should do?
-            # If we don't get a 200 we logout
-            if not t_refresh():
-                #TODO there is no logout view in library... though maybe a project level logout makes more sense
-#                app_root = request.path
-#               sys.stdout.write("### request: %s \r\n" % request.path )
-                return HttpResponseRedirect('/logout?next='+request.get_full_path())
-            #setting collections data as a session var if no already set
+		
+             #Not this (thanks Berthold!)
+#            if not t_refresh():
+#                return HttpResponseRedirect('/logout/?next='+request.get_full_path())
+
+            #setting collections data as a session var if not already set
             if "collections" not in request.session or request.session['collections'] is None:
-                request.session['collections'] = t_collections()
-            return function(request, *args, **kw)
+                t_collections(request)            
+
+            # We check here to see if we are still authenticated with transkribus
+            # a quick post request to auth/refresh should do?
+            # If we get 401/403 redirect to logout if not 200 raise exception
+            response = None
+            try:
+                response = function(request, *args, **kw)
+            except HTTPError as e:
+                if e.status_code not in (401, 403):
+                    raise e
+                response = HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+
+            return response
         else:
             path = request.build_absolute_uri()
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
