@@ -1,0 +1,10 @@
+{% load i18n %}
+
+	<p>You are a member of the following {{ collections|length }} collections:</p>
+
+		   <ul>
+		     {% for coll in collections %}
+			<li><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a> | {{ coll.owner }} | {{ coll.role }} | {{ coll.description }} </li>
+		     {% endfor %}
+		   </ul>
+

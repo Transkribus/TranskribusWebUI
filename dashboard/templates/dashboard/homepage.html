@@ -3,6 +3,29 @@
 
 {% block content %}
 
-Hello dashboard
+<h1>COLLECTIONS</h1>
+
+<h2>Last activity (on any of owned collections?)</h2>
+
+<p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
+
+<h2>5 last activities overall:</h2>
+<ul>
+<li>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</li>
+<li>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</li>
+<li>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</li>
+<li>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</li>
+<li>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</li>
+</ul>
+
+<button>show more</button>
+<h2>My Collections</h2>
+{% include "dashboard/collections_list.html" with collections=collections %}
+
+<pre>
+Graph here
+</pre>
+
+<button>Nbre of Jobs by type / ingesting</button>
 
 {% endblock %}
