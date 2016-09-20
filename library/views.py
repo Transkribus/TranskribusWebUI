@@ -5,10 +5,8 @@ import re
 import random
 
 #Imports of django modules
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -16,7 +14,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 
-from read.utils import crop
+from read.utils import crop, t_metadata
 #Imports pf read modules
 from read.decorators import t_login_required
 from read.services import *
@@ -88,10 +86,9 @@ def collections(request):
 def collection(request, collId):
     #this is actually a call to collections/{collId}/list and returns only the document objects for a collection
     docs = t_collection(request,collId)
-    if(docs == 403): #no access to requested collection
-        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
-        sys.stdout.flush()
-        return HttpResponseRedirect('/library/collection_noaccess/'+collId)
+    #probably a redirect if an HttpResponse
+    if isinstance(docs,HttpResponse): 
+        return docs
 
     collections = request.session.get("collections");
     #there is currently no transkribus call for collections/{collId} on its own to fetch just data for collection
@@ -133,7 +130,12 @@ def collection(request, collId):
 @t_login_required
 def document(request, collId, docId, page=None):
     collection = t_collection(request, collId)
+    if isinstance(collection,HttpResponse): 
+        return collection
     full_doc = t_document(request, collId, docId,-1)
+    if isinstance(full_doc,HttpResponse): 
+        return full_doc
+
     nav = navigation.up_next_prev("document",docId,collection,[collId])
 
     return render(request, 'library/document.html', {
@@ -152,6 +154,8 @@ def document(request, collId, docId, page=None):
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
     full_doc = t_document(request, collId, docId, -1)
+    if isinstance(full_doc,HttpResponse): 
+        return full_doc
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
     #extract page data from full_doc (may be better from a  separate page data request)
@@ -186,6 +190,9 @@ def page(request, collId, docId, page):
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
     pagedata = t_page(request, collId, docId, page)
+    if isinstance(pagedata,HttpResponse): 
+        return pagedata
+
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
 
     pageXML_url = None;
@@ -198,6 +205,9 @@ def transcript(request, collId, docId, page, transcriptId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
+        if isinstance(transcript,HttpResponse): 
+            return transcript
+
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
 
@@ -230,32 +240,35 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # we could get one transcript from ...{page}/curr, but for completeness would
     # rather use transciptId to target a particular transcript
     transcripts = t_page(request,collId, docId, page)
+    if isinstance(transcripts,HttpResponse): 
+        return transcripts
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
+    if isinstance(full_doc,HttpResponse): 
+        return full_doc
+
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
 
-#    sys.stdout.write("############# PAGEDATA: %s\r\n" % pagedata )
-    sys.stdout.write("############# TRANSCRIPTS: %s\r\n" % transcripts )
+    t_log("############# TRANSCRIPTS: %s" % transcripts )
 
     #we are only using the transcripts to get the pageXML for a particular transcript...
     pageXML_url = None;
     for x in transcripts:
-#        sys.stdout.write("############# transcript id comp: %s \r\n" % x.get("tsId") )
-#        sys.stdout.write("############# transcript id comp: %s \r\n" % transcriptId )
-
         if int(x.get("tsId")) == int(transcriptId):
-            sys.stdout.write("############# transcript id comp: %s \r\n" % x.get("tsId") )
-            sys.stdout.write("############# transcript id comp: %s \r\n" % transcriptId )
+            t_log("############# transcript id comp: %s" % x.get("tsId") )
+            t_log("############# transcript id comp: %s" % transcriptId )
             pageXML_url = x.get("url")
             break
 
-    sys.stdout.write("############# PAGEXML_url: %s\r\n" % pageXML_url )
+    t_log("############# PAGEXML_url: %s" % pageXML_url )
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
+        if isinstance(transcript,HttpResponse): 
+            return transcript
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
     if isinstance(regions, dict):
@@ -305,6 +318,8 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     # we could get one transcript from ...{page}/curr, but for completeness would
     # rather use transciptId to target a particular transcript
     transcripts = t_page(request,collId, docId, page)
+    if isinstance(transcripts,HttpResponse): 
+        return transcripts
     #we are only using the transcripts to get the pageXML for a particular
     pageXML_url = None;
     for x in transcripts:
@@ -314,9 +329,14 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
+        if isinstance(transcript,HttpResponse): 
+            return transcript
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
+    if isinstance(full_doc,HttpResponse): 
+        return full_doc
+
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
@@ -379,6 +399,8 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
     transcripts = t_page(request, collId, docId, page)
+    if isinstance(transcripts,HttpResponse): 
+        return transcripts
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
     for x in transcripts:
@@ -388,9 +410,14 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
+        if isinstance(transcript,HttpResponse): 
+            return transcript
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
+    if isinstance(full_doc,HttpResponse): 
+        return full_doc
+
     index = int(page)-1
     # and then extract the correct page from full_doc (may be better from a  separate page data request??)
     pagedata = full_doc.get('pageList').get('pages')[index]
@@ -450,24 +477,19 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 @t_login_required
 def rand(request, collId, element):
     collection = t_collection(request,collId)
-    if(collection == 403): #no access to requested collection
-        sys.stdout.write("403 referrer: %s%% \r\n" % (request.META.get("HTTP_REFERER")) )
-        sys.stdout.flush()
-        return HttpResponseRedirect('/library/collection_noaccess/'+collId)
-
+    if isinstance(collection,HttpResponse): 
+        return collection
 
     doc = random.choice(collection)
-
 
     collection = None
     for x in doc.get("collectionList").get("colList"):
         if str(x.get("colId")) == str(collId):
             collection = x
 
-    sys.stdout.write("RANDOM DOC: %s\r\n" % (doc.get("docId")) )
-    sys.stdout.flush()
-
     pages  = t_document(request, collId, doc.get("docId"), 0)
+    if isinstance(pages,HttpResponse): 
+        return pages
     page = random.choice(pages.get("pageList").get("pages"))
 
     sys.stdout.write("RANDOM PAGE: %s\r\n" % (page.get("pageNr")) )
