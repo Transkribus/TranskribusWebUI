@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout
 
 from django.http import HttpResponseRedirect
-from urllib2 import HTTPError
+#from urllib2 import HTTPError
+import requests
 
 import sys
 from .services import t_refresh, t_collections, t_log
@@ -37,11 +38,10 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
             response = None
             try:
                 response = function(request, *args, **kw)
-            except HTTPError as e:
+            except requests.exceptions.HTTPError as e:
                 if e.status_code not in (401, 403):
                     raise e
                 response = HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
-
             return response
         else:
             path = request.build_absolute_uri()
