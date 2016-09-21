@@ -1,5 +1,55 @@
 from collections import Hashable
 
+from prima_page_content import attributes
+
+
+def points_from_string(points_string):
+    return attributes.Points.from_string(points_string)
+
+def rect_from_string(points_string):
+    points = points_from_string(points_string)
+    return points.rect
+
+def tokenize(text, punct=False):
+
+    abbreviations = frozenset([
+        'hr', 'prof', 'bsp', 'dh'
+    ])
+
+    def split_punct(token):
+        if punct is False:
+            if token[-1] in (',', '.', '-', ':', ';'):
+                return (token[:-1], )
+            else:
+                return (token, )
+        elif len(token) <= 1:
+            return (token, )
+        elif token.endswith(','):
+            return (token[:-1], token[-1])
+        elif token.endswith('.'):
+            if token[:-1].lower() not in abbreviations:
+                return (token[:-1], token[-1])
+            else:
+                return (token, )
+        elif token.endswith('-'):
+            return (token[:-1], token[-1])
+        else:
+            return (token, )
+
+    def concat_token(token_1, token_2):
+        return token_1 + token_2
+
+    tokens = [token for token in text.split(' ') if token not in ('', )]
+    return functools.reduce(concat_token, map(split_punct, tokens))
+
+def tokenize_line(obj):
+    return tokenize(obj.text or '')
+
+def get_cropped_image_url(url, rect):
+    crop = "{x}x{y}x{width}x{height}".format(**rect.as_dict())
+    return "{url}&crop={crop}".format(url=url, crop=crop)
+
+
 class Root: pass
 class Child: pass
 
@@ -70,3 +120,4 @@ class mURL(Hashable):
 
     def __repr__(self):
         return "{}({})".format(self.__class__.name, str(self))
+

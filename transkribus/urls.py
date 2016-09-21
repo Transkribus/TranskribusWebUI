@@ -17,12 +17,13 @@ router.register(
 )
 
 document_list = viewsets.DocumentViewSet.as_view({'get': 'list'})
+
 router.register(
     r'collections/(?P<collection_id>\w+)/documents',
     viewsets.DocumentViewSet,
     base_name='documents'
 )
 
-urlpatterns = [url(r'^test/', views.test_view, name='test_view')]
-
-urlpatterns += router.urls
+urlpatterns = [
+    url(r'^transkribus/', include(router.urls))
+]

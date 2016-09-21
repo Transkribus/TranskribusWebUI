@@ -168,7 +168,7 @@ class TestTranskribusBackend(TestCase):
 
 class TestServices(TestCase):
 
-    data = b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><trpUserLogin><userId>1</userId><userName>some@thing.org</userName><email>some@thing.org</email><affiliation>nouns</affiliation><firstname>some</firstname><lastname>thing</lastname><gender>neuter</gender><isActive>1</isActive><isAdmin>true</isAdmin><created><nanos>0</nanos></created><loginTime>1776-07-04T02:55:09.625+02:00</loginTime><sessionId>1AF785265C5FEA0F0B2ED78BEB0F6E0A</sessionId><userAgent>TranskribusWebUI</userAgent><ip>80.110.80.189</ip></trpUserLogin>'
+    data = b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><trpUserLogin><userId>1</userId><userName>some@thing.org</userName><email>some@thing.org</email><affiliation>nouns</affiliation><firstname>some</firstname><lastname>thing</lastname><gender>neuter</gender><isActive>1</isActive><isAdmin>true</isAdmin><created><nanos>0</nanos></created><loginTime>1776-07-04T02:55:09.625+02:00</loginTime><sessionId>1AF785265C5FEA0F0B2ED78BEB0F6E0A</sessionId><userAgent>TranskribusWebUI</userAgent><ip>1.2.3.4</ip></trpUserLogin>'
 
     @mock.patch('requests.post')
     def test_login_succeeds(self, post):
@@ -222,7 +222,6 @@ class TestLoginRequired(TestCase):
 
         user = User.objects.create_user(username='some', password='thing', email='some@thing.org')
 
-        # NOTE: patching backend did not work, so patching login
         login.return_value = {
             'username': 'some',
             'password': 'thing',
