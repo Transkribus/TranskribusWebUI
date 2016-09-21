@@ -47,9 +47,9 @@ def t_check_cache(request,t_id, url) :
     if t_id in request.session :
         #Have data  keyed with t_id in session, get the *cache_url*
         if isinstance(request.session.get(t_id), list) :
-            cache_url = request.session.get(t_id)[0].get('cache_url') 
+            cache_url = request.session.get(t_id)[0].get('cache_url')
         else :
-            cache_url = request.session.get(t_id).get('cache_url') 
+            cache_url = request.session.get(t_id).get('cache_url')
         #Do the urls match too?
         if cache_url == url :
             return request.session[t_id]
@@ -68,13 +68,13 @@ def t_set_cache_value(request,t_id,data,url) :
 #    t_log("### [CAHCING] CACHING %s with url : %s" % (t_id,url) )
     request.session[t_id] = data
 
-#Make a request for data (possibly) to the transkribus REST service make 
+#Make a request for data (possibly) to the transkribus REST service make
 #use of helper functions and calling the appropriate data handler when done
 def t_request(request,t_id,url,params=None,method=None,headers=None,handler_params=None):
 
     #Check for cached value and return that #TODO override this on some occaisions
     if t_check_cache(request, t_id, url) :
-	return request.session[t_id]
+        return request.session[t_id]
 
     #Add default headers to *possibly* already defined header data
     if not headers : headers = {}
@@ -89,21 +89,21 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     #Check to see if we are still authenticated...
     try:
         r.raise_for_status()
-    except requests.exceptions.HTTPError as e: 
-	if e.response.status_code not in (401, 403):
-	    raise e
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code not in (401, 403):
+            raise e
         #no access to requested collection... if we are indeed requesting a collection (which we usually are)
         #FAFF collId needs passed in via handler_params... we could extract from url??
-        if e.response.status_code == 403 : # and handler_params is not None and "collId" in handler_params): 
+        if e.response.status_code == 403 : # and handler_params is not None and "collId" in handler_params):
             m = re.match(r'^.*/rest/[^/]+/(\d+)/.*', url)
             collId = m.group(1)
             if collId :
                 return HttpResponseRedirect("/library/collection_noaccess/"+str(collId))
-	#otherwise you get logged out...
-	return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+        #otherwise you get logged out...
+        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
 
-    # Pass transkribus response to handler (NB naming convention is t_[t_id]_handler(r, handler_params) 
-    # handler_params are for things that we might need to pass through this t_request to the handler 
+    # Pass transkribus response to handler (NB naming convention is t_[t_id]_handler(r, handler_params)
+    # handler_params are for things that we might need to pass through this t_request to the handler
     data = eval("t_"+t_id+"_handler(r,handler_params)")
     #We store the data in the sesison cache
     t_set_cache_value(request,t_id,data,url)
@@ -145,7 +145,7 @@ def t_login(user, pw):
 
     #t_login is called from backend and doesn't have "request" so we don't call t_request or the handler
     r = s.post(url, params=params, verify=False, headers=headers)
-    
+
     if r.status_code != requests.codes.ok:
         return None
 
