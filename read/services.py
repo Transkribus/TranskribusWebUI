@@ -6,22 +6,14 @@ requests.packages.urllib3.disable_warnings()
 #TODO sudo pip install 'requests[security]'
 #Possibly check for openssl-devel python-devel libffi-devel (yum)
 
-#import urllib2
-#from urllib2 import HTTPError
 import xmltodict
 import dicttoxml
-#from lxml import objectify
 from django.http import HttpResponseRedirect
 from django.conf import settings
 import sys #remove after switching to t_log
 from .utils import t_log
 import json
 import re
-
-#TODO rationalise this code
-# - lots of repitition
-# - possible to find or create (UIBK to create) more efficient ways of getting data
-# - epecially t_collection (which calls t_document in loop)
 
 s = requests.Session()
 
@@ -34,7 +26,7 @@ s = requests.Session()
 def t_set_default_headers(headers):
 
     if 'clientId' not in headers:
-        headers['clientId'] = 2
+        headers['clientId'] = str(2)
     if 'content-type' not in headers:
         headers['content-type'] = 'application/json'
 
