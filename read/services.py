@@ -7,7 +7,7 @@ requests.packages.urllib3.disable_warnings()
 #Possibly check for openssl-devel python-devel libffi-devel (yum)
 
 #import urllib2
-from urllib2 import HTTPError
+#from urllib2 import HTTPError
 import xmltodict
 import dicttoxml
 #from lxml import objectify
@@ -59,7 +59,6 @@ def t_check_cache(request,t_id, url) :
 
 #Set the session cache after a successful request to transkribus REST service
 def t_set_cache_value(request,t_id,data,url) :
-
     #Use the t_id as identifer for cached data, Store the url with key "cache_url" (in first element if data is a list)
     if isinstance(data, list) :
         data[0]['cache_url']=url
@@ -75,7 +74,6 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
 
     #Check for cached value and return that #TODO override this on some occaisions
     if t_check_cache(request, t_id, url) :
-#        t_log("### [HAVE CACHE] RETURNING CACHED data for %s" % (t_id) )
 	return request.session[t_id]
 
     #Add default headers to *possibly* already defined header data
@@ -87,7 +85,7 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
         r = s.post(url, params=params, verify=False, headers=headers)
 
     r = s.get(url, params=params, verify=False, headers=headers)
-    
+
     #Check to see if we are still authenticated...
     try:
         r.raise_for_status()
@@ -157,6 +155,7 @@ def t_user_data_handler(r,params=None):
     return xmltodict.parse(r.text).get('trpUserLogin')
 
 #refresh transkribus session (called by t_login_required decorator to test persistence/validity of transkribus session)
+############## DEPRECATED ########################
 def t_refresh():
     url = settings.TRP_URL+'auth/refresh'
 
@@ -185,18 +184,19 @@ def t_action_types_handler(r,params=None):
 
 
 #t_actions_info called to get lookup for action types for subsequent action list calls
-def t_list_actions(request,collId=None,docId=None):
+def t_list_actions(request,start=None,end=None,collId=None,docId=None):
     url = settings.TRP_URL+'actions/list'
     t_id = "actions"
     params = {}
-    if collId :
-        params['collId']=collId
-    if docId :
-        params['collId']=docId
+    if collId : params['collId']=collId
+    if docId : params['collId']=docId
+    if start : params['start']=start
+    if end : params['end']=end
 
     return t_request(request,t_id,url,"GET",params)
 
 def t_actions_handler(r,params=None):
+
     return json.loads(r.text)
 
 def t_collections(request):
