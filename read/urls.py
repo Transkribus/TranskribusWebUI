@@ -26,4 +26,7 @@ urlpatterns = [
     url(r'^search/', include('search.urls')),
     url('', include('django.contrib.auth.urls')),
 
+
+    url(r'^e-learning/', include('read_e_learning.urls', namespace='e-learning')),
+
 ]

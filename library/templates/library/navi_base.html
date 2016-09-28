@@ -33,6 +33,10 @@
 						<a href="{% url 'profile' %}">{% trans "Profile"%}</a>
 					</li>
 					<li>
+						<a href="{% url 'e-learning:app:index' %}">{% trans "e-Learning" %}</a>
+					</li>
+
+					<li>
 						<a href="{% url 'logout' %}?next={{request.path}}">{% trans "Logout" %}</a>
 					</li>
 				{% else %}
