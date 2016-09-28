@@ -44,7 +44,10 @@ INSTALLED_APPS = [
     'review',
     'dashboard',
     'edit',
-    'search'
+    'search',
+    'e_learning',
+    'transkribus',
+    'django_q',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -213,3 +216,6 @@ NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
 #not used...
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'norsun'
+
+TRANSKRIBUS_URL = TRP_URL
+
