@@ -74,7 +74,9 @@ def index(request):
 #@profile("collections.prof")
 @t_login_required
 def collections(request):
-    collections = request.session.get("collections");
+    collections = t_collections(request)
+    if isinstance(collections,HttpResponse): 
+        return collections
     return render(request, 'library/collections.html', {'collections': collections} )
 
 #/library/collection/{colId}
@@ -90,7 +92,7 @@ def collection(request, collId):
     if isinstance(docs,HttpResponse): 
         return docs
 
-    collections = request.session.get("collections");
+    collections = t_collections(request)
     #there is currently no transkribus call for collections/{collId} on its own to fetch just data for collection
     # so we'll loop through collections and pick out collection level metadata freom there
     # The same could be achieved using the list of documents (ie pick first doc match collId with member of colList)
@@ -606,7 +608,7 @@ def users(request, collId, userId):
 
 @t_login_required
 def profile(request):
-    collections = request.session.get("collections");
+    collections = t_collections(request)
     return render(request, 'library/profile.html', {'collections': collections})
 
 #error pages (where not handled by modals
@@ -641,7 +643,10 @@ def ingest_mets_xml(request):
             return HttpResponse(json.dumps({'RESET': 'false', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
     else:
         ingest_mets_xml_file_form = MetsFileForm()
-        collections = request.session.get("collections")
+        collections = t_collections(request)
+        if isinstance(collections,HttpResponse): 
+            return collections
+
         return render(request, 'library/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
 
 @t_login_required
@@ -657,12 +662,17 @@ def ingest_mets_url(request):
     else:
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)
-        collections = request.session.get("collections")
+        collections = t_collections(request)
+        if isinstance(collections,HttpResponse): 
+            return collections
+
         return render(request, 'library/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
 
 @t_login_required
 def collections_dropdown(request):
-    collections = t_collections()
+    collections = t_collections(request)
+    if isinstance(collections,HttpResponse): 
+        return collections
     return render(request, 'library/collections_dropdown.html', {'collections': collections})
 
 @t_login_required
