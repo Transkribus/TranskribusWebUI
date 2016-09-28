@@ -27,6 +27,6 @@ urlpatterns = [
     url('', include('django.contrib.auth.urls')),
 
 
-    url(r'^e-learning/', include('read_e_learning.urls', namespace='e-learning')),
+    url(r'^e-learning/', include('e_learning.urls', namespace='e-learning')),
 
 ]

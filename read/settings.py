@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'dashboard',
     'edit',
     'search',
-    'read_e_learning',
+    'e_learning',
     'transkribus',
     'django_q',
 ]
