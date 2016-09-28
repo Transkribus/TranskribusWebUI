@@ -11,7 +11,7 @@ import dicttoxml
 from django.http import HttpResponseRedirect
 from django.conf import settings
 import sys #remove after switching to t_log
-from .utils import t_log
+from .utils import t_log, t_gen_request_id
 import json
 import re
 
@@ -33,46 +33,65 @@ def t_set_default_headers(headers):
     return headers
 
 #Check session cache in case we don't need to bother the transkribus REST service at all
-def t_check_cache(request,t_id, url) :
+def t_check_cache(request,t_id, url, params=None) :
 
     # t_id and url as identifer for cached data, Store with key "cache_url" and in first element if data is a list
     if t_id in request.session :
-        #Have data  keyed with t_id in session, get the *cache_url*
-        if isinstance(request.session.get(t_id), list) :
-            cache_url = request.session.get(t_id)[0].get('cache_url')
-        else :
-            cache_url = request.session.get(t_id).get('cache_url')
+        request_id = t_gen_request_id(url,params)
+        if request_id in request.session[t_id] :
+            t_log("HAVE CACHE: %s " % request_id)
+            return request.session[t_id][request_id]
+
+#		#Have data  keyed with t_id in session, get the *request_id*
+#		if isinstance(request.session.get(t_id), list) :
+#		    cache_rid = request.session.get(t_id)[0].get('request_id')
+#		else :
+#		    cache_rid = request.session.get(t_id).get('request_id')
+
         #Do the urls match too?
-        if cache_url == url :
-            return request.session[t_id]
+#        t_log("FOR T_ID: %s" % (t_id))
+#        t_log("CACHE_RID: %s == RID : %s" % (cache_rid, request_id ))
+
+ #       if cache_rid == request_id:
+ #           t_log("HAVE CACHE: %s " % request_id)
+ #           return request.session[t_id]
 
     #no data cached for this t_id/url pair, return None
     return None
 
 #Set the session cache after a successful request to transkribus REST service
-def t_set_cache_value(request,t_id,data,url) :
+def t_set_cache_value(request,t_id,data,url,params=None) :
+    
     #Use the t_id as identifer for cached data, Store the url with key "cache_url" (in first element if data is a list)
-    if isinstance(data, list) :
-        data[0]['cache_url']=url
-    else :
-        data['cache_url']=url
+    request_id = t_gen_request_id(url,params)
+    #if isinstance(data, list):
+    #    if not data or len(data) == 0: 
+    #        data = [{'request_id' : request_id}]
+    #    else :
+    #        data[0]['request_id']=request_id
+    #else :
+    #    data['request_id']=request_id
 
-#    t_log("### [CAHCING] CACHING %s with url : %s" % (t_id,url) )
-    request.session[t_id] = data
+    t_log("### [CAHCING] CACHING %s with request_id : %s" % (t_id,request_id) )
+    if t_id not in request.session : request.session[t_id] = {}
+    request.session[t_id][request_id] = data
 
 #Make a request for data (possibly) to the transkribus REST service make
 #use of helper functions and calling the appropriate data handler when done
 def t_request(request,t_id,url,params=None,method=None,headers=None,handler_params=None):
 
     #Check for cached value and return that #TODO override this on some occaisions
-    if t_check_cache(request, t_id, url) :
-        return request.session[t_id]
+    cache_data = t_check_cache(request, t_id, url, params)
+    if cache_data :
+        t_log("FROM CACHE: %s" % url)
+        return cache_data
 
     #Add default headers to *possibly* already defined header data
     if not headers : headers = {}
     headers = t_set_default_headers(headers)
 
     #Default method is GET
+    t_log("TRANSKRIBUS REQUEST: %s" % url)
     if method == 'POST' :
         r = s.post(url, params=params, verify=False, headers=headers)
 
@@ -84,6 +103,7 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     except requests.exceptions.HTTPError as e:
         if e.response.status_code not in (401, 403):
             raise e
+
         #no access to requested collection... if we are indeed requesting a collection (which we usually are)
         #FAFF collId needs passed in via handler_params... we could extract from url??
         if e.response.status_code == 403 : # and handler_params is not None and "collId" in handler_params):
@@ -98,7 +118,7 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     # handler_params are for things that we might need to pass through this t_request to the handler
     data = eval("t_"+t_id+"_handler(r,handler_params)")
     #We store the data in the sesison cache
-    t_set_cache_value(request,t_id,data,url)
+    t_set_cache_value(request,t_id,data,url,params)
     #And return it too
     return data
 
@@ -169,26 +189,38 @@ def t_actions_info(request):
     #the id to use call the correct data handler and store the data
     t_id = "action_types"
     #Return the data from the request (via the handler, defined below)
-    return t_request(request,t_id,url,"GET")
+    return t_request(request,t_id,url)
 # Below is the simplest case imaginable
 def t_action_types_handler(r,params=None):
     return json.loads(r.text)
 
 
 #t_actions_info called to get lookup for action types for subsequent action list calls
-def t_list_actions(request,start=None,end=None,collId=None,docId=None):
+def t_list_actions(request,params=None):
     url = settings.TRP_URL+'actions/list'
     t_id = "actions"
-    params = {}
-    if collId : params['collId']=collId
-    if docId : params['collId']=docId
-    if start : params['start']=start
-    if end : params['end']=end
+#    params = {}
+#    if collId : params['collId']=collId
+#    if docId : params['collId']=docId
+#    if start : params['start']=start
+#    if end : params['end']=end
+
+    return t_request(request,t_id,url,params)
+
+def t_actions_handler(r,params=None):
+    return json.loads(r.text)
+
+
+#t_actions_info called to get lookup for action types for subsequent action list calls
+def t_collection_recent(request,collId):
+    url = settings.TRP_URL+'collections/'+str(collId)+'/list'
+    t_id = "collection_recent"
+    params = {'collId': collId}
 
     return t_request(request,t_id,url,"GET",params)
 
-def t_actions_handler(r,params=None):
-
+def t_collection_recent_handler(r,params=None):
+    #t_log("collection_recent: %s " % r.text)
     return json.loads(r.text)
 
 def t_collections(request):
@@ -198,6 +230,7 @@ def t_collections(request):
 
 def t_collections_handler(r,params=None):
     t_collections = json.loads(r.text)
+    t_log(str(t_collections))
     #use common param 'key' for ids (may yet drop...)
     for col in t_collections:
         col['key'] = col['colId']
