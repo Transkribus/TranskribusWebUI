@@ -53,12 +53,17 @@ function init_date_inputs(actions_table){
 	}}).val(new Date(max*1000).toDateString());
 
 }
-function init_actions_table(collId,docId){
+function init_actions_table(){
+	var url = "/dashboard/actions_for_table_ajax";
+	if($("#actions_table").attr("data-collid")){
+		url += "/"+$("#actions_table").data("collid");
+	}
+
 	var actions_table = $("#actions_table").DataTable({
 		"processing": true,
         	"serverSide": true,
 		"ajax": {
-			"url": "./actions_ajax",
+			"url": url,
 			"data": function ( d ) {
 				console.log("(RE)LOADING",$("#slider-range").data("uiSlider") );
 				if($("#slider-range").data("uiSlider")){

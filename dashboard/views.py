@@ -16,6 +16,8 @@ from querystring_parser import parser
 @t_login_required
 def index(request):
     collections = t_collections(request)
+    if isinstance(collections,HttpResponse): 
+        return collections
 
     action_types = t_actions_info(request)
     if isinstance(action_types,HttpResponse): 
@@ -38,13 +40,47 @@ def index(request):
     """
     return render(request, 'dashboard/homepage.html', {'collections': collections, 'action_types': action_types} )
 
+@t_login_required
+def collection(request,collId):
+    documents = t_collection(request,collId)
+    if isinstance(documents,HttpResponse): 
+        return documents
+
+    t_log("DOCUMENTS: %s" % documents)
+#    collections = t_collections(request)
+#    if isinstance(collections,HttpResponse): 
+#        return collections
+
+    #Avoid this sort of nonsense if possible
+    collection=None
+    for col in documents[0].get("collectionList").get("colList"):
+        if col.get("colId") == int(collId):
+            collection = col
+            break
+
+    action_types = t_actions_info(request)
+    if isinstance(action_types,HttpResponse): 
+        return action_types
+    return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types, 'documents': documents} )
+
+
+@t_login_required
+def document(request,collId,docId):
+
+    t_log("HERE")
+    return HttpResponse("#TODO document level template...")
+
+#####################################################
+# actions_data(request,collId=None,docId=None): Handles the request to 
+# TS rest and any constraining params sent to it eg scope (user/collection/doc, dates, paging etc)
+
 @t_login_required_ajax #this version of the decorator will not redirect but pass the error back for the jscript to worry about
-def actions_ajax(request,collId=None,docId=None):
+def actions_data(request,collId=None,docId=None):
 
     dt_params = parser.parse(request.GET.urlencode())
-    length = int(dt_params.get('length')) if dt_params.get('length') else 5
-    start = int(dt_params.get('start')) if dt_params.get('start') else 0
-#    end = int(dt_params.get('end')) if dt_params.get('end') else ""
+    #TODO handle here when possible
+#    length = int(dt_params.get('length')) if dt_params.get('length') else 5
+#    start = int(dt_params.get('start')) if dt_params.get('start') else 0
 
     start_date = str(dt_params.get('start_date')) if dt_params.get('start_date') else ""
     end_date = str(dt_params.get('end_date')) if dt_params.get('end_date') else ""
@@ -52,7 +88,7 @@ def actions_ajax(request,collId=None,docId=None):
 #    t_log("DT PARAMS: %s" % dt_params)
 
     #TODO use columns names rather than index
-    params = {'start': start_date, 'end': end_date}
+    params = {'start': start_date, 'end': end_date, 'collId' : collId}
     # yuk at the moment
     if 'columns' in dt_params and dt_params.get('columns').get(5).get('search').get('value'):
         params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value')) 
@@ -61,7 +97,20 @@ def actions_ajax(request,collId=None,docId=None):
 
     actions=t_list_actions(request,params)
   
-    #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not.... 
+    return actions
+
+@t_login_required_ajax
+def actions_for_table_ajax(request,collId=None) :
+    t_log("COLLID: %s" % collId)
+    actions = actions_data(request,collId)
+
+    #TODO When offset/limit params can be handled by TS we can move this up to actions_data
+    dt_params = parser.parse(request.GET.urlencode())
+    length = int(dt_params.get('length')) if dt_params.get('length') else 5
+    start = int(dt_params.get('start')) if dt_params.get('start') else 0
+    ##############################
+ 
+   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not.... 
     if isinstance(actions,HttpResponse): 
         t_log("actions request has failed... %s" % actions)
         #For now this will do but there may be other reasons the transckribus request fails... (see comment above)
@@ -77,8 +126,24 @@ def actions_ajax(request,collId=None,docId=None):
             filtered_action[field] = action.get(field) if action.get(field) else "n/a"
         actions_filtered.append(filtered_action)
 
+    #When start/length come from TS we'll need to feed back from actions_data to here to datatables
     return JsonResponse({
             'recordsTotal': len(actions), 
             'recordsFiltered': len(actions), 
             'data': actions_filtered[start:(start+length)]
         },safe=False)
+
+@t_login_required_ajax
+def actions_for_chart_ajax(request) :
+
+    actions = actions_data(request)
+
+    #TODO When offset/limit params can be handled by TS we can move this up to actions_data
+    dt_params = parser.parse(request.GET.urlencode())
+    length = int(dt_params.get('length')) if dt_params.get('length') else 5
+    start = int(dt_params.get('start')) if dt_params.get('start') else 0
+    ##############################
+
+   #TODO settle on a charting library and then present the data to that as appropriate
+
+    return JsonResponse({},safe=False)

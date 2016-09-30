@@ -8,7 +8,7 @@
 		   </thead>
 		   <tbody>
 		     {% for coll in collections %}
-	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
+	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection' coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
 		     {% endfor %}
 		   </tbody>
 		</table>
