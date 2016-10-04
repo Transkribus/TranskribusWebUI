@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'dashboard',
     'edit',
     'search',
+
+    'rest_framework',
     'e_learning',
     'transkribus',
     'django_q',
@@ -189,9 +191,11 @@ LOGIN_REDIRECT_URL = 'profile'
 
 ### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
-    'read.backends.TranskribusBackend',
+    # 'read.backends.TranskribusBackend',
+    'transkribus.auth_backends.TranskribusBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 ]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 ### parameters for services
 #transkribus rest service
@@ -206,5 +210,30 @@ NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'norsun'
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+Q_CLUSTER = {
+    'name': 'DjangORM',
+    'workers': 1,
+    'retry': 3600,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default'
+}
+
+
 TRANSKRIBUS_URL = TRP_URL
+TRANSKRIBUS_API = TRP_URL
+TRANSKRIBUS_IMAGE_URL_PATTERN = '{image}'
+MOCK = False
 
