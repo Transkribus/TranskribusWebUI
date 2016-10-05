@@ -19,6 +19,9 @@ $(document).ready(function(){
 	});
 	actions_table = init_actions_table();
 	init_date_inputs(actions_table);
+
+	init_collections_table();
+
 });
 
 function init_date_inputs(actions_table){
@@ -58,16 +61,36 @@ function init_actions_table(){
 	if($("#actions_table").attr("data-collid")){
 		url += "/"+$("#actions_table").data("collid");
 	}
+	var columns =  [
+		    { "data": "time" },
+		    { "data": "colId" },
+		    { "data": "docId" },
+		    { "data": "pageId" },
+		    { "data": "userName" },
+		    { "data": "type" }
+        	];
+	return init_datatable($("#actions_table"),url,columns);
+}
+function init_collections_table(){
+	var url = "/dashboard/collections_for_table_ajax";
+	var columns =  [
+		    { "data": "colId" },
+		    { "data": "colName" },
+		    { "data": "description" },
+		    { "data": "role" },
+        	];
+	init_datatable($("#collections_table"),url,columns);
+}
 
-	var actions_table = $("#actions_table").DataTable({
+function init_datatable(table,url, columns){
+	console.log("HERE", table, url, columns);
+	var datatable = table.DataTable({
 		"processing": true,
         	"serverSide": true,
 		"ajax": {
 			"url": url,
 			"data": function ( d ) {
-				console.log("(RE)LOADING",$("#slider-range").data("uiSlider") );
 				if($("#slider-range").data("uiSlider")){
-					console.log("GOGOGO" );
 					return $.extend( {}, d, { 
 						"start_date": ($("#slider-range").slider("option", "values")[0]*1000),
 						"end_date":($("#slider-range").slider("option", "values")[1]*1000) ,
@@ -81,30 +104,28 @@ function init_actions_table(){
 				//TODO needs query string too...?
 				alert("There was an issue communicating with the transkribus service Please try again, if the problem persists send the error below to....\n "+error);
 //				window.location.replace("/login/?next="+window.location.pathname)
-			}
+			},
+			"dataSrc": function ( json ) {
+			      for ( var i=0, ien=json.data.length ; i<ien ; i++ ) {
+				json.data[i][1] = '<a href="/dashboard/'+json.data[i][0]+'>'+json.data[i][1]+'</a>';
+			      }
+			      return json.data;
+			},
 		},		
 		"sDom": "rltip",
 		"length" : 5,
 		"lengthMenu": [ 5, 10, 20, 50, 100 ],
 		//ordering should be handled server side
-//		"order": [[ 0, "desc" ]],
-		"ordering": false, 
-		"columns": [
-		    { "data": "time" },
-		    { "data": "colId" },
-		    { "data": "docId" },
-		    { "data": "pageId" },
-		    { "data": "userName" },
-		    { "data": "type" }
-        	],
+		"ordering": false,  //still not sure about this
+		"columns": columns,
 	});
 	$(".table_filter").on("click", function(){
-		 actions_table.columns( 5 )
+		 datatable.columns( 5 )
         	.search( this.value )
         	.draw();
 		return false;
 	});
-	return actions_table;
+	return datatable;
 }
 /* Collections */
 
