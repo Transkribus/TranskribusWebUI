@@ -194,16 +194,19 @@ def t_actions_info(request):
 def t_action_types_handler(r,params=None):
     return json.loads(r.text)
 
+#t_actions_count #NB this call is not yet available
+def t_actions_count(request,params=None):
+    url = settings.TRP_URL+'actions/count'
+    t_id = "actions_count"
+    return t_request(request,t_id,url,params)
 
-#t_actions_info called to get lookup for action types for subsequent action list calls
-def t_list_actions(request,params=None):
+def t_actions_count_handler(r,params=None):
+    return json.loads(r.text)
+
+#t_actions_list
+def t_actions(request,params=None):
     url = settings.TRP_URL+'actions/list'
     t_id = "actions"
-#    params = {}
-#    if collId : params['collId']=collId
-#    if docId : params['collId']=docId
-#    if start : params['start']=start
-#    if end : params['end']=end
 
     return t_request(request,t_id,url,params)
 
@@ -223,10 +226,20 @@ def t_collection_recent_handler(r,params=None):
     #t_log("collection_recent: %s " % r.text)
     return json.loads(r.text)
 
-def t_collections(request):
+#t_collections_count
+def t_collections_count(request,params=None):
+    url = settings.TRP_URL+'collections/count'
+    t_id = "collections_count"
+
+    return t_request(request,t_id,url,params)
+
+def t_collections_count_handler(r,params=None):
+    return json.loads(r.text)
+
+def t_collections(request,params=None):
     url = settings.TRP_URL+'collections/list'
     t_id = "collections"
-    return t_request(request,t_id,url)
+    return t_request(request,t_id,url,params)
 
 def t_collections_handler(r,params=None):
     t_collections = json.loads(r.text)
