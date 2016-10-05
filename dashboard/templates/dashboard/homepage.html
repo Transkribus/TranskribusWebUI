@@ -66,7 +66,32 @@ nValues
 sortColumn
 sortDirection
 -->
+
+{% comment %}
 {% include "dashboard/collections_table.html" with collections=collections %}
+{% endcomment %}
+
+<p>You are a member of the following {{ collections|length }} collections:</p>
+
+ <table class="table table-striped display" id="collections_table">
+   <thead>
+	<tr>
+		<th>{% trans "ColId" %}</th>
+		<th>{% trans "Collection" %}</th>
+		<th>{% trans "Description" %}</th>
+		<th>{% trans "Role" %}</th>
+	</tr>
+   </thead>
+   <tbody>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+   </tbody>
+</table>
+
 <pre>
 Graph here
 </pre>
