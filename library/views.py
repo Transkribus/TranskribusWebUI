@@ -75,7 +75,7 @@ def index(request):
 @t_login_required
 def collections(request):
     collections = t_collections(request)
-    if isinstance(collections,HttpResponse): 
+    if isinstance(collections,HttpResponse):
         return collections
     return render(request, 'library/collections.html', {'collections': collections} )
 
@@ -89,7 +89,7 @@ def collection(request, collId):
     #this is actually a call to collections/{collId}/list and returns only the document objects for a collection
     docs = t_collection(request,collId)
     #probably a redirect if an HttpResponse
-    if isinstance(docs,HttpResponse): 
+    if isinstance(docs,HttpResponse):
         return docs
 
     collections = t_collections(request)
@@ -132,10 +132,10 @@ def collection(request, collId):
 @t_login_required
 def document(request, collId, docId, page=None):
     collection = t_collection(request, collId)
-    if isinstance(collection,HttpResponse): 
+    if isinstance(collection,HttpResponse):
         return collection
     full_doc = t_document(request, collId, docId,-1)
-    if isinstance(full_doc,HttpResponse): 
+    if isinstance(full_doc,HttpResponse):
         return full_doc
 
     nav = navigation.up_next_prev("document",docId,collection,[collId])
@@ -156,7 +156,7 @@ def document(request, collId, docId, page=None):
 def page(request, collId, docId, page):
     #call t_document with noOfTranscript=-1 which will return no transcript data
     full_doc = t_document(request, collId, docId, -1)
-    if isinstance(full_doc,HttpResponse): 
+    if isinstance(full_doc,HttpResponse):
         return full_doc
     # big wodge of data from full doc includes data for each page and for each page, each transcript...
     index = int(page)-1
@@ -192,7 +192,7 @@ def page(request, collId, docId, page):
 def transcript(request, collId, docId, page, transcriptId):
     #t_page returns an array of the transcripts for a page
     pagedata = t_page(request, collId, docId, page)
-    if isinstance(pagedata,HttpResponse): 
+    if isinstance(pagedata,HttpResponse):
         return pagedata
 
     nav = navigation.up_next_prev("transcript",transcriptId,pagedata,[collId,docId,page])
@@ -207,7 +207,7 @@ def transcript(request, collId, docId, page, transcriptId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
-        if isinstance(transcript,HttpResponse): 
+        if isinstance(transcript,HttpResponse):
             return transcript
 
 
@@ -242,12 +242,12 @@ def region(request, collId, docId, page, transcriptId, regionId):
     # we could get one transcript from ...{page}/curr, but for completeness would
     # rather use transciptId to target a particular transcript
     transcripts = t_page(request,collId, docId, page)
-    if isinstance(transcripts,HttpResponse): 
+    if isinstance(transcripts,HttpResponse):
         return transcripts
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
-    if isinstance(full_doc,HttpResponse): 
+    if isinstance(full_doc,HttpResponse):
         return full_doc
 
     index = int(page)-1
@@ -269,7 +269,7 @@ def region(request, collId, docId, page, transcriptId, regionId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
-        if isinstance(transcript,HttpResponse): 
+        if isinstance(transcript,HttpResponse):
             return transcript
 
     regions=transcript.get("PcGts").get("Page").get("TextRegion");
@@ -320,7 +320,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
     # we could get one transcript from ...{page}/curr, but for completeness would
     # rather use transciptId to target a particular transcript
     transcripts = t_page(request,collId, docId, page)
-    if isinstance(transcripts,HttpResponse): 
+    if isinstance(transcripts,HttpResponse):
         return transcripts
     #we are only using the transcripts to get the pageXML for a particular
     pageXML_url = None;
@@ -331,12 +331,12 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
-        if isinstance(transcript,HttpResponse): 
+        if isinstance(transcript,HttpResponse):
             return transcript
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
-    if isinstance(full_doc,HttpResponse): 
+    if isinstance(full_doc,HttpResponse):
         return full_doc
 
     index = int(page)-1
@@ -401,7 +401,7 @@ def line(request, collId, docId, page, transcriptId, regionId, lineId):
 def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
     # booo hiss
     transcripts = t_page(request, collId, docId, page)
-    if isinstance(transcripts,HttpResponse): 
+    if isinstance(transcripts,HttpResponse):
         return transcripts
     #we are only using the pagedata to get the pageXML for a particular
     pageXML_url = None;
@@ -412,12 +412,12 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 
     if pageXML_url:
         transcript = t_transcript(request,transcriptId,pageXML_url)
-        if isinstance(transcript,HttpResponse): 
+        if isinstance(transcript,HttpResponse):
             return transcript
 
     #To get the page image url we need the full_doc (we hope it's been cached)
     full_doc = t_document(request, collId, docId, -1)
-    if isinstance(full_doc,HttpResponse): 
+    if isinstance(full_doc,HttpResponse):
         return full_doc
 
     index = int(page)-1
@@ -479,7 +479,7 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 @t_login_required
 def rand(request, collId, element):
     collection = t_collection(request,collId)
-    if isinstance(collection,HttpResponse): 
+    if isinstance(collection,HttpResponse):
         return collection
 
     doc = random.choice(collection)
@@ -490,7 +490,7 @@ def rand(request, collId, element):
             collection = x
 
     pages  = t_document(request, collId, doc.get("docId"), 0)
-    if isinstance(pages,HttpResponse): 
+    if isinstance(pages,HttpResponse):
         return pages
     page = random.choice(pages.get("pageList").get("pages"))
 
@@ -644,7 +644,7 @@ def ingest_mets_xml(request):
     else:
         ingest_mets_xml_file_form = MetsFileForm()
         collections = t_collections(request)
-        if isinstance(collections,HttpResponse): 
+        if isinstance(collections,HttpResponse):
             return collections
 
         return render(request, 'library/ingest_mets_xml.html', {'ingest_mets_xml_form': ingest_mets_xml_file_form,  'collections': collections})
@@ -663,7 +663,7 @@ def ingest_mets_url(request):
         data = {'url': request.GET.get('metsURL', '')}
         ingest_mets_url_form = IngestMetsUrlForm(initial=data)
         collections = t_collections(request)
-        if isinstance(collections,HttpResponse): 
+        if isinstance(collections,HttpResponse):
             return collections
 
         return render(request, 'library/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
@@ -671,7 +671,7 @@ def ingest_mets_url(request):
 @t_login_required
 def collections_dropdown(request):
     collections = t_collections(request)
-    if isinstance(collections,HttpResponse): 
+    if isinstance(collections,HttpResponse):
         return collections
     return render(request, 'library/collections_dropdown.html', {'collections': collections})
 

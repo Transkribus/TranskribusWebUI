@@ -19,14 +19,14 @@ import sys
 from .services import t_refresh, t_collections, t_log
 
 ########################
-# override the login_required decorator, mostly so we can call services.t_collecctions 
+# override the login_required decorator, mostly so we can call services.t_collecctions
 # at login  (we can use this to check that the transkribus session is still good or not)
 
 def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=None):
     @wraps(function)
     def wrapper(request, *args, **kw):
         if request.user.is_authenticated():
-		
+
              #Not this (thanks Berthold!)
 #            if not t_refresh():
 #                return HttpResponseRedirect('/logout/?next='+request.get_full_path())
@@ -68,7 +68,7 @@ def t_login_required_ajax(function,redirect_field_name=REDIRECT_FIELD_NAME,login
     @wraps(function)
     def wrapper(request, *args, **kw):
         if request.user.is_authenticated():
-		
+
             #setting collections data as a session var if not already set
 #            if "collections" not in request.session or request.session['collections'] is None:
 #                resp = t_collections(request)
@@ -81,9 +81,9 @@ def t_login_required_ajax(function,redirect_field_name=REDIRECT_FIELD_NAME,login
             try:
                 response = function(request, *args, **kw)
             except requests.exceptions.HTTPError as e:
-#		t_log(e)
-#		t_log(response)
-		#TODO status_code not available here so this error catching throws an error (!)
+#               t_log(e)
+#               t_log(response)
+                #TODO status_code not available here so this error catching throws an error (!)
                 if e.status_code not in (401, 403):
                     raise e
                 response =  HttpResponse('Error', status=e.status_code)
@@ -92,4 +92,3 @@ def t_login_required_ajax(function,redirect_field_name=REDIRECT_FIELD_NAME,login
             return HttpResponse('Unauthorized', status=401)
 
     return wrapper
-

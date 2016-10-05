@@ -42,11 +42,11 @@ def t_check_cache(request,t_id, url, params=None) :
             t_log("HAVE CACHE: %s " % request_id)
             return request.session[t_id][request_id]
 
-#		#Have data  keyed with t_id in session, get the *request_id*
-#		if isinstance(request.session.get(t_id), list) :
-#		    cache_rid = request.session.get(t_id)[0].get('request_id')
-#		else :
-#		    cache_rid = request.session.get(t_id).get('request_id')
+#               #Have data  keyed with t_id in session, get the *request_id*
+#               if isinstance(request.session.get(t_id), list) :
+#                   cache_rid = request.session.get(t_id)[0].get('request_id')
+#               else :
+#                   cache_rid = request.session.get(t_id).get('request_id')
 
         #Do the urls match too?
 #        t_log("FOR T_ID: %s" % (t_id))
@@ -61,11 +61,11 @@ def t_check_cache(request,t_id, url, params=None) :
 
 #Set the session cache after a successful request to transkribus REST service
 def t_set_cache_value(request,t_id,data,url,params=None) :
-    
+
     #Use the t_id as identifer for cached data, Store the url with key "cache_url" (in first element if data is a list)
     request_id = t_gen_request_id(url,params)
     #if isinstance(data, list):
-    #    if not data or len(data) == 0: 
+    #    if not data or len(data) == 0:
     #        data = [{'request_id' : request_id}]
     #    else :
     #        data[0]['request_id']=request_id

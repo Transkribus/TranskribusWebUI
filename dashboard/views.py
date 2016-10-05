@@ -16,11 +16,11 @@ from querystring_parser import parser
 @t_login_required
 def index(request):
     collections = t_collections(request)
-    if isinstance(collections,HttpResponse): 
+    if isinstance(collections,HttpResponse):
         return collections
 
     action_types = t_actions_info(request)
-    if isinstance(action_types,HttpResponse): 
+    if isinstance(action_types,HttpResponse):
         return action_types
 
     return render(request, 'dashboard/homepage.html', {'collections': collections, 'action_types': action_types} )
@@ -29,7 +29,7 @@ def index(request):
 @t_login_required
 def d_collection(request,collId):
     documents = t_collection(request,collId)
-    if isinstance(documents,HttpResponse): 
+    if isinstance(documents,HttpResponse):
         return documents
 
     #Avoid this sort of nonsense if possible
@@ -40,7 +40,7 @@ def d_collection(request,collId):
             break
 
     action_types = t_actions_info(request)
-    if isinstance(action_types,HttpResponse): 
+    if isinstance(action_types,HttpResponse):
         return action_types
     return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types, 'documents': documents} )
 
@@ -67,7 +67,7 @@ def paged_data(request,list_name,collId=None,docId=None):
     params['sortDirection'] = int(dt_params.get('start')) if dt_params.get('start') else None
 
     if 'columns' in dt_params and list_name == "actions" and dt_params.get('columns').get(5).get('search').get('value'):
-        params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value')) 
+        params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value'))
 
     if collId : params['collId'] = int(collId)
 
@@ -79,9 +79,9 @@ def paged_data(request,list_name,collId=None,docId=None):
     data = eval("t_"+list_name+"(request,params)")
 
     return (data,count)
-   
+
 #####################################################
-# actions_data(request,collId=None,docId=None): Handles the request to 
+# actions_data(request,collId=None,docId=None): Handles the request to
 # TS rest and any constraining params sent to it eg scope (user/collection/doc, dates, paging etc)
 #@t_login_required_ajax #this version of the decorator will not redirect but pass the error back for the jscript to worry about
 #def actions_data(request,collId=None,docId=None):
@@ -98,11 +98,11 @@ def paged_data(request,list_name,collId=None,docId=None):
 #
 #    # yuk at the moment
 #    if 'columns' in dt_params and dt_params.get('columns').get(5).get('search').get('value'):
-#        params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value')) 
+#        params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value'))
 #
 #
 #    actions=t_list_actions(request,params)
-#  
+#
 #    return actions
 
 @t_login_required_ajax
@@ -110,8 +110,8 @@ def actions_for_table_ajax(request,collId=None) :
 #    actions = actions_data(request,collId)
     (actions,count) = paged_data(request,"actions",collId)
 
-   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not.... 
-    if isinstance(actions,HttpResponse): 
+   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not....
+    if isinstance(actions,HttpResponse):
         t_log("actions request has failed... %s" % actions)
         #For now this will do but there may be other reasons the transckribus request fails... (see comment above)
         return HttpResponse('Unauthorized', status=401)
@@ -120,8 +120,8 @@ def actions_for_table_ajax(request,collId=None) :
 
     #When start/length come from TS we'll need to feed back from actions_data to here to datatables
     return JsonResponse({
-            'recordsTotal': len(actions), 
-            'recordsFiltered': len(actions), 
+            'recordsTotal': len(actions),
+            'recordsFiltered': len(actions),
             'data': actions_filtered
         },safe=False)
 
@@ -159,8 +159,8 @@ def collections_for_table_ajax(request) :
     """
     (collections,count) = paged_data(request,"collections")
 
-   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not.... 
-    if isinstance(collections,HttpResponse): 
+   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not....
+    if isinstance(collections,HttpResponse):
         #For now this will do but there may be other reasons the transckribus request fails... (see comment above)
         return HttpResponse('Unauthorized', status=401)
 
@@ -168,21 +168,21 @@ def collections_for_table_ajax(request) :
 
     #When start/length come from TS we'll need to feed back from actions_data to here to datatables
     return JsonResponse({
-            'recordsTotal': count, 
-            'recordsFiltered': count, 
+            'recordsTotal': count,
+            'recordsFiltered': count,
             'data': collections_filtered
         },safe=False)
 
 
-def filter_data(fields, data) : 
+def filter_data(fields, data) :
 
     #data tables requires a specific set of table columns so we filter down the actions
     filtered = []
     #I suspect some combination of filter/lambda etc could do this better...
     for datum in data:
         filtered_datum = {}
-        for field in fields : 
+        for field in fields :
             filtered_datum[field] = datum.get(field) if datum.get(field) else "n/a"
         filtered.append(filtered_datum)
-    
+
     return filtered
