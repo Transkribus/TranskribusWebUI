@@ -28,7 +28,7 @@ def index(request):
 # dashboard/{colID} is the dashboard for collection with ID colId. Will show actions, documents and metrics for that collection
 @t_login_required
 def d_collection(request,collId):
-    documents = t_collection(request,collId)
+    documents = t_collection(request,{'collId': collId})
     if isinstance(documents,HttpResponse):
         return documents
 
@@ -42,7 +42,9 @@ def d_collection(request,collId):
     action_types = t_actions_info(request)
     if isinstance(action_types,HttpResponse):
         return action_types
-    return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types, 'documents': documents} )
+#    return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types, 'documents': documents} )
+    return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types} )
+
 
 @t_login_required
 def d_document(request,collId,docId):
@@ -143,20 +145,6 @@ def actions_for_chart_ajax(request) :
 
 @t_login_required_ajax
 def collections_for_table_ajax(request) :
-    """
-    dt_params = parser.parse(request.GET.urlencode())
-    #TODO handle here when possible
-    nValues = int(dt_params.get('length')) if dt_params.get('length') else 5
-    index = int(dt_params.get('start')) if dt_params.get('start') else 0
-
-    #TODO use columns names rather than index
-    params = {'nValues': nValues, 'index': index}
-
-    #TODO set sortColumn sort Direction
-    t_log("SENT PARAMS: %s" % params)
-
-    collections = t_collections(request,params)
-    """
     (collections,count) = paged_data(request,"collections")
 
    #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not....
@@ -173,6 +161,24 @@ def collections_for_table_ajax(request) :
             'data': collections_filtered
         },safe=False)
 
+@t_login_required_ajax
+def documents_for_table_ajax(request,collId) :
+    (documents,count) = paged_data(request,"documents",collId)
+
+   #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not....
+    if isinstance(documents,HttpResponse):
+        #For now this will do but there may be other reasons the transckribus request fails... (see comment above)
+        return HttpResponse('Unauthorized', status=401)
+
+    documents_filtered = filter_data(['docId','title','author','uploadTimestamp','uploader','nrOfPages','language','status'],documents)
+
+    #When start/length come from TS we'll need to feed back from actions_data to here to datatables
+    return JsonResponse({
+            'recordsTotal': count,
+            'recordsFiltered': count,
+            'data': documents_filtered
+        },safe=False)
+
 
 def filter_data(fields, data) :
 
@@ -182,7 +188,7 @@ def filter_data(fields, data) :
     for datum in data:
         filtered_datum = {}
         for field in fields :
-            filtered_datum[field] = datum.get(field) if datum.get(field) else "n/a"
+            filtered_datum[field] = datum.get(field) if datum.get(field) else "n/a" #TODO this will n/a 0!!
         filtered.append(filtered_datum)
 
     return filtered

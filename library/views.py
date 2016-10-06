@@ -87,7 +87,7 @@ def collections(request):
 @t_login_required
 def collection(request, collId):
     #this is actually a call to collections/{collId}/list and returns only the document objects for a collection
-    docs = t_collection(request,collId)
+    docs = t_collection(request,{'collId':collId})
     #probably a redirect if an HttpResponse
     if isinstance(docs,HttpResponse):
         return docs
@@ -131,7 +131,7 @@ def collection(request, collId):
 #@profile("document.prof")
 @t_login_required
 def document(request, collId, docId, page=None):
-    collection = t_collection(request, collId)
+    collection = t_collection(request, {'collId': collId})
     if isinstance(collection,HttpResponse):
         return collection
     full_doc = t_document(request, collId, docId,-1)
@@ -478,7 +478,8 @@ def word(request, collId, docId, page, transcriptId, regionId, lineId, wordId):
 # This may be as simple as isPublished(), rather than any analysis on the content
 @t_login_required
 def rand(request, collId, element):
-    collection = t_collection(request,collId)
+    collection = t_collection(request, {'collId': collId})
+
     if isinstance(collection,HttpResponse):
         return collection
 

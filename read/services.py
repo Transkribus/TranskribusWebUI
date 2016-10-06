@@ -107,7 +107,7 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
         #no access to requested collection... if we are indeed requesting a collection (which we usually are)
         #FAFF collId needs passed in via handler_params... we could extract from url??
         if e.response.status_code == 403 : # and handler_params is not None and "collId" in handler_params):
-            m = re.match(r'^.*/rest/[^/]+/(\d+)/.*', url)
+            m = re.match(r'^.*/rest/[^/]+/(-?\d+)/.*', url)
             collId = m.group(1)
             if collId :
                 return HttpResponseRedirect("/library/collection_noaccess/"+str(collId))
@@ -249,13 +249,31 @@ def t_collections_handler(r,params=None):
         col['key'] = col['colId']
     return t_collections
 
-def t_collection(request,collId):
-    url = settings.TRP_URL+'collections/'+str(collId)+'/list'
+def t_collection(request,params):
+    url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/list'
     t_id = "collection"
-    return t_request(request,t_id,url,"GET",None,None,{"collId": collId})
+    return t_request(request,t_id,url,"GET",None,None,{"collId": params.get('collId')})
 def t_collection_handler(r,params=None):
     collection_json=r.text
     return json.loads(r.text)
+
+def t_collection_count(request,params):
+    url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/count'
+    t_id = "collection_count"
+
+    return t_request(request,t_id,url,params)
+
+def t_collection_count_handler(r,params=None):
+    return json.loads(r.text)
+
+#Alias t_documents > t_collection
+def t_documents(request,collId):
+    return t_collection(request,collId)
+
+def t_documents_count(request,collId):
+    return t_collection_count(request,collId)
+
+
 
 def t_document(request, collId, docId, nrOfTranscripts=None):
 

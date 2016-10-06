@@ -42,12 +42,12 @@
    </thead>
    <tfoot>
 	<tr>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
 	</tr>
    </tfoot>
 </table>
@@ -60,9 +60,33 @@
 </div>
 
 <h2>Documents in {{collection.colName}}</h2>
-<!-- TODO make this an ajax data table and make use of paging facilities -->
-{% include "dashboard/documents_table.html" with document=documents collection=collection %}
 
+<p>This collecction contains the following {{ documents|length }} document{%if documents|length != 1 %}s{% endif %}:</p>
+
+<table class="table table-striped display" id="documents_table">
+   <thead>
+	<tr>
+		<th>{% trans "ID" %}</th>
+		<th>{% trans "Document" %}</th>
+		<th>{% trans "Author" %}</th>
+		<th>{% trans "Uploaded" %}</th>
+		<th>{% trans "Uploader" %}</th>
+		<th>{% trans "Pages" %}</th>
+		<th>{% trans "Language" %}</th>
+		<th>{% trans "Status" %}</th>
+	</tr>
+   </thead>
+   <tbody>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+   </tbody>
+</table>
 <pre>
 Graph here
 </pre>

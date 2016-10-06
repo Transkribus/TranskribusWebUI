@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^actions_for_table_ajax$', views.actions_for_table_ajax, name='actions_for_table_ajax'),
     url(r'^actions_for_table_ajax/([0-9]+)$', views.actions_for_table_ajax, name='actions_for_table_ajax'),
     url(r'^collections_for_table_ajax$', views.collections_for_table_ajax, name='collections_for_table_ajax'),
+    url(r'^documents_for_table_ajax/([0-9]+)$', views.documents_for_table_ajax, name='documents_for_table_ajax'),
     url(r'^actions_for_chart_ajax$', views.actions_for_chart_ajax, name='actions_for_chart_ajax'),
     url(r'^$', views.index, name='index'),
 ]

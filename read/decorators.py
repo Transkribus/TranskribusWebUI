@@ -84,9 +84,9 @@ def t_login_required_ajax(function,redirect_field_name=REDIRECT_FIELD_NAME,login
 #               t_log(e)
 #               t_log(response)
                 #TODO status_code not available here so this error catching throws an error (!)
-                if e.status_code not in (401, 403):
-                    raise e
-                response =  HttpResponse('Error', status=e.status_code)
+#                if e.status_code not in (401, 403):
+ #                   raise e
+                response =  HttpResponse('Error', status=e)
             return response
         else:
             return HttpResponse('Unauthorized', status=401)

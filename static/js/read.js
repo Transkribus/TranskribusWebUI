@@ -17,10 +17,13 @@ $(document).ready(function(){
 	$("#id_language").on("change keyup", function () {
 		$(this).closest("form").submit();
 	});
+	//actions (always)
 	actions_table = init_actions_table();
 	init_date_inputs(actions_table);
-
+	//dashboard only
 	init_collections_table();
+	//dashboard/{colId} only
+	init_documents_table();
 
 });
 
@@ -79,11 +82,25 @@ function init_collections_table(){
 		    { "data": "description" },
 		    { "data": "role" },
         	];
-	init_datatable($("#collections_table"),url,columns);
+	init_datatable($("#collections_table"),url,columns,"colName","colId");
 }
 
-function init_datatable(table,url, columns){
-	console.log("HERE", table, url, columns);
+function init_documents_table(){
+	var url = "/dashboard/documents_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+	var columns =  [
+		    { "data": "docId" },
+		    { "data": "title" },
+		    { "data": "author" },
+		    { "data": "uploadTimestamp" },
+		    { "data": "uploader" },
+		    { "data": "nrOfPages" },
+		    { "data": "language" },
+		    { "data": "status" },
+        	];
+	init_datatable($("#documents_table"),url,columns,"title","docId");
+}
+
+function init_datatable(table,url, columns,id_link,id_field){
 	var datatable = table.DataTable({
 		"processing": true,
         	"serverSide": true,
@@ -102,12 +119,23 @@ function init_datatable(table,url, columns){
 				//that TS REST session is expired and you need logged out... 
 				//this could be annoying if not the case though!
 				//TODO needs query string too...?
-				alert("There was an issue communicating with the transkribus service Please try again, if the problem persists send the error below to....\n "+error);
+				alert("There was an issue communicating with the transkribus service Please try again, if the problem persists send the error below to....\n ",error, thrown);
 //				window.location.replace("/login/?next="+window.location.pathname)
 			},
 			"dataSrc": function ( json ) {
+				if(id_link == undefined || id_field == undefined) return json.data;
+				
+				var ids = parse_path();	
 			      for ( var i=0, ien=json.data.length ; i<ien ; i++ ) {
-				json.data[i][1] = '<a href="/dashboard/'+json.data[i][0]+'>'+json.data[i][1]+'</a>';
+				link_str = '/dashboard';
+				for(x in ids){
+					link_str += '/'+ids[x];
+				}
+				link_str += '/'+json.data[i][id_field];
+
+ 				json.data[i][id_link] = '<a href="'+link_str+'">'+json.data[i][id_link]+'</a>';
+
+				console.log(json.data[i][id_link]);
 			      }
 			      return json.data;
 			},
@@ -126,6 +154,17 @@ function init_datatable(table,url, columns){
 		return false;
 	});
 	return datatable;
+}
+
+function parse_path(){
+	var pattern = /^\/dashboard\/(\d+)(|\/(\d+)(|\/(\d+)))$/;
+	var result = pattern.exec(window.location.pathname);
+	ids = {};
+	if(result != null && result[1]) ids['collId'] = result[1];
+	if(result != null && result[2]) ids['docId'] = result[2];
+	if(result != null && result[3]) ids['pageId'] = result[3];
+
+	return ids;
 }
 /* Collections */
 
