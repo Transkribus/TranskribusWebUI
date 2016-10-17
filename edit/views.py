@@ -36,9 +36,10 @@ def correct_js(request):
     return render(request, 'edit/correct_js.html')
 
 @t_login_required
-def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide how to select which transcript to work with unless it should always be the newest?
+def correct(request, collId, docId, page, transcriptId):# TODO Decide whether to select which transcript to work with unless it should always be the newest?
     current_transcript = t_current_transcript(request, collId, docId, page)
-    
+    transcript = t_transcript(request, current_transcript.get("tsId"), current_transcript.get("url"))
+    transcriptId = str(transcript.get("tsId"))
     if request.method == 'POST':# This is by JQuery...
         content = json.loads(request.POST.get('content'))    
         transcript_xml = t_transcript_xml(request, transcriptId, current_transcript.get("url"))
@@ -53,23 +54,23 @@ def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide 
             text_region.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = regionTextEquiv
         t_save_transcript(request, ElementTree.tostring(transcript_root), collId, docId, page)
         current_transcript = t_current_transcript(request, collId, docId, page)# We want the updated transcript now.
-        return HttpResponse("Transcript saved!", content_type="text/plain")
+        success_message = str(_("Transcript saved!"))
+        return HttpResponse("<div class='alert alert-success'>" + success_message + "</div>", content_type="text/plain")
     else:
-        transcript = t_transcript(request, current_transcript.get("tsId"),current_transcript.get("url"))
-        transcriptId = str(transcript.get("tsId"))    
         regions=transcript.get("PcGts").get("Page").get("TextRegion");
         
         if isinstance(regions, dict):
             regions = [regions]
 
         lineList = []
-        for x in regions:
-            lines = x.get("TextLine")
-            if isinstance(lines, dict):
-                lineList.extend([lines])
-            else: # Assume that lines is a list of lines
-                for line in lines:
-                    lineList.extend([line])
+        if regions:
+            for x in regions:
+                lines = x.get("TextLine")
+                if isinstance(lines, dict):
+                    lineList.extend([lines])
+                else: # Assume that lines is a list of lines
+                    for line in lines:
+                        lineList.extend([line])
         
         content_dict = {}
         # TODO Use "readingorder"?
@@ -79,12 +80,48 @@ def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide 
                 line['crop'] = line_crop
                 line_id = line.get("@id")
                 line['id'] = line_id
-                content_dict[line_id] = line.get('TextEquiv').get('Unicode')
+                line['Unicode'] = line.get('TextEquiv').get('Unicode')
         
         return render(request, 'edit/correct.html', {
              'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
              'lines': lineList,  
-             'content': json.dumps(content_dict) 
+             'content': json.dumps(content_dict)
             })
     
+def  proofread(request, collId, docId, page, transcriptId):# TODO Transcript selection....
+    
+    current_transcript = t_current_transcript(request, collId, docId, page)
+    transcript = t_transcript(request, current_transcript.get("tsId"), current_transcript.get("url"))
+    transcriptId = str(transcript.get("tsId"))
 
+    
+    regions=transcript.get("PcGts").get("Page").get("TextRegion");
+    
+    if isinstance(regions, dict):
+        regions = [regions]
+
+    lineList = []
+    if regions:
+        for x in regions:
+            lines = x.get("TextLine")
+            if isinstance(lines, dict):
+                lineList.extend([lines])
+            else: # Assume that lines is a list of lines
+                for line in lines:
+                    lineList.extend([line])
+    
+    content_dict = {}
+    # TODO Use "readingorder"?
+    if lineList:
+        for line in lineList:
+            line_crop = crop(line.get("Coords").get("@points"))#,True)
+            line['crop'] = line_crop
+            line_id = line.get("@id")
+            line['id'] = line_id
+            content_dict[line_id] = line.get('TextEquiv').get('Unicode')
+    
+    return render(request, 'edit/proofread.html', {
+         'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
+         'lines': lineList,  
+         'content': json.dumps(content_dict) 
+        })

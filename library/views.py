@@ -697,7 +697,12 @@ def job_count(request):# TODO Consider how much of a DOS risk these queries cons
 
     #return  JsonResponse({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')});
     #return HttpResponse(json.dumps({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')}), content_type='application/json')
+    #try:
+        #t_log("polling result: " + json.dumps({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')}))
     return HttpResponse(json.dumps({'CREATED': t_job_count('CREATED'), 'FAILED': t_job_count('FAILED'), 'FINISHED': t_job_count('FINISHED'),'WAITING': t_job_count('WAITING'), 'RUNNING': t_job_count('RUNNING'), 'CANCELED': t_job_count('CANCELED'), 'INCOMPLETE': t_job_count('INCOMPLETE')}), content_type='text/plain')
+    #except:
+       # t_log("exception when polling")
+        #return HttpResponse(status=500)
 
 @t_login_required
 def changed_jobs_modal(request):

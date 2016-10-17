@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
-    'nocaptcha_recaptcha',
+    #'nocaptcha_recaptcha',
     'read',
     'library',
     'review',
@@ -196,8 +196,8 @@ TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
 
-NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
-NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
+#NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
+#NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
 
 #not used...
 ADMIN_LOGIN = 'admin'

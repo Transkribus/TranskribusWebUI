@@ -1,14 +1,11 @@
 /* Draggable modal: */
 .modal {
     overflow: hidden;
-    top: 40%;
-    left: 25%;
 }
 
 .modal-dialog{
     margin-right: 0;
     margin-left: 0;
-    width: 1000px;/* A percentage here causes problems when the modal is dragged. TODO Change with JavaScript when loading? */
 }
 
 /* We crop the image like this... */
@@ -32,8 +29,6 @@
 	background: none;
 }
 
-ul {
-    list-style-type: none;
-    margin:0;
-    padding:0; 
+li {
+    list-style-type: none; 
 }

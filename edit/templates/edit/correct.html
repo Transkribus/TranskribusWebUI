@@ -23,32 +23,153 @@
 	</div>
     <div class="row row-centered">
 		<div class="col-md-3">		
-	    	<a class="scroll-up" href="#">scroll up </a><a class="scroll-down" href="#">scroll down</a> (dragging with the mouse works too)
+	    	<a class="scroll-up btn-lg" href="#"><span class="glyphicon glyphicon-arrow-up"></span></a><a class="scroll-down btn-lg" href="#"><span class="glyphicon glyphicon-arrow-down"></span></a>
 		</div>
 	    <div class="col-md-3">
-	    	<a class="zoom-in" href="#">zoom in </a><a class="zoom-out" href="#">zoom out</a>  (scrolling with the mouse also works)
+	    	<a class="zoom-in btn-lg" href="#"><span class="glyphicon glyphicon-zoom-in"></span></a><a class="zoom-out btn-lg" href="#"><span class="glyphicon glyphicon-zoom-out"></span></a>
 		</div>
 	    <div class="col-md-3">
 			<div id="message"></div>
 		</div>
 		<div class="col-md-3">
-			<a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a>
+			<a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a><br/><br/><br/>{# TODO CSS for this purpose. #}
 		</div>
 	</div>
 	<div class="transcript-div">
 		<div class="transcript-map-div">
-
-		<map name="transcriptMap" id="transcriptMap">
-			{% for line in lines %} {# TODO Use key instead of href in the scripts... #}
-					<area line-key="{{ line|get_item:"id"}}"  href="{{ line|get_item:"id"}}"  shape="poly" coords="{{line|get_item:"crop"|coords_for_imagemap}}" >
-			{% endfor %}
-		</map>
-		<img src="{{imageUrl}}" usemap="#transcriptMap"  id="transcriptImage" class="transcript-img">
+			<map name="transcriptMap" id="transcriptMap">
+				{% for line in lines %}
+						<area line-key="{{ line|get_item:"id"}}" id="{{ line|get_item:"id"}}"  href="{{ line|get_item:"id"}}"  shape="poly" coords="{{line|get_item:"crop"|coords_for_imagemap}}" >
+				{% endfor %}
+			</map>
+			<canvas id="transcriptCanvas"   style="position: absolute; z-index: 998;"></canvas>
+			<img src="{{imageUrl}}" usemap="#transcriptMap"  id="transcriptImage" class="transcript-img" style="position: absolute; z-index: 999;">
 		</div>
 	</div>
 </div>
- 
+
 {% include "edit/correct_modal.html" %}
-{% include "edit/correct_js.html" %}
- 
+
+<script src="{% static "js/jquery.imagemapster.min.js" %}"></script>
+<script src="{% static "js/correct.js" %}"></script>
+<script>
+	var contentArray= [[0, '', [0, 0, 0, 0, 0, 0, 0, 0]]
+		{% for line in lines %}
+			,['{{ line|get_item:"id"}}', '{{line|get_item:"Unicode"}}', [{{line|get_item:"crop"|coords_for_imagemap}}]]
+		{% endfor %}
+	];
+	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
+	
+	$("a[data-target=#saveChanges]").click(function(event) {
+    	event.preventDefault();
+    	$.post(window.location.href, {content: JSON.stringify(content), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
+    		setMessage(data);
+    		changed = false;
+		});
+    	{# TODO Handle failures here or are we happy with the current solution? #}
+	});
+	$('#correctModal').draggable({
+       handle: $('.modal-dialog')
+	});
+	$('.transcript-map-div').draggable({
+		start: function() {
+			isDragged = true;
+			$('area').mapster('set', false); {# We assume that the user does not want to select a region when dragging. #}
+		},
+		stop: function() {
+			setTimeout(function() { {# A hack to avoid triggering clicks on the map if clicking a region when dragging. #}
+				isDragged = false;
+			}, 250);
+		}
+	});
+	$('#correctModal').on('hidden.bs.modal', function () {
+		setCurrentLineId(null);
+		resetCanvas();
+		$(".line-list").html('');
+		ignoreLeave = false;
+	});
+	$( "#transcriptMap  area" ).on('click', function(e) {
+    	e.preventDefault();
+		updateModalPosition(e.originalEvent.clientX, e.originalEvent.clientY);
+		if (isDragged) {# We ignore clicks if the user has been dragging the image, we assume that that's what the user wants. #}
+			return;
+		ignoreLeave = true; {# We don't want the original selection "unhighlighted" when the user moves the mouse to the modal. #}
+		setCurrentLineId($(this).attr("line-key"));
+		$("#correctModal").modal({
+        	backdrop: "static", {# TODO Figure out whether to allow updating of the text by clicking elsewhere. false allows that but works poorly. #}
+        	//keyboard: false {# TODO Needed? #}
+    	});
+		buildLineList();
+	});
+	$('#transcriptImage').one("load", function() {
+		initialWidth = $('#transcriptImage').width();
+		scrollFactor = initialWidth / $('#transcriptImage').get(0).naturalWidth;
+		transcriptDivHeightString = $( ".transcript-div" ).css("height");
+		$( ".modal-dialog" ).css("width", initialWidth + 'px');
+		resetCanvas();
+	});
+	$('area').mouseenter(function(e) {
+		highlightLine(e.target.id);
+	});
+	$('area').mouseleave(function(e) {
+		if (!ignoreLeave) 
+			resetCanvas();
+	});
+	$( ".scroll-up" ).on('click', function(e) {
+		scrollToPreviousTop();
+	});
+	$( ".scroll-down" ).on('click', function(e) {
+		scrollToNextTop();
+	});
+	$('#correctModal').keydown(function(e){
+	    if (e.keyCode == 13) {
+	        typewriterNext();
+	    }
+	});
+	$( ".typewriter-previous" ).on('click', function(e) {
+		typewriterPrevious();
+	});
+	$( ".typewriter-next" ).on('click', function(e) {
+		typewriterNext();
+	});	
+	$( ".zoom-in" ).on('click', function(e) {
+		setZoom(10);
+	});
+	$( ".zoom-out" ).on('click', function(e) {
+		setZoom(-10);
+	});
+	$( ".add-line" ).on('click', function(e) {
+		surroundingCount++;
+		buildLineList();
+	});
+	$( ".remove-line" ).on('click', function(e) {
+		surroundingCount--;
+		if (surroundingCount >= 0)
+			buildLineList();
+		else
+			surroundingCount = 0;
+	});
+    $('.transcript-div').on('mousewheel DOMMouseScroll', function(e) {
+    	e.preventDefault();
+    	var mouseZoom;
+    	if (e.originalEvent.detail > 0)
+			mouseZoom = -10;        	
+		else
+			mouseZoom = 10;
+    	setZoom(mouseZoom, e.originalEvent.pageX - $( ".transcript-map-div" ).offset().left, e.originalEvent.pageY - $( ".transcript-map-div" ).offset().top);
+    });
+	$('#transcriptImage').mapster({ {# TODO Figure out if we can do without mapster. This configuration already makes it as invisible as possible. #}
+		mapKey: 'line-key',
+        render_highlight: {
+	        fade: false,
+            fillColor: 'ffffff',
+            fillOpacity: 0
+        },
+	    render_select: {
+        	fillColor: 'ffffff',
+        	fillOpacity: 0   
+        }
+	});
+</script>
+
 {% endblock %}

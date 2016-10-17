@@ -15,14 +15,16 @@ function getCookie(cookieName) {
 function jobCountsChanged(json) {
 	jobs = getCookie("jobs");
 	stringified = JSON.stringify(json);
+	console.log("comparing: " + jobs);
+	console.log(" with " + stringified);
 	if ("" == jobs) {// TODO Decide whether to consider changes in jobs between sessions worth informing the user about. Cookie expiration decides this. 
 		document.cookie = "jobs=" + stringified; 
 	} else if (jobs != stringified) {
 		document.cookie = "jobs=" + stringified;
 		document.cookie = "changes_acknowledged=false";
 		jobStatusAlert();
-	} else {
-			$('.changed-jobs-content').load(jobs_list_compact);// Refresh the modal if job statuses have changed since it was shown.
+	} else {// TODO Improve this, it's stupid now.
+		$('.changed-jobs-content').load(jobs_list_compact);// Refresh the modal if job statuses have changed since it was shown.
 	}
 }
 

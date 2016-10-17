@@ -11,8 +11,8 @@ from django.contrib.auth.models import User
 
 class TSData(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    gender = models.CharField(max_length=100)
-    affiliation = models.CharField(max_length=100)
+    #gender = models.CharField(max_length=100)
+    #affiliation = models.CharField(max_length=100)
 
     #Add fields for any user data local to app here
     #thingthatappneedstostoreperuser = models.WhateverField();
