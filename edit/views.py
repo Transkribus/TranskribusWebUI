@@ -36,9 +36,11 @@ def correct_js(request):
     return render(request, 'edit/correct_js.html')
 
 @t_login_required
-def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide how to select which transcript to work with unless it should always be the newest?
+#def correct(request, collId, docId, page, transcriptId=None, regionId=None):# TODO Decide how to select which transcript to work with unless it should always be the newest?
+def correct(request, collId, docId, page, transcriptId=None, regionId=None):# TODO Decide how to select which transcript to work with unless it should always be the newest?
+
     current_transcript = t_current_transcript(request, collId, docId, page)
-    
+    transcriptId = current_transcript.get('tsId')
     if request.method == 'POST':# This is by JQuery...
         content = json.loads(request.POST.get('content'))    
         transcript_xml = t_transcript_xml(request, transcriptId, current_transcript.get("url"))
@@ -67,7 +69,7 @@ def correct(request, collId, docId, page, transcriptId, regionId):# TODO Decide 
             lines = x.get("TextLine")
             if isinstance(lines, dict):
                 lineList.extend([lines])
-            else: # Assume that lines is a list of lines
+            elif lines: # Assume that lines is a list of lines
                 for line in lines:
                     lineList.extend([line])
         

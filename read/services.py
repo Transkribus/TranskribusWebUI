@@ -42,20 +42,6 @@ def t_check_cache(request,t_id, url, params=None) :
             t_log("HAVE CACHE: %s " % request_id)
             return request.session[t_id][request_id]
 
-#               #Have data  keyed with t_id in session, get the *request_id*
-#               if isinstance(request.session.get(t_id), list) :
-#                   cache_rid = request.session.get(t_id)[0].get('request_id')
-#               else :
-#                   cache_rid = request.session.get(t_id).get('request_id')
-
-        #Do the urls match too?
-#        t_log("FOR T_ID: %s" % (t_id))
-#        t_log("CACHE_RID: %s == RID : %s" % (cache_rid, request_id ))
-
- #       if cache_rid == request_id:
- #           t_log("HAVE CACHE: %s " % request_id)
- #           return request.session[t_id]
-
     #no data cached for this t_id/url pair, return None
     return None
 
@@ -64,13 +50,6 @@ def t_set_cache_value(request,t_id,data,url,params=None) :
 
     #Use the t_id as identifer for cached data, Store the url with key "cache_url" (in first element if data is a list)
     request_id = t_gen_request_id(url,params)
-    #if isinstance(data, list):
-    #    if not data or len(data) == 0:
-    #        data = [{'request_id' : request_id}]
-    #    else :
-    #        data[0]['request_id']=request_id
-    #else :
-    #    data['request_id']=request_id
 
     t_log("### [CAHCING] CACHING %s with request_id : %s" % (t_id,request_id) )
     if t_id not in request.session : request.session[t_id] = {}
@@ -220,7 +199,7 @@ def t_collection_recent(request,collId):
     t_id = "collection_recent"
     params = {'collId': collId}
 
-    return t_request(request,t_id,url,"GET",params)
+    return t_request(request,t_id,url,params,"GET")
 
 def t_collection_recent_handler(r,params=None):
     #t_log("collection_recent: %s " % r.text)
@@ -252,9 +231,9 @@ def t_collections_handler(r,params=None):
 def t_collection(request,params):
     url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/list'
     t_id = "collection"
-    return t_request(request,t_id,url,"GET",None,None,{"collId": params.get('collId')})
+    return t_request(request,t_id,url,params,"GET",None,{"collId": params.get('collId')})
+
 def t_collection_handler(r,params=None):
-    collection_json=r.text
     return json.loads(r.text)
 
 def t_collection_count(request,params):
@@ -267,13 +246,20 @@ def t_collection_count_handler(r,params=None):
     return json.loads(r.text)
 
 #Alias t_documents > t_collection
-def t_documents(request,collId):
-    return t_collection(request,collId)
+def t_documents(request,params):
+    return t_collection(request,params)
 
-def t_documents_count(request,collId):
-    return t_collection_count(request,collId)
+def t_documents_count(request,params):
+    return t_collection_count(request,params)
 
+def t_fulldoc(request,params):
 
+    url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/'+str(params.get('docId'))+'/fulldoc'
+    t_id = "fulldoc"
+    return t_request(request,t_id,url,params)
+
+def t_fulldoc_handler(r,params=None):
+    return json.loads(r.text)
 
 def t_document(request, collId, docId, nrOfTranscripts=None):
 
@@ -329,7 +315,7 @@ def t_transcript(request,transcriptId,url):
     t_id = "transcript"
     headers = {'content-type': 'application/xml'}
     params = {}
-    return t_request(request,t_id,url,"GET",params,headers,{'transcriptId': transcriptId})
+    return t_request(request,t_id,url,params,"GET",headers,{'transcriptId': transcriptId})
 
 def t_transcript_handler(r,params=None):
     t_transcript=xmltodict.parse(r.text)

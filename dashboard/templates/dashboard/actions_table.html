@@ -1,0 +1,52 @@
+{% load i18n %}
+
+ <div class="row">
+  <div class="form-inline">
+	  <div class="form-group">
+		  <label for="start_date">Start:</label>
+		  <input type="text" id="start_date"/>
+	  </div>
+	  <div class="form-group">
+		  <label for="end_date">End:</label>
+		  <input type="text" id="end_date"/>
+	  </div>
+  </div>
+ </div>
+ <div class="row col-md-6">
+  <div id="slider-range"></div>
+ </div>
+ <div class="row">
+  <table class="table table-striped display" id="actions_table" {%if collection %}data-collid="{{collection.colId}}"{%endif%}>
+   <thead>
+	<tr>
+		<th>{% trans "Time" %}</th>
+		<th class="select-filter">{% trans "Collection Id" %}</th>
+		<th class="select-filter">{% trans "Collection" %}</th>
+		<th>{% trans "Document ID" %}</th>
+		<th>{% trans "Document" %}</th>
+		<th>{% trans "Page ID" %}</th>
+		<th>{% trans "Page" %}</th>
+		<th>{% trans "Username" %}</th>
+		<th class="select-filter">{% trans "Operation" %}</th>
+	</tr>
+   </thead>
+   <tfoot>
+	<tr>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+	</tr>
+   </tfoot>
+  </table>
+  {% for at in action_types %}
+	<button class="btn btn-default table_filter" id="filter_{{at.type}}" value="{{at.id}}">{{at.type}}</button>
+  {% endfor %}
+  <button class="btn btn-default table_filter" id="filter_clear" value="">X</button>
+ </div>
+

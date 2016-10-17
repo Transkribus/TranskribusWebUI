@@ -184,6 +184,7 @@ STATICFILES_DIRS = [
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
 #UseCDNS for libs or static versions
+PAGE_SIZE_DEFAULT = 5
 USE_CDNS = False
 CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" },
        'bootstrap_js' : {'local': "/static/js/bootstrap.min.js", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"},
@@ -192,6 +193,7 @@ CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//
        'jquery' : {'local' : "/static/js/jquery.js", 'cdn': "//code.jquery.com/jquery-1.12.3.js" },
        'jquery_ui' : {'local' : "/static/js/jquery-ui.min.js", 'cdn': "//code.jquery.com/ui/1.12.1/jquery-ui.min.js" },
        'jquery_ui_css' : {'local' : "/static/css/jquery-ui.css", 'cdn' : "//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" },
+       'chart_js' : {'local': "/static/js/Chart.bundle.min.js", 'cdn': "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"},
 
       }
 

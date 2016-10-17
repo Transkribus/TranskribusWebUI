@@ -10,6 +10,17 @@ def t_log(text):
     sys.stdout.flush()
 
 def t_gen_request_id(url,params):
+    ###### EXCEPTION ######
+    # we will exlucde the params of fulldoc calls from being used in cacheid,
+    # this is because TS is not *currently* paging any data in the fulldoc requests
+    # paging is handled here in django so lets's not reqeust the fulldocs unnecessarily
+    pattern = re.compile('fulldoc$')
+    t_log("regex result for url (%s): %s" % (url,pattern.match(url)))
+    if pattern.match(url) : 
+        t_log("USING %s FOR FULL DOC CACHE ID" % hashlib.md5(str(url)).hexdigest())
+        return hashlib.md5(str(url)).hexdigest()
+    ########################
+
     return hashlib.md5(str(url)+str(params)).hexdigest()
 
 ###########################################################

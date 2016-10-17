@@ -10,86 +10,36 @@
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
 
+<div class="container">
+
 <h2>Activities for {{collection.colName}}</h2>
 
-<div class="container">
- <div class="row">
-  <div class="form-inline">
-	  <div class="form-group">
-		  <label for="start_date">Start:</label>
-		  <input type="text" id="start_date"/>
-	  </div>
-	  <div class="form-group">
-		  <label for="end_date">End:</label>
-		  <input type="text" id="end_date"/>
-	  </div>
-  </div>
- </div>
- <div class="row col-md-6">
-  <div id="slider-range"></div>
- </div>
- <div class="row">
- <table class="table table-striped display" id="actions_table"  data-collid="{{collection.colId}}">
-   <thead>
-	<tr>
-		<th>{% trans "Time" %}</th>
-		<th class="select-filter">{% trans "Collection" %}</th>
-		<th>{% trans "Document ID" %}</th>
-		<th>{% trans "Page ID" %}</th>
-		<th>{% trans "Username" %}</th>
-		<th class="select-filter">{% trans "Operation" %}</th>
-	</tr>
-   </thead>
-   <tfoot>
-	<tr>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-	</tr>
-   </tfoot>
-</table>
-<!-- TODO use types from TSREST  -->
-{% for at in action_types %}
-	<button class="btn btn-default table_filter" id="filter_{{at.type}}" value="{{at.id}}">{{at.type}}</button>
-{% endfor %}
-<button class="btn btn-default table_filter" id="filter_clear" value="">X</button>
- </div>
+  {% include "dashboard/actions_table.html" with action_types=action_types collection=collection %}
+
 </div>
+
+<div class="container">
 
 <h2>Documents in {{collection.colName}}</h2>
 
-<p>This collecction contains the following {{ documents|length }} document{%if documents|length != 1 %}s{% endif %}:</p>
+  {% include "dashboard/documents_table.html" with documents=documents %}
 
-<table class="table table-striped display" id="documents_table">
-   <thead>
-	<tr>
-		<th>{% trans "ID" %}</th>
-		<th>{% trans "Document" %}</th>
-		<th>{% trans "Author" %}</th>
-		<th>{% trans "Uploaded" %}</th>
-		<th>{% trans "Uploader" %}</th>
-		<th>{% trans "Pages" %}</th>
-		<th>{% trans "Language" %}</th>
-		<th>{% trans "Status" %}</th>
-	</tr>
-   </thead>
-   <tbody>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-   </tbody>
-</table>
-<pre>
-Graph here
-</pre>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12" id="actions_chart">
+		<h3>Activity for {{collection.colName}}</h3>
+		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
+		</div>
+		<div class="col-md-8">
+		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
+		</div>
+		<div class="col-md-4">
+		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
+		</div>
+	</div>
+</div>
 
 <button>No of Jobs by type / ingesting</button>
 

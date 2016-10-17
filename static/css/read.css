@@ -167,5 +167,14 @@ fieldset[disabled] .btn-inverse.active {
 .ui-slider {
 
 	margin: 10px;
+}
 
+/*charts*/
+/*.chart_container {
+	width: 200px;
+}
+*/
+
+.clickable:hover {
+	cursor: pointer;
 }

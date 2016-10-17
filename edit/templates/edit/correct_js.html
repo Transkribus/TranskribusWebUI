@@ -136,7 +136,12 @@
 			}
 		}
 	}
-	function setZoom(zoom, x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2, y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2) { {# TODO: Remove the zoom buttons altogether or set default to center? #}
+//	function setZoom(zoom, x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2, y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2) { {# TODO: Remove the zoom buttons altogether or set default to center? #}
+	function setZoom(zoom){
+
+//, x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2, y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2) { {# TODO: Remove the zoom buttons altogether or set default to center? #}
+		x = parseInt( $( ".transcript-map-div" ).css("width"),10) / 2;
+		y = parseInt( $( ".transcript-map-div" ).css("height"),10) / 2;
 		savedZoom += zoom;
 		var zoom_factor = savedZoom / 100;
 		$('#transcriptImage').mapster('resize', Math.round(initial_width * (1 + zoom_factor)));
