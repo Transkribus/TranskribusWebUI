@@ -1,7 +1,7 @@
 from django import template
 from django.template.defaulttags import register
 import datetime
-
+import read.settings
 
 #register = template.Library()
 @register.filter
@@ -42,3 +42,9 @@ def coords_for_imagemap(crop):
 @register.filter
 def y_for_typewriterline(crop):
     return str(crop.get('tl')[1])
+
+@register.filter
+def load_lib(lib):
+    if read.settings.USE_CDNS and lib in read.settings.CDNS:
+        return str(read.settings.CDNS.get(lib).get('cdn'))
+    return str(read.settings.CDNS.get(lib).get('local'))

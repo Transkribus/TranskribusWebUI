@@ -3,14 +3,14 @@
 
 {% block content %}
 
-<h1>COLLECTIONS</h1>
+<h1>{{collection.colName}}</h1>
 
-<h2>Last activity (on any of owned collections?)</h2>
+<h2>Last activity {{collection.colName}}</h2>
 
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
 
-<h2>Your activities:</h2>
+<h2>Activities for {{collection.colName}}</h2>
 
 <div class="container">
  <div class="row">
@@ -29,7 +29,7 @@
   <div id="slider-range"></div>
  </div>
  <div class="row">
- <table class="table table-striped display" id="actions_table">
+ <table class="table table-striped display" id="actions_table"  data-collid="{{collection.colId}}">
    <thead>
 	<tr>
 		<th>{% trans "Time" %}</th>
@@ -42,12 +42,12 @@
    </thead>
    <tfoot>
 	<tr>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
 	</tr>
    </tfoot>
 </table>
@@ -59,43 +59,38 @@
  </div>
 </div>
 
-<h2>My Collections</h2>
-<!-- TODO make this an ajax data table and make use of paging facilities 
-index
-nValues
-sortColumn
-sortDirection
--->
+<h2>Documents in {{collection.colName}}</h2>
 
-{% comment %}
-{% include "dashboard/collections_table.html" with collections=collections %}
-{% endcomment %}
+<p>This collecction contains the following {{ documents|length }} document{%if documents|length != 1 %}s{% endif %}:</p>
 
-<p>You are a member of the following {{ collections|length }} collections:</p>
-
- <table class="table table-striped display" id="collections_table">
+<table class="table table-striped display" id="documents_table">
    <thead>
 	<tr>
-		<th>{% trans "ColId" %}</th>
-		<th>{% trans "Collection" %}</th>
-		<th>{% trans "Description" %}</th>
-		<th>{% trans "Role" %}</th>
+		<th>{% trans "ID" %}</th>
+		<th>{% trans "Document" %}</th>
+		<th>{% trans "Author" %}</th>
+		<th>{% trans "Uploaded" %}</th>
+		<th>{% trans "Uploader" %}</th>
+		<th>{% trans "Pages" %}</th>
+		<th>{% trans "Language" %}</th>
+		<th>{% trans "Status" %}</th>
 	</tr>
    </thead>
    <tbody>
-	<tr>
 		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
-	</tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
    </tbody>
 </table>
-
 <pre>
 Graph here
 </pre>
 
-<button>Nbre of Jobs by type / ingesting</button>
+<button>No of Jobs by type / ingesting</button>
 
 {% endblock %}

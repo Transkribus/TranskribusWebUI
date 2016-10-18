@@ -2,12 +2,15 @@ import re
 import sys
 import datetime
 import json
+import hashlib
 
-# log message 
+# log message
 def t_log(text):
-    sys.stdout.write("["+str(datetime.datetime.now())+"] "+text+"\n")
+    sys.stdout.write("[%s] %s \n" % (datetime.datetime.now(), text))
     sys.stdout.flush()
 
+def t_gen_request_id(url,params):
+    return hashlib.md5(str(url)+str(params)).hexdigest()
 
 ###########################################################
 # crop(list coords, boolean offset=None)
@@ -66,4 +69,3 @@ def t_metadata(custom_attr):
     t_log("### METADATA from CSS: %s   \r\n" % (t_metadata) )
 
     return t_metadata
-

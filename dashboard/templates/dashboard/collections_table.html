@@ -2,13 +2,13 @@
 
 	<p>You are a member of the following {{ collections|length }} collections:</p>
 
-		<table class="table table-striped">
+		 <table class="table table-striped display" id="collections_table">
 		   <thead>
 	  		<tr><th>{% trans "ID" %}</th><th>{% trans "Collection" %}</th><th>{% trans "Description" %}</th><th>{% trans "Role" %}</th></tr>
 		   </thead>
 		   <tbody>
 		     {% for coll in collections %}
-	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
+	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection' coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
 		     {% endfor %}
 		   </tbody>
 		</table>

@@ -4,7 +4,7 @@
 
 		   <ul>
 		     {% for coll in collections %}
-			<li><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a> | {{ coll.owner }} | {{ coll.role }} | {{ coll.description }} </li>
+			<li><a href="{% url 'collection'  coll.colId %}">{{ coll.colName }}</a> | {{ coll.role }} | {{ coll.description }} </li>
 		     {% endfor %}
 		   </ul>
 

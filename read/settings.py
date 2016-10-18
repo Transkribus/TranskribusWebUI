@@ -183,8 +183,19 @@ STATICFILES_DIRS = [
 # This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
+#UseCDNS for libs or static versions
+USE_CDNS = False
+CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" },
+       'bootstrap_js' : {'local': "/static/js/bootstrap.min.js", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"},
+       'datatables_css' : {'local': "/static/css/jquery.dataTables.min.css", 'cdn': "//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"},
+       'datatables_js' : {'local': "/static/js/jquery.dataTables.min.js", 'cdn': "//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"},
+       'jquery' : {'local' : "/static/js/jquery.js", 'cdn': "//code.jquery.com/jquery-1.12.3.js" },
+       'jquery_ui' : {'local' : "/static/js/jquery-ui.min.js", 'cdn': "//code.jquery.com/ui/1.12.1/jquery-ui.min.js" },
+       'jquery_ui_css' : {'local' : "/static/css/jquery-ui.css", 'cdn' : "//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" },
 
-### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
+      }
+
+## Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
     'read.backends.TranskribusBackend',
 #    'django.contrib.auth.backends.ModelBackend',

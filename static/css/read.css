@@ -161,3 +161,11 @@ fieldset[disabled] .btn-inverse.active {
 	width: 600px;
 	height: auto;
 }
+
+/*dashboard*/
+/*slider (for date range)*/
+.ui-slider {
+
+	margin: 10px;
+
+}
