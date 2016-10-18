@@ -10,7 +10,7 @@ def t_log(text):
     sys.stdout.flush()
 
 def t_gen_request_id(url,params):
-    return hashlib.md5(str(url)+str(params)).hexdigest()
+    return hashlib.md5((str(url)+str(params)).encode('utf-8')).hexdigest()
 
 ###########################################################
 # crop(list coords, boolean offset=None)
