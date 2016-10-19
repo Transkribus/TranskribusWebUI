@@ -128,7 +128,6 @@ function typewriterNext() { // Aka. "press typewriter enter scroll". Changes the
 	if (newLineId != null) {
 		var old = parseInt($( ".transcript-map-div" ).css("top"), 10);
 		var delta = Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]);
-		console.log("scroll delta: " + delta + "for topLineId: " + topLineId);
 		$( ".transcript-map-div" ).css("top", (old - delta) + 'px');
 		resetCanvas();
 		setCurrentLineId(newLineId);
