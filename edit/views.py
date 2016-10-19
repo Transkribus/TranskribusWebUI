@@ -31,10 +31,6 @@ from library.forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
 
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
 
-# TODO Decide whether to use this when static javascript is, well, static...
-def correct_js(request):
-    return render(request, 'edit/correct_js.html')
-
 @t_login_required
 def correct(request, collId, docId, page, transcriptId):# TODO Decide whether to select which transcript to work with unless it should always be the newest?
     current_transcript = t_current_transcript(request, collId, docId, page)
@@ -87,41 +83,3 @@ def correct(request, collId, docId, page, transcriptId):# TODO Decide whether to
              'lines': lineList,  
              'content': json.dumps(content_dict)
             })
-    
-def  proofread(request, collId, docId, page, transcriptId):# TODO Transcript selection....
-    
-    current_transcript = t_current_transcript(request, collId, docId, page)
-    transcript = t_transcript(request, current_transcript.get("tsId"), current_transcript.get("url"))
-    transcriptId = str(transcript.get("tsId"))
-
-    
-    regions=transcript.get("PcGts").get("Page").get("TextRegion");
-    
-    if isinstance(regions, dict):
-        regions = [regions]
-
-    lineList = []
-    if regions:
-        for x in regions:
-            lines = x.get("TextLine")
-            if isinstance(lines, dict):
-                lineList.extend([lines])
-            else: # Assume that lines is a list of lines
-                for line in lines:
-                    lineList.extend([line])
-    
-    content_dict = {}
-    # TODO Use "readingorder"?
-    if lineList:
-        for line in lineList:
-            line_crop = crop(line.get("Coords").get("@points"))#,True)
-            line['crop'] = line_crop
-            line_id = line.get("@id")
-            line['id'] = line_id
-            content_dict[line_id] = line.get('TextEquiv').get('Unicode')
-    
-    return render(request, 'edit/proofread.html', {
-         'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
-         'lines': lineList,  
-         'content': json.dumps(content_dict) 
-        })
