@@ -32,7 +32,7 @@ from library.forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
 
 @t_login_required
-def correct(request, collId, docId, page, transcriptId):# TODO Decide whether to select which transcript to work with unless it should always be the newest?
+def correct(request, collId, docId, page, transcriptId=None):# TODO Decide whether to select which transcript to work with unless it should always be the newest?
     current_transcript = t_current_transcript(request, collId, docId, page)
     transcript = t_transcript(request, current_transcript.get("tsId"), current_transcript.get("url"))
     transcriptId = str(transcript.get("tsId"))
