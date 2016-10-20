@@ -37,14 +37,14 @@ def correct(request, collId, docId, page, transcriptId):# TODO Decide whether to
     transcript = t_transcript(request, current_transcript.get("tsId"), current_transcript.get("url"))
     transcriptId = str(transcript.get("tsId"))
     if request.method == 'POST':# This is by JQuery...
-        content = json.loads(request.POST.get('content'))    
+        content = json.loads(request.POST.get('content'))
         transcript_xml = t_transcript_xml(request, transcriptId, current_transcript.get("url"))
         transcript_root = ElementTree.fromstring(transcript_xml)
         # TODO Decide what to do about regionId... It's not necessary....
         for text_region in transcript_root.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextRegion'):# We have to have the namespace...
             regionTextEquiv = ""
             for line in text_region.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextLine'):
-                 modified_text = content.get(line.get("id"))
+                 modified_text = content.get(id = line.get("id"))
                  regionTextEquiv += modified_text +"\r\n"
                  line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
             text_region.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = regionTextEquiv

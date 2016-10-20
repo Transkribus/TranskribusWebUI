@@ -10,6 +10,19 @@ var modalBelowMouse = 50;// TODO Decide whether to calculate this or have a simp
 var ignoreLeave = false;
 var topLineId = null;
 
+// "JSON.stringifies" contentArray and also strips out content which does not need to be submitted.
+function getContent() {
+	var lengthMinusOne = contentArray.length - 1;
+	content = '{';
+	for (var cI = 1; cI <= lengthMinusOne; cI++) {// cI = 1 since we skip the "line" which isn't real since it's the top of the page
+		content += '"' + contentArray[cI][0] + '":"' + contentArray[cI][1] + '"';
+		if (cI < lengthMinusOne)
+			content += ',';
+	}
+	content += '}';
+	return content;
+}
+
 // Modal functions:
 function updateModalPosition(clickX, clickY) {
 	$( ".modal" ).css("left", (clickX - parseInt($( ".modal-dialog" ).css("width"), 10)/2) + 'px');
@@ -44,7 +57,7 @@ function setCurrentLineId(newId) {// We're not happy with just "=" to set the ne
 	currentContent = $("#currentLine").val();
 	if (null != currentLineId && contentArray[getIndexFromLineId(currentLineId)][1] != currentContent) {		
 		if (!changed)
-			$("#message").html("<div class='alert alert-warning'>" + transUnsavedChanges + "</div>");
+			setMessage("<div class='alert alert-warning'>" + transUnsavedChanges + "</div>");
 		changed = true;
 		contentArray[getIndexFromLineId(currentLineId)][1] = currentContent;
 	}	
@@ -77,6 +90,9 @@ function scrollToPreviousTop() {
 }
 
 // GUI:
+function setMessage(message) {
+	$("#message").html(message);
+}
 function buildLineList() {
 	$(".line-list").html("");
 	$('area').mapster('set', false);
