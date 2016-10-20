@@ -14,7 +14,7 @@
 
 <h2>Your activities:</h2>
 
-  {% include "dashboard/actions_table.html" with action_types=action_types collection=None%}
+  {% include "dashboard/actions_table.html" with action_types=action_types%}
 
 </div>
 
@@ -22,7 +22,7 @@
 
 <h2>My Collections</h2>
 
-{% include "dashboard/collections_table.html" with collections=collections %}
+{% include "dashboard/collections_table.html" %}
 
 </div>
 
@@ -33,9 +33,11 @@
 		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-8">
+		<h3>User activity</h3>
 		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-4">
+		<h3>Status</h3>
 		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
 		</div>
 	</div>

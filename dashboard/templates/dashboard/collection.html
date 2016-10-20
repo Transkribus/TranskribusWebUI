@@ -14,7 +14,7 @@
 
 <h2>Activities for {{collection.colName}}</h2>
 
-  {% include "dashboard/actions_table.html" with action_types=action_types collection=collection %}
+  {% include "dashboard/actions_table.html" with action_types=action_types %}
 
 </div>
 
@@ -22,7 +22,15 @@
 
 <h2>Documents in {{collection.colName}}</h2>
 
-  {% include "dashboard/documents_table.html" with documents=documents %}
+  {% include "dashboard/documents_table.html" %}
+
+</div>
+
+<div class="container">
+
+<h2>Users in {{collection.colName}}</h2>
+
+  {% include "dashboard/users_table.html" %}
 
 </div>
 
@@ -33,14 +41,13 @@
 		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-8">
-		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
+		<h3>Activity for {{collection.colName}}</h3>
+		<canvas id="top_users_bar" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-4">
 		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
 		</div>
 	</div>
 </div>
-
-<button>No of Jobs by type / ingesting</button>
 
 {% endblock %}

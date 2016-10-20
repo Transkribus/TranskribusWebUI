@@ -178,3 +178,14 @@ fieldset[disabled] .btn-inverse.active {
 .clickable:hover {
 	cursor: pointer;
 }
+
+/* page thumbnails */
+
+/* colour for status in thumbnails */
+.NEW { background-color: #ffdddd;} 
+.IN_PROGRESS { background-color: #ddffdd;} 
+.DONE { background-color: #fdfd96;} 
+.FINAL { background-color: #ddddff;} 
+/*.GROUNDTRUTH { background-color: green;} */
+
+.thumb_label { width: 100%; text-align: center;}

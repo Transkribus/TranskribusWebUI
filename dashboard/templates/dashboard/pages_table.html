@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<p>This document contains {{ pages|length }} page{%if pages|length != 1 %}s{% endif %}:</p>
+<p>This document contains <span id="pages_table_count"></span> pages:</p>
 
 <table class="table table-striped display" id="pages_table">
    <thead>

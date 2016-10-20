@@ -228,6 +228,25 @@ def t_collections_handler(r,params=None):
         col['key'] = col['colId']
     return t_collections
 
+#t_users_count
+def t_users_count(request,params=None):
+    url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/userlist/count'
+    t_id = "users_count"
+    return t_request(request,t_id,url,params,"GET",None,{"collId": params.get('collId')})
+
+def t_users_count_handler(r,params=None):
+    return json.loads(r.text)
+
+#t_users_list
+def t_users(request,params=None):
+    url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/userlist'
+    t_id = "users"
+
+    return t_request(request,t_id,url,params)
+
+def t_users_handler(r,params=None):
+    return json.loads(r.text)
+
 def t_collection(request,params):
     url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/list'
     t_id = "collection"
