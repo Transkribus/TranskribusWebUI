@@ -9,7 +9,7 @@ from  xml.etree import ElementTree
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponseRedirect 
+from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -44,9 +44,9 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
         for text_region in transcript_root.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextRegion'):# We have to have the namespace...
             regionTextEquiv = ""
             for line in text_region.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextLine'):
-                 modified_text = content.get(id = line.get("id"))
-                 regionTextEquiv += modified_text +"\r\n"
-                 line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
+                modified_text = content.get(id = line.get("id"))
+                regionTextEquiv += modified_text +"\r\n"
+                line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
             text_region.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = regionTextEquiv
         t_save_transcript(request, ElementTree.tostring(transcript_root), collId, docId, page)
         current_transcript = t_current_transcript(request, collId, docId, page)# We want the updated transcript now.
@@ -54,7 +54,7 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
         return HttpResponse("<div class='alert alert-success'>" + success_message + "</div>", content_type="text/plain")
     else:
         regions=transcript.get("PcGts").get("Page").get("TextRegion");
-        
+
         if isinstance(regions, dict):
             regions = [regions]
 
@@ -67,7 +67,7 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
                 else: # Assume that lines is a list of lines
                     for line in lines:
                         lineList.extend([line])
-        
+
         content_dict = {}
         # TODO Use "readingorder"?
         if lineList:
@@ -77,9 +77,9 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
                 line_id = line.get("@id")
                 line['id'] = line_id
                 line['Unicode'] = line.get('TextEquiv').get('Unicode')
-        
+
         return render(request, 'edit/correct.html', {
              'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
-             'lines': lineList,  
+             'lines': lineList,
              'content': json.dumps(content_dict)
             })
