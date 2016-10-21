@@ -141,17 +141,20 @@ function buildLineList() {
 // Actions: 
 function typewriterNext() { // Aka. "press typewriter enter scroll". Changes the selected lines and the modal content.
 	newLineId = getNextLineId(currentLineId);
-	if (newLineId != null) {
-		var old = parseInt($( ".transcript-map-div" ).css("top"), 10);
-		var delta = Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]);
-		$( ".transcript-map-div" ).css("top", (old - delta) + 'px');
-		resetCanvas();
-		setCurrentLineId(newLineId);
-		buildLineList();
-	}
+	if (newLineId != null)
+		typewriterStep(newLineId, Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]))
 }
 function typewriterPrevious() {
-
+	newLineId = getPreviousLineId(currentLineId);
+	if (newLineId != null)
+		typewriterStep(getPreviousLineId(currentLineId), Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]));
+}
+function typewriterStep(newLineId, delta) {
+	var old = parseInt($( ".transcript-map-div" ).css("top"), 10);
+	$( ".transcript-map-div" ).css("top", (old - delta) + 'px');
+	resetCanvas();
+	setCurrentLineId(newLineId);
+	buildLineList();
 }
 function resetCanvas() {        
 	var c=document.getElementById("transcriptCanvas");
