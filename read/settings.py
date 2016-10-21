@@ -185,7 +185,7 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
 #UseCDNS for libs or static versions
 PAGE_SIZE_DEFAULT = 5
-USE_CDNS = False
+USE_CDNS = True
 CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" },
        'bootstrap_js' : {'local': "/static/js/bootstrap.min.js", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"},
        'datatables_css' : {'local': "/static/css/jquery.dataTables.min.css", 'cdn': "//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"},
