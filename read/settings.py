@@ -159,11 +159,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/read/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
@@ -182,7 +181,7 @@ STATICFILES_DIRS = [
 
 # This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'profile'
+LOGIN_REDIRECT_URL = 'dashboard'
 #UseCDNS for libs or static versions
 PAGE_SIZE_DEFAULT = 5
 USE_CDNS = True
@@ -208,10 +207,3 @@ AUTHENTICATION_BACKENDS = [
 TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
-
-#NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
-#NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
-
-#not used...
-ADMIN_LOGIN = 'admin'
-ADMIN_PASSWORD = 'norsun'
