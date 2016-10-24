@@ -45,6 +45,7 @@
     <script src="{{ "chart_js"|load_lib }}"></script>
     <!-- Local JS -->
     <script src="{% static "js/read.js" %}"></script>
+        <script> var static_url = "{% static '/' %} "; </script>
 	<!--- Only needed when logged in -->
 	{% if user.is_authenticated %}
 	    <script>

@@ -11,10 +11,10 @@ urlpatterns = [
     url(r'^table_ajax/(?P<list_name>[a-z]+)/(?P<collId>[0-9]+)$', views.table_ajax, name='table_ajax'),
     url(r'^table_ajax/(?P<list_name>[a-z]+)/(?P<collId>[0-9]+)/(?P<docId>[0-9]+)$', views.table_ajax, name='table_ajax'),
 
-    url(r'^actions_for_chart_ajax$', views.actions_for_chart_ajax, name='actions_for_chart_ajax'),
-    url(r'^actions_for_chart_ajax/(?P<collId>[0-9]+)$', views.actions_for_chart_ajax, name='actions_for_chart_ajax'),
-    url(r'^actions_for_chart_ajax/(?P<collId>[0-9]+)/(?P<docId>[0-9]+)$', views.actions_for_chart_ajax, name='actions_for_chart_ajax'),
-
+    url(r'^chart_ajax/(?P<list_name>[a-z]+)$', views.chart_ajax, name='chart_ajax'),
+    url(r'^chart_ajax/(?P<list_name>[a-z]+)/(?P<collId>[0-9]+)$', views.chart_ajax, name='chart_ajax'),
+    url(r'^chart_ajax/(?P<list_name>[a-z]+)/(?P<collId>[0-9]+)/(?P<docId>[0-9]+)$', views.chart_ajax, name='chart_ajax'),
+    url(r'^chart_ajax/(?P<list_name>[a-z]+)/(?P<userId>[0-9]+)$', views.chart_ajax, name='chart_ajax'),
 
     url(r'^$', views.index, name='index'),
 ]

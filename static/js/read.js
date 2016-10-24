@@ -1,6 +1,5 @@
 $(document).ready(function(){
 	$(".menu-toggle-wrapper").css("height",window.innerHeight+'px');
-
 	var sidebar_state = localStorage.getItem("sidebar_state");
 	if (sidebar_state === "in") {
 		$("#wrapper").toggleClass("toggled");
@@ -67,7 +66,8 @@ function init_actions_table(){
 	if(!$("#actions_table").length) return;
 
 	var ids = parse_path();
-	var url = "/dashboard/table_ajax/actions";
+	var url = static_url+"dashboard/table_ajax/actions";
+
 	var context = '';
 	for(x in ids){
 		console.log(x," => ",ids[x])
@@ -93,7 +93,7 @@ function init_users_table(){
 	if(!$("#users_table").length) return;
 
 	var ids = parse_path();
-	var url = "/dashboard/table_ajax/users";
+	var url = static_url+"/dashboard/table_ajax/users";
 	var context = '';
 	for(x in ids){
 		context += '/'+ids[x];
@@ -116,7 +116,7 @@ function init_collections_table(){
 	if(!$("#collections_table").length) return;
 
 //	var url = "/dashboard/collections_for_table_ajax";
-	var url = "/dashboard/table_ajax/collections";
+	var url = static_url+"/dashboard/table_ajax/collections";
 
 	var columns =  [
 		    { "data": "colId" },
@@ -136,7 +136,7 @@ function init_documents_table(){
 	if(!$("#documents_table").length) return;
 
 //	var url = "/dashboard/documents_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
-	var url = "/dashboard/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+	var url = static_url+"/dashboard/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
 
 	var ids = parse_path();	
 
@@ -156,7 +156,7 @@ function init_documents_table(){
 function init_pages_table(){
 
 //	var url = "/dashboard/pages_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
-	var url = "/dashboard/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+	var url = static_url+"/dashboard/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
 
 	var ids = parse_path();	
 
@@ -219,7 +219,9 @@ function init_datatable(table,url, columns,id_link,id_field){
 				if(data.pageNr != undefined && data.pageNr !== "n/a") //NB will break until we use base url
 					url = '/edit/correct/'+data.colId+'/'+data.docId+'/'+data.pageNr;
 				/*TODO add case for userlist links */
-				if(url) window.location.href=url;
+				if(url){
+					 window.location.href=static_url+url;
+				}
 			});
         	},
 
@@ -241,7 +243,7 @@ function init_actions_chart(){
 
 	if(!$("#actions_line").length) return;
 	ids=parse_path();
-	var url = "/dashboard/actions_for_chart_ajax";
+	var url = static_url+"/dashboard/chart_ajax/actions";
 	for(id in ids){
 		url += '/'+ids[id];
 	}
@@ -301,7 +303,7 @@ function init_pages_thumbs(){
 function get_thumbs(start,length){
 //	var url = "/dashboard/thumbnails_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
 	var ids = parse_path();	
-	var url = "/dashboard/table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
+	var url = static_url+"/dashboard/table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
 
 	$.ajax({
 	    type: 'GET',

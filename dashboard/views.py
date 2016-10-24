@@ -35,6 +35,7 @@ def index(request):
     if isinstance(action_types,HttpResponse):
         return action_types
 
+    t_log("STATIC_URL %s" % read.settings.STATIC_URL)
     return render(request, 'dashboard/homepage.html', {'action_types': action_types} )
 
 # dashboard/{colID}
@@ -217,12 +218,11 @@ def get_ts_status(x) :
 #       - TODO we'll need an entry for regular time intervals to reflect activity properly
 
 @t_login_required_ajax
-def actions_for_chart_ajax(request,collId=None,docId=None) :
+def chart_ajax(request,list_name,collId=None,docId=None,userId=None) :
 
     # When requesting data for chart we do not want this paged so nValues=-1
     # Other constraint params can be used (ids, dates etc)
-    (actions,count) = paged_data(request,"actions",{'nValues':-1, 'collId': collId, 'docId': docId})
-
+    (actions,count) = paged_data(request,list_name,{'nValues':-1, 'collId': collId, 'docId': docId, 'userid': userId})
 
     #TODO When offset/limit params can be handled by TS we can move this up to actions_data
 #    dt_params = parser.parse(request.GET.urlencode())
@@ -277,7 +277,8 @@ def actions_for_chart_ajax(request,collId=None,docId=None) :
                          'fill': False,
                          'borderColor': action_info.get(x).get('colour'),
                          'backgroundColor': action_info.get(x).get('colour'),
-                         'pointRadius': 0
+                         'pointRadius': 0,
+                         'pointHoverRadius': 5,
                          })
     return JsonResponse({
             'labels': x_data.keys(),
@@ -300,7 +301,6 @@ def actions_for_chart_ajax(request,collId=None,docId=None) :
                     'pointBorderColor': "rgba(75,192,192,1)",
                     'pointBackgroundColor': "#fff",
                     'pointBorderWidth': 1,
-                    'pointHoverRadius': 5,
                     'pointHoverBackgroundColor': "rgba(75,192,192,1)",
                     'pointHoverBorderColor': "rgba(220,220,220,1)",
                     'pointHoverBorderWidth': 2,
