@@ -66,7 +66,7 @@ function init_actions_table(){
 	if(!$("#actions_table").length) return;
 
 	var ids = parse_path();
-	var url = static_url+"dashboard/table_ajax/actions";
+	var url = static_url+"/dashboard/table_ajax/actions";
 
 	var context = '';
 	for(x in ids){
