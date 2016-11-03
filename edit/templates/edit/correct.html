@@ -60,6 +60,8 @@
 	];
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
 	
+	var previousInnerWidth = window.innerWidth;
+	
 	$("a[data-target=#saveChanges]").click(function(event) {
     	event.preventDefault();
     	$.post(window.location.href, {content: getContent(), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {//getContent()
@@ -105,7 +107,7 @@
 		initialWidth = $('#transcriptImage').width();
 		scrollFactor = initialWidth / $('#transcriptImage').get(0).naturalWidth;
 		transcriptDivHeightString = $( ".transcript-div" ).css("height");
-		$( ".modal-dialog" ).css("width", initialWidth + 'px');
+		$( ".modal-dialog" ).css("width", initialWidth*0.8 + 'px');
 		resetCanvas();
 	});
 	$('area').mouseenter(function(e) {
@@ -169,6 +171,15 @@
         	fillColor: 'ffffff',
         	fillOpacity: 0   
         }
+	});
+	$(window).resize(function(){
+		console.log("old: " + previousInnerWidth);
+		console.log("current. " + window.innerWidth);
+	   	var widthFactor = window.innerWidth/previousInnerWidth;
+	   	console.log("resizing with factor: " + widthFactor);
+	    previousInnerWidth = window.innerWidth;
+	    $( ".modal-dialog" ).css("width", parseInt($( ".modal-dialog" ).css("width"))*widthFactor + 'px');
+	    $( ".modal" ).css("left", parseInt($( ".modal" ).css("left"))*widthFactor + 'px');
 	});
 </script>
 
