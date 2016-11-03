@@ -15,6 +15,10 @@ class RegisterForm(forms.Form):
 class IngestMetsUrlForm(forms.Form):
     url = forms.URLField(label='METS XML file URL')
 
+class QuickIngestMetsUrlForm(forms.Form):
+    url = forms.CharField(widget=forms.HiddenInput())
+    return_url = forms.CharField(widget=forms.HiddenInput())
+
 class CollectionForm(forms.Form):
     collection_name = forms.CharField(label=_('Collection Name'), max_length=100)
 
