@@ -45,6 +45,7 @@ class TranskribusBackend(object):
                 tsdata = TSData.objects.create(user=user)
             tsdata.gender=t_user['gender']
             tsdata.affiliation=t_user['affiliation']
+            tsdata.userId=t_user['userId']
 
             ######
             # If we have some local user data that we need to update dependent on whatever TS-REST returns do so here
