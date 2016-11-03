@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^collections_dropdown$', views.collections_dropdown, name='collections_dropdown'),
     url(r'^ingest_mets_xml$', views.ingest_mets_xml, name='ingest_mets_xml'),
     url(r'^ingest_mets_url$', views.ingest_mets_url, name='ingest_mets_url'),
-
+    url(r'^quick_ingest_mets_url$', views.quick_ingest_mets_url, name='quick_ingest_mets_url'),
 
     url(r'^collections$', views.collections, name='collections'),
     url(r'^collection/([\-0-9]+)$', views.collection, name='collection'),
