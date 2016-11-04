@@ -94,8 +94,8 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     t_log("TRANSKRIBUS REQUEST: %s" % url)
     if method == 'POST' :
         r = s.post(url, params=params, verify=False, headers=headers)
-
-    r = s.get(url, params=params, verify=False, headers=headers)
+    else:
+        r = s.get(url, params=params, verify=False, headers=headers)
 
     #Check to see if we are still authenticated...
     try:
@@ -336,6 +336,18 @@ def t_transcript_handler(r,params=None):
     t_transcript['tsId'] = params.get('transcriptId')
     return t_transcript
 
+def t_transcript_xml(request,transcriptId,url):
+    t_id = "transcript_xml"
+    headers = {'content-type': 'application/xml'}
+    params = {}
+    return t_request(request,t_id,url,params,headers,{'transcriptId': transcriptId})
+
+def t_transcript_xml_handler(r,params=None):
+    return r.text
+
+def t_create_collection_handler(r, params=None):
+    return r.status_code == requests.codes.ok
+
 # t_metadata moved to utils
 
 ####################################
@@ -355,7 +367,10 @@ def t_save_transcript(request, transcript_xml, collId, docId, page):
 
     return None
 
-
+def t_download_mets_xml(mets_url):
+    r = s.get(mets_url)
+    # TODO Consider returning some "document name" or such to enable the user to verify the document title...? 
+    return r.text 
 
 def t_ingest_mets_xml(collId, mets_file):
 
@@ -377,18 +392,18 @@ def t_ingest_mets_url(collId, mets_url):
 
     sys.stdout.write("Ingesting document from METS XML file URL: %s%% \r\n" % (mets_url) )
     sys.stdout.flush()
+    if (r.status_code == requests.codes.ok):
+        return True
+    else:
+        sys.stdout.write("ERROR CODE: %s%% \r\n ERROR: %s%%" % (r.status_code, r.text) )
+        sys.stdout.flush()
+        return None
 
-    return r.status_code == requests.codes.ok
-
-def t_create_collection(collection_name):
+def t_create_collection(request, collection_name):
     url = settings.TRP_URL+'collections/createCollection'
     params = {'collName': collection_name}
-    r = s.post(url, params=params, verify=False)
-
-    sys.stdout.write("Response to create collection: %s  \r\n" % (r.status_code) )
-    sys.stdout.flush()
-
-    return r.status_code == requests.codes.ok
+    headers = {'content-type': None}
+    return t_request(request, t_id, url, method='POST', params=params, headers=headers)
 
 def t_jobs(status = ''):
     url = settings.TRP_URL+'jobs/list'
