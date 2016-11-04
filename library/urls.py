@@ -26,9 +26,7 @@ urlpatterns = [
     url(r'^transcript/([\-0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)$', views.transcript, name='transcript'),
     url(r'^region/([\-0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([\w-]+)$', views.region, name='region'), #TODO improve regionId regex?
     url(r'^line/([\-0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([\w-]+)/([\w-]+)$', views.line, name='line'), #TODO as above...
-    #oh no he di'nt
     url(r'^word/([\-0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([\w-]+)/([\w-]+)/([\w-]+)$', views.word, name='word'), #TODO as above...
-    #oh yes he di'
     url(r'^rand/([\-0-9]+)/(word|line|region|transcript|document)$', views.rand, name='rand'),
 
     url(r'^error$', views.error, name='error'),

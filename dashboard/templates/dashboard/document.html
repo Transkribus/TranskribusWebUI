@@ -3,46 +3,38 @@
 
 {% block content %}
 
-<h1>{{collection.colName}}</h1>
+<h1>{{document.title}}</h1>
 
-<h2>Last activity {{collection.colName}}</h2>
+<h2>Last activity {{document.title}}</h2>
 
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
 
 <div class="container">
 
-<h2>Activities for {{collection.colName}}</h2>
+<h2>Activities for {{document.title}}</h2>
 
   {% include "dashboard/actions_table.html" with action_types=action_types %}
 
 </div>
-
+{%comment%}
+<!-- Pages table -->
 <div class="container">
-
-<h2>Documents in {{collection.colName}}</h2>
-
-  {% include "dashboard/documents_table.html" %}
-
+<h2>Pages in {{document.title}}</h2>
+  {% include "dashboard/pages_table.html" with pages=pages %}
 </div>
+{%endcomment%}
 
-<div class="container">
-
-<h2>Users in {{collection.colName}}</h2>
-
-  {% include "dashboard/users_table.html" %}
-
-</div>
+<div class="container" id="pages_thumbnail_grid"></div>
 
 <div class="container">
 	<div class="row">
 		<div class="col-md-12" id="actions_chart">
-		<h3>Activity for {{collection.colName}}</h3>
+		<h3>Activity for {{document.title}}</h3>
 		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-8">
-		<h3>Activity for {{collection.colName}}</h3>
-		<canvas id="top_users_bar" class="chart_canvas" width="400" height="200"></canvas>
+		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
 		</div>
 		<div class="col-md-4">
 		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>

@@ -59,10 +59,10 @@
 		{% endfor %}
 	];
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
-	
+
 	var previousInnerWidth = window.innerWidth;
 	
-	$("a[data-target=#saveChanges]").click(function(event) {
+	$("a[data-target='#saveChanges']").click(function(event) {
     	event.preventDefault();
     	$.post(window.location.href, {content: getContent(), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {//getContent()
     		setMessage(data);

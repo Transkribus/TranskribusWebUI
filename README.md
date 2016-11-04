@@ -68,6 +68,7 @@ Alias /static/ /path/to/TranskribusWebUI/static/
 </Directory>
 
 ```
+Run "python manage.py collectstatic" in "/path/to/TranskribusWebUI".
 Restart httpd and check if everything works.
 
 ### Internationalisation

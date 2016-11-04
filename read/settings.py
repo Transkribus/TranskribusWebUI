@@ -159,9 +159,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
+
+STATIC_ROOT = 'static'
 
 STATIC_ROOT = 'static'
 
@@ -184,9 +185,10 @@ STATICFILES_DIRS = [
 
 # This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'profile'
+LOGIN_REDIRECT_URL = 'dashboard'
 #UseCDNS for libs or static versions
-USE_CDNS = False
+PAGE_SIZE_DEFAULT = 5
+USE_CDNS = True
 CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" },
        'bootstrap_js' : {'local': "/static/js/bootstrap.min.js", 'cdn' : "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"},
        'datatables_css' : {'local': "/static/css/jquery.dataTables.min.css", 'cdn': "//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"},
@@ -194,6 +196,7 @@ CDNS = {'bootstrap_css' : {'local': "/static/css/bootstrap.min.css", 'cdn' : "//
        'jquery' : {'local' : "/static/js/jquery.js", 'cdn': "//code.jquery.com/jquery-1.12.3.js" },
        'jquery_ui' : {'local' : "/static/js/jquery-ui.min.js", 'cdn': "//code.jquery.com/ui/1.12.1/jquery-ui.min.js" },
        'jquery_ui_css' : {'local' : "/static/css/jquery-ui.css", 'cdn' : "//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" },
+       'chart_js' : {'local': "/static/js/Chart.bundle.min.js", 'cdn': "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"},
 
       }
 
@@ -208,10 +211,3 @@ AUTHENTICATION_BACKENDS = [
 TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
-
-#NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
-#NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
-
-#not used...
-ADMIN_LOGIN = 'admin'
-ADMIN_PASSWORD = 'norsun'

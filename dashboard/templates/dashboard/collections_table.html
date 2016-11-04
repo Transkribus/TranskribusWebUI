@@ -1,15 +1,22 @@
 {% load i18n %}
 
-	<p>You are a member of the following {{ collections|length }} collections:</p>
+<p>You are a member of the following <span id="collections_table_count"></span> collections:</p>
 
-		 <table class="table table-striped display" id="collections_table">
-		   <thead>
-	  		<tr><th>{% trans "ID" %}</th><th>{% trans "Collection" %}</th><th>{% trans "Description" %}</th><th>{% trans "Role" %}</th></tr>
-		   </thead>
-		   <tbody>
-		     {% for coll in collections %}
-	  		<tr><td>{{ coll.colId }}</td><td><a href="{% url 'collection' coll.colId %}">{{ coll.colName }}</a></td><td>{{ coll.description }}</td><td>{{ coll.role }}</td></tr>
-		     {% endfor %}
-		   </tbody>
-		</table>
-
+ <table class="table table-striped display" id="collections_table">
+   <thead>
+	<tr>
+		<th>{% trans "ColId" %}</th>
+		<th>{% trans "Collection" %}</th>
+		<th>{% trans "Description" %}</th>
+		<th>{% trans "Role" %}</th>
+	</tr>
+   </thead>
+   <tbody>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+   </tbody>
+</table>

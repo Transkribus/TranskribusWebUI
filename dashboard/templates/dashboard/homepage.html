@@ -1,4 +1,4 @@
-{% extends "navi_base.html" %}
+{% extends "dashboard/navi_base.html" %}
 {% load i18n %}
 
 {% block content %}
@@ -10,92 +10,71 @@
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
 
+<div class="container">
+
 <h2>Your activities:</h2>
 
-<div class="container">
- <div class="row">
-  <div class="form-inline">
-	  <div class="form-group">
-		  <label for="start_date">Start:</label>
-		  <input type="text" id="start_date"/>
-	  </div>
-	  <div class="form-group">
-		  <label for="end_date">End:</label>
-		  <input type="text" id="end_date"/>
-	  </div>
-  </div>
- </div>
- <div class="row col-md-6">
-  <div id="slider-range"></div>
- </div>
- <div class="row">
- <table class="table table-striped display" id="actions_table">
-   <thead>
-	<tr>
-		<th>{% trans "Time" %}</th>
-		<th class="select-filter">{% trans "Collection" %}</th>
-		<th>{% trans "Document ID" %}</th>
-		<th>{% trans "Page ID" %}</th>
-		<th>{% trans "Username" %}</th>
-		<th class="select-filter">{% trans "Operation" %}</th>
-	</tr>
-   </thead>
-   <tfoot>
-	<tr>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th></th>
-	</tr>
-   </tfoot>
-</table>
-<!-- TODO use types from TSREST  -->
-{% for at in action_types %}
-	<button class="btn btn-default table_filter" id="filter_{{at.type}}" value="{{at.id}}">{{at.type}}</button>
-{% endfor %}
-<button class="btn btn-default table_filter" id="filter_clear" value="">X</button>
- </div>
+  {% include "dashboard/actions_table.html" with action_types=action_types%}
+
 </div>
 
+<div class="container">
+
 <h2>My Collections</h2>
-<!-- TODO make this an ajax data table and make use of paging facilities 
-index
-nValues
-sortColumn
-sortDirection
--->
 
-{% comment %}
-{% include "dashboard/collections_table.html" with collections=collections %}
-{% endcomment %}
+{% include "dashboard/collections_table.html" %}
 
-<p>You are a member of the following {{ collections|length }} collections:</p>
+</div>
 
- <table class="table table-striped display" id="collections_table">
-   <thead>
-	<tr>
-		<th>{% trans "ColId" %}</th>
-		<th>{% trans "Collection" %}</th>
-		<th>{% trans "Description" %}</th>
-		<th>{% trans "Role" %}</th>
-	</tr>
-   </thead>
-   <tbody>
-	<tr>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-	</tr>
-   </tbody>
-</table>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12" id="actions_chart">
+		<h3>Your overall activity</h3>
+		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
+		</div>
+		<div class="col-md-8">
+		<h3>User activity</h3>
+		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
+		</div>
+		<div class="col-md-4">
+		<h3>Status</h3>
+		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
+		</div>
+	</div>
+</div>
+<script>
+var ctx = document.getElementById("status_pie");
+var myChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ["New", "In progress", "Complete", "Published"],
+        datasets: [{
+            label: 'Status',
+            data: [12, 19, 3, 5],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+	 title: {
+		    display: true,
+		    text: 'Document statuses'
+		}
+    }
+});
+</script>
 
-<pre>
-Graph here
-</pre>
-
-<button>Nbre of Jobs by type / ingesting</button>
+<!--<button>Nbre of Jobs by type / ingesting</button>-->
 
 {% endblock %}

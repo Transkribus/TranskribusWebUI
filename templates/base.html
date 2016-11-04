@@ -41,8 +41,11 @@
     <script src="{% static "js/jquery.fancytree-all.min.js" %}"></script>
     <!-- Data tables -->
     <script src="{{ "datatables_js"|load_lib }}"></script>
+    <!-- Chart.js -->
+    <script src="{{ "chart_js"|load_lib }}"></script>
     <!-- Local JS -->
     <script src="{% static "js/read.js" %}"></script>
+	<script language="javascript">var static_url = "{{ STATIC_URL|escapejs }}";</script>
 	<!--- Only needed when logged in -->
 	{% if user.is_authenticated %}
 	    <script>
