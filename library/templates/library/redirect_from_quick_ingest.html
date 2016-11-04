@@ -1,0 +1,18 @@
+{% extends "library/navi_base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+				{% trans "Your document is being processed." %}
+            </h1>
+			<p>{% trans "You're being redirected to where you came from." %}</p>
+			TODO JavaScript with some countdown!? {{ return_url}}
+    		</div>
+	</div>
+</div>
+
+{% endblock %}
