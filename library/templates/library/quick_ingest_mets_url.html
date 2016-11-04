@@ -1,0 +1,32 @@
+{% extends "library/navi_base.html" %}
+{% load i18n %}
+
+{% load bootstrap3 %}
+{% load staticfiles %}
+{% block content %}
+
+<!-- Page Content -->
+<div class="container">
+    <!-- Marketing Icons Section -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                {% trans "Quick Ingest METS XML URL" %}
+            </h1>
+		    <div class="col-lg-8">
+				{% trans "Collection Name" %}: {{ collectionName }}
+		    	<form action="quick_ingest_mets_url" method="post" role="form">
+				    {% csrf_token %}
+				    {% bootstrap_form quick_ingest_mets_url_form %}
+		        	{% include "library/collections_dropdown.html"  %}
+		            {% include "library/create_collection_modal.html" %}
+				    <input class="btn btn-large btn-primary" type="submit" value="Submit" />
+				</form>
+		    </div>         
+		</div>
+	</div>
+</div>
+
+<div id="messages"></div>
+
+{% endblock %}
