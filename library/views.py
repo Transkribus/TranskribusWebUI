@@ -23,7 +23,7 @@ from read.services import *
 #Imports from app (library)
 import library.settings
 from . import navigation
-from .forms import RegisterForm, IngestMetsUrlForm, MetsFileForm
+from .forms import RegisterForm, IngestMetsUrlForm, MetsFileForm, QuickIngestMetsUrlForm
 
 #from profiler import profile #profile is a decorator, but things get circular if I include it in decorators.py so...
 
@@ -670,6 +670,20 @@ def ingest_mets_url(request):
         return render(request, 'library/ingest_mets_url.html', {'ingest_mets_url_form': ingest_mets_url_form, 'collections': collections})
 
 @t_login_required
+def quick_ingest_mets_url(request):
+    if request.method == 'POST':
+        if (t_ingest_mets_url(request.POST.get('collection'), request.POST.get('url'))):
+            return render(request, 'library/redirect_from_quick_ingest.html', {'return_url': request.POST.get('return_url', '')})
+        else:
+            return render(request, 'library/redirect_from_quick_ingest.html', {'return_url': request.POST.get('return_url', '')})
+    else:
+        data = {'url': request.GET.get('metsURL', ''), 'return_url': request.GET.get('returnURL', '')}
+        t_log('url %s' % data)
+        quick_ingest_mets_url_form = QuickIngestMetsUrlForm(initial=data)
+        collections = collections = t_collections(request)
+        return render(request, 'library/quick_ingest_mets_url.html', {'quick_ingest_mets_url_form': quick_ingest_mets_url_form, 'collections': t_collections(request)})
+
+@t_login_required
 def collections_dropdown(request):
     collections = t_collections(request)
     if isinstance(collections,HttpResponse):
@@ -678,10 +692,10 @@ def collections_dropdown(request):
 
 @t_login_required
 def create_collection_modal(request):
-    if (t_create_collection(request.POST.get('collection_name'))):
+    if (t_create_collection(request, request.POST.get('collection_name'))):
         return HttpResponse("New collection created successfully!", content_type="text/plain")
-    #else:
-           # TODO Handle failures...
+    else:
+        t_log("couldn't create collection because (reasons?)")
 
 @t_login_required
 def jobs_list(request):
