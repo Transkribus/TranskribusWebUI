@@ -27,10 +27,6 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
     def wrapper(request, *args, **kw):
         if request.user.is_authenticated():
 
-             #Not this (thanks Berthold!)
-#            if not t_refresh():
-#                return HttpResponseRedirect('/logout/?next='+request.get_full_path())
-
             #setting collections data as a session var if not already set
             if "collections" not in request.session or request.session['collections'] is None:
                 resp = t_collections(request)
@@ -43,8 +39,9 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
             try:
                 response = function(request, *args, **kw)
             except requests.exceptions.HTTPError as e:
-                if e.status_code not in (401, 403):
-                    raise e
+                t_log(e)
+#                if e.status_code not in (401, 403):
+#                    raise e
                 response = HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
 
             return response

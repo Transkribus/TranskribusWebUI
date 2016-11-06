@@ -9,37 +9,54 @@
 
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
-
 <div class="container">
 
-<h2>Activities for {{document.title}}</h2>
+ <h2>Activities for {{document.title}}</h2>
 
-  {% include "dashboard/actions_table.html" with action_types=action_types %}
+   {% include "dashboard/date_input.html" %}
 
 </div>
-{%comment%}
-<!-- Pages table -->
-<div class="container">
-<h2>Pages in {{document.title}}</h2>
-  {% include "dashboard/pages_table.html" with pages=pages %}
+
+<div class="panel">
+ 
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#a_table" aria-controls="home" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#a_chart_doc" aria-controls="profile" role="tab" data-toggle="tab">All activities</a></li>
+    <li role="presentation"><a href="#a_chart_me" aria-controls="profile" role="tab" data-toggle="tab">Your activities</a></li>
+    <li class="dropdown">
+	<a href="#" data-toggle="dropdown">Activities for... <span class="caret"></span></a>
+	<ul class="dropdown-menu" role="menu" id="user_list">
+	    <li><a href="#user_list_panel" data-toggle="tab">Default 4</a></li>
+	</ul>
+    </li>
+    <li role="presentation"><a href="#a_top_users" aria-controls="profile" role="tab" data-toggle="tab">Most Active Users</a></li>
+
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="a_table">
+	   {% include "dashboard/actions_table.html" with action_types=action_types%}
+    </div>
+    <div role="tabpanel" class="tab-pane" id="a_chart_doc">
+	   <canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="a_chart_me">
+	   <canvas id="user_actions_line" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="user_list_panel">
+	   <canvas id="user_actions_line_x" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="a_top_users">
+	   <canvas id="top_users" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+  </div> <!-- end .tab-content -->
+
 </div>
-{%endcomment%}
+
 
 <div class="container" id="pages_thumbnail_grid"></div>
 
-<div class="container">
-	<div class="row">
-		<div class="col-md-12" id="actions_chart">
-		<h3>Activity for {{document.title}}</h3>
-		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
-		</div>
-		<div class="col-md-8">
-		<canvas id="_bar" class="chart_canvas" width="400" height="200"></canvas>
-		</div>
-		<div class="col-md-4">
-		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
-		</div>
-	</div>
-</div>
 
 {% endblock %}

@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 #from django.contrib.auth.models import User
 import datetime
 import dateutil.parser
+import functools
 import collections
 
 
@@ -95,6 +96,21 @@ def d_document(request,collId,docId):
 
         } )
 
+# dashboard/u/{userId} is the dashboard for that user. Will show actions, collections and metrics for that user, can only be accessed by collection owners (editors?)
+@t_login_required
+def d_user(request,username):
+
+    t_log("##################### USERNAME: %s " % username)
+    
+    user = t_user(request,{'user' : username}) #TODO use url encoding...
+    t_log("##################### USER: %s " % user)
+    action_types = t_actions_info(request)
+    if isinstance(action_types,HttpResponse):
+        return action_types
+
+    return render(request, 'dashboard/user.html', {'action_types': action_types, 'user' : user} )
+
+
 ##########
 # Helpers
 ##########
@@ -127,14 +143,19 @@ def paged_data(request,list_name,params=None):#collId=None,docId=None):
     if 'columns' in dt_params and list_name == "actions" and dt_params.get('columns').get(5).get('search').get('value'):
         params['typeId'] = int(dt_params.get('columns').get(5).get('search').get('value'))
 
+    ########### EXCEPTION ############
+    # docId is known as id when passed into actions/list as a parameter
+    if  list_name == 'actions' : params['id'] = params['docId']
+    ##################################
+
     #Get data
     t_log("SENT PARAMS: %s" % params)
     data = eval("t_"+list_name+"(request,params)")
 
     #Get count
     count=None
-    #stupid awkward special cases don't have count calls (yet)
-    if list_name not in ["actions", "fulldoc"]:
+    #When we call a full doc we *probably* want to count the pages (we can't fo that with a /count call)
+    if list_name not in ["fulldoc"]:
         count = eval("t_"+list_name+"_count(request,params)")
     #In some cases we can derive count from data (eg pages from fulldoc)
     if list_name == "fulldoc" : #as we have the full page list in full doc for now we can use it for a recordsTotal
@@ -148,10 +169,10 @@ def paged_data(request,list_name,params=None):#collId=None,docId=None):
 # data as data, this is designed for consumption by dataTables.js
 
 @t_login_required_ajax
-def table_ajax(request,list_name,collId=None,docId=None) :
+def table_ajax(request,list_name,collId=None,docId=None,userId=None) :
 
     t_list_name=list_name
-    params = {'collId': collId, 'docId': docId}
+    params = {'collId': collId, 'docId': docId, 'userid' : userId} #userid can only be used to filter in context of a collection
     ####### EXCEPTION #######
     # list_name is pages we extract this from fulldoc
     if list_name == 'pages' :
@@ -160,11 +181,6 @@ def table_ajax(request,list_name,collId=None,docId=None) :
     #########################
 
     (data,count) = paged_data(request,t_list_name,params)
-
-    ####### EXCEPTION #######
-    # no actions/count
-    if list_name == 'actions' : count = len(data)
-    ###########################
 
    #TODO pass back the error not the redirect and then process the error according to whether we have been called via ajax or not....
     if isinstance(data,HttpResponse):
@@ -218,27 +234,107 @@ def get_ts_status(x) :
 #       - TODO we'll need an entry for regular time intervals to reflect activity properly
 
 @t_login_required_ajax
-def chart_ajax(request,list_name,collId=None,docId=None,userId=None) :
+def chart_ajax(request,list_name,chart_type,collId=None,docId=None,userId=None,subject=None,label=None) :
 
     # When requesting data for chart we do not want this paged so nValues=-1
     # Other constraint params can be used (ids, dates etc)
-    (actions,count) = paged_data(request,list_name,{'nValues':-1, 'collId': collId, 'docId': docId, 'userid': userId})
+    (data,count) = paged_data(request,list_name,{'nValues':-1, 'collId': collId, 'docId': docId, 'userid': userId})
 
-    #TODO When offset/limit params can be handled by TS we can move this up to actions_data
-#    dt_params = parser.parse(request.GET.urlencode())
-#    length = int(dt_params.get('length')) if dt_params.get('length') else 5
-#    start = int(dt_params.get('start')) if dt_params.get('start') else 0
-    ##############################
+    if isinstance(data,HttpResponse):
+        t_log("data request has failed... %s" % data)
+        #For now this will do but there may be other reasons the transckribus request fails... (see comment above)
+        return HttpResponse('Unauthorized', status=401)
+    return eval(chart_type+"(data,subject,label)")
+
+#plot bar for the X number of Y with greatest number of (activity) records
+def top_bar(data,subject,label=None,chart_size=None):
+
+    #map just the users to list
+#    just_subject = list(set(isolate_data(data,'userName')))
+#    just_userids = list(set(isolate_data(data,'userId')))
+
+#    t_log("JUST_SUBJECT: %s" % just_subject)
+    if chart_size is None : chart_size = read.settings.PAGE_SIZE_DEFAULT
+    t_log("*subject: %s label: %s" % (subject,label))
+
+    actions = {}
+    labels = {}
+    for datum in data:
+        subject_value = datum.get(subject)
+	if subject_value is None : continue
+
+        #we can maintain labels separate to subjects 
+        # (eg we can use colId to key/sort data and colName when displaying... protects agains duplicate colNames cumulating
+        label_value = datum.get(label)
+        if subject_value not in labels and label_value is not None:
+            labels[subject_value] = label_value
+        #use subject value in case there is no value for the label
+        if label_value is None: 
+            labels[subject_value] = subject_value
+
+        #accumulate the data
+        if subject_value not in actions :
+            actions[subject_value]=0
+        else:
+            actions[subject_value]+=1
+
+    action_data = actions.values()
+    key_data = actions.keys()
+
+    chart_data=[]
+    chart_labels=[]
+    chart_label_ids=[]
+    #This bit will retrun the index of the 5/chart_size subjects with the highest value in actions_data
+    ind_arr = sorted(range(len(action_data)), key=lambda i: action_data[i], reverse=True)[:chart_size]
+    for ind in ind_arr : 
+        chart_data.append(action_data[ind])
+        chart_labels.append(labels[key_data[ind]])
+        chart_label_ids.append(key_data[ind])
+
+
+    #TODO dynamically process colours...
+    return JsonResponse({
+            'labels': chart_labels,	
+	    'label_ids': chart_label_ids,
+            'datasets' : [{
+		 #      'label' : "Top users by activity",
+		       'borderWidth': 1,
+		       'backgroundColor': [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+			    ],
+			'borderColor': [
+				'rgba(255,99,132,1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+			    ],
+            	       'data': chart_data,
+			}]
+        },safe=False)
+
+
+#plot the (activites) data against time as a line
+#subject and label not used here (yet)
+def line(data,subject=None,label=None):
+    
     action_info = {
                   1 : {'label' : 'Save' ,'colour': 'rgba(255,99,132,1)'},
                   2 : {'label' : 'Login', 'colour': 'rgba(54, 162, 235, 1)'},
                   3 : {'label' : 'Status change' , 'colour' :'rgba(255, 206, 86, 1)'},
                   4 : {'label' : 'Access document', 'colour' : 'rgba(75, 192, 192, 1)'},
                 }
+    if(len(data) == 0) :
+        return JsonResponse({'labels': [],'datasets' : []},safe=False)
 
     #map just the times to list
-    just_times = map(get_times, actions)
-    just_types = list(set(map(get_types, actions))) #unique types
+    just_times = isolate_data(data,'time')
+    just_types = list(set(isolate_data(data,'typeId'))) #unique types
+
     #get max and min
     max_time = max(just_times)
     min_time = min(just_times)
@@ -261,9 +357,9 @@ def chart_ajax(request,list_name,collId=None,docId=None,userId=None) :
         type_id =just_types.pop()
         types[type_id] = x_data.copy()
     #assign/increment values based on actions, we do this by type_id to the types dict
-    for action in actions:
-        d = dateutil.parser.parse(action.get("time")).date()
-        type_id = action.get("typeId")
+    for datum in data:
+        d = dateutil.parser.parse(datum.get("time")).date()
+        type_id = datum.get("typeId")
         if d in types[type_id] : types[type_id][d] = types[type_id][d]+1
 
     #now we put shake it all out into datasets for chart.js
@@ -285,37 +381,12 @@ def chart_ajax(request,list_name,collId=None,docId=None,userId=None) :
             'datasets' : datasets
         },safe=False)
 
-    '''
-            'labels': ["January", "February", "March", "April", "May", "June", "July"],
-            'datasets': [
-                {
-                    'label': "My First dataset",
-                    'fill': 'false',
-                    'lineTension': 0.1,
-                    'backgroundColor': "rgba(75,192,192,0.4)",
-                    'borderColor': "rgba(75,192,192,1)",
-                    'borderCapStyle': 'butt',
-                    'borderDash': [],
-                    'borderDashOffset': 0.0,
-                    'borderJoinStyle': 'miter',
-                    'pointBorderColor': "rgba(75,192,192,1)",
-                    'pointBackgroundColor': "#fff",
-                    'pointBorderWidth': 1,
-                    'pointHoverBackgroundColor': "rgba(75,192,192,1)",
-                    'pointHoverBorderColor': "rgba(220,220,220,1)",
-                    'pointHoverBorderWidth': 2,
-                    'pointRadius': 1,
-                    'pointHitRadius': 10,
-                    'data': [65, 59, 80, 81, 56, 55, 40],
-                    'spanGaps': 'false',
-                }
-            ]
-      '''
-def get_times(x) :
-    return x.get('time')
+def isolate_data(data,field) :
+    return map(functools.partial(get_item, f=field), data)
 
-def get_types(x) :
-    return x.get('typeId')
+#I would do this anonymously in map, but not sure how...
+def get_item(x,f) :
+    return x.get(f)
 
 
 def filter_data(fields, data) :

@@ -9,14 +9,36 @@
 
 <p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
 
-
 <div class="container">
 
-<h2>Activities for {{collection.colName}}</h2>
+ <h2>Activities for {{collection.colName}}</h2>
 
-  {% include "dashboard/actions_table.html" with action_types=action_types %}
+   {% include "dashboard/date_input.html" %}
 
 </div>
+
+<div class="panel">
+ 
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Chart</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+	   {% include "dashboard/actions_table.html" with action_types=action_types%}
+    </div>
+    <div role="tabpanel" class="tab-pane" id="profile">
+	   <canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="messages">messages</div>
+    <div role="tabpanel" class="tab-pane" id="settings">settings</div>
+  </div>
+
+</div>
+
 
 <div class="container">
 
@@ -32,22 +54,6 @@
 
   {% include "dashboard/users_table.html" %}
 
-</div>
-
-<div class="container">
-	<div class="row">
-		<div class="col-md-12" id="actions_chart">
-		<h3>Activity for {{collection.colName}}</h3>
-		<canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
-		</div>
-		<div class="col-md-8">
-		<h3>Activity for {{collection.colName}}</h3>
-		<canvas id="top_users_bar" class="chart_canvas" width="400" height="200"></canvas>
-		</div>
-		<div class="col-md-4">
-		<canvas id="status_pie" class="chart_canvas" width="200" height="200"></canvas>
-		</div>
-	</div>
 </div>
 
 {% endblock %}

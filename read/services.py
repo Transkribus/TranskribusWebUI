@@ -142,6 +142,7 @@ def t_login(user, pw):
 
     return xmltodict.parse(r.text).get('trpUserLogin')
 
+# NOT currently used
 def t_user_data_handler(r,params=None):
     return xmltodict.parse(r.text).get('trpUserLogin')
 
@@ -246,6 +247,17 @@ def t_users(request,params=None):
 
 def t_users_handler(r,params=None):
     return json.loads(r.text)
+
+#t_user (by username... yuk!)
+def t_user(request,params=None):
+    url = settings.TRP_URL+'user/findUser'	
+    t_id = "user"
+    headers = {'content-type': 'application/x-www-form-urlencoded'}
+
+    return t_request(request,t_id,url,params,'GET',headers)
+
+def t_user_handler(r,params=None): 
+    return xmltodict.parse(r.text).get('trpUsers').get('trpUser')
 
 def t_collection(request,params):
     url = settings.TRP_URL+'collections/'+str(params.get('collId'))+'/list'

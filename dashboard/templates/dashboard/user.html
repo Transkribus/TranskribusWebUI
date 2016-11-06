@@ -1,0 +1,57 @@
+{% extends "dashboard/navi_base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<span id="userid" data-userid="{{user.userId}}"/>
+
+<h1>COLLECTIONS</h1>
+
+<h2>Last activity (on any of owned collections?)</h2>
+
+<p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
+
+
+<div class="container">
+
+ <h2>Activities for {{user.firstname}} {{user.lastname}}:</h2>
+
+   {% include "dashboard/date_input.html" %}
+
+</div>
+
+
+<div class="panel">
+ 
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#a_table" aria-controls="a_table" role="tab" data-toggle="tab">{{user.firstname}}'s activities</a></li>
+    <li role="presentation"><a href="#a_chart" aria-controls="a_chart" role="tab" data-toggle="tab">{{user.firstname}}'s activities chart</a></li>
+    <li role="presentation"><a href="#top_coll" aria-controls="top_coll" role="tab" data-toggle="tab">{{user.firstname}}'s most active collections</a></li>
+
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="a_table">
+	   {% include "dashboard/actions_table.html" with action_types=action_types%}
+    </div>
+    <div role="tabpanel" class="tab-pane" id="a_chart">
+	   <canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="top_coll">
+	   <canvas id="top_collections" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<div class="container">
+
+<h2>My Collections</h2>
+
+{% include "dashboard/collections_table.html" %}
+
+</div>
+
+{% endblock %}
