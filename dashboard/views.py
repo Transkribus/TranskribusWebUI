@@ -53,7 +53,7 @@ def index(request):
 @t_login_required
 def d_collection(request,collId):
     #Avoid this sort of nonsense if possible
-    collections = t_collections(request)
+    collections = t_collections(request,{'end':None,'start':None})
     if isinstance(collections,HttpResponse):
         return collections
 
@@ -356,6 +356,11 @@ def line(data,subject=None,label=None):
     while just_types:
         type_id =just_types.pop()
         types[type_id] = x_data.copy()
+    #fill in null cases TODO merge this wirh above
+    for type_id in action_info:
+        if type_id not in types:
+            types[type_id] = x_data.copy()
+
     #assign/increment values based on actions, we do this by type_id to the types dict
     for datum in data:
         d = dateutil.parser.parse(datum.get("time")).date()

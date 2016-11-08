@@ -12,6 +12,8 @@ $(document).ready(function(){
 });
 
 var data_cache = {};
+var charts = {};
+
 
 
 $(document).ready(function(){
@@ -34,6 +36,8 @@ $(document).ready(function(){
 	init_documents_table();
 //	init_pages_table();
 	init_pages_thumbs();
+
+	init_chart_filters();
 });
 function init_date_inputs(actions_table){
 
@@ -358,14 +362,25 @@ function init_chart(canvas_id,url,chart_type){
 		else
 			Chart.defaults.global.legend.display = true;
 
-		var chart = new Chart(document.getElementById(canvas_id).getContext('2d'), {
+		charts[canvas_id] = new Chart(document.getElementById(canvas_id).getContext('2d'), {
 		    type: chart_type,
 		    data: data,
+/* options: {
+        legend: {
+            onClick : function(event, legendItem)  { console.log("legend clicked\n")}
+        }
+    }
+*/
  		});
+
+
 		$("#"+canvas_id).on("click",
 		    function(e){
-		        //var activePoints = myNewChart.getSegmentsAtEvent(evt);
-		        activeElement = chart.getElementAtEvent(e);
+			//where appropriate we can navigate by clicking on chart bar/lines/segmments
+			//only tested for collection bars presently
+			var chart =  charts[canvas_id];
+	        
+			activeElement = chart.getElementAtEvent(e);
 			if(activeElement[0] == undefined) return; //not clicked on a dataset
 			var clicked_value = data.datasets[activeElement[0]._datasetIndex].data[activeElement[0]._index];
 			var clicked_label = data.labels[activeElement[0]._index];
@@ -388,7 +403,33 @@ function init_chart(canvas_id,url,chart_type){
 
 	    }
 	});
+
 }	
+function init_chart_filters(){
+
+	$(".table_filter").on("click", function(){
+		active_canvas = $(".tab-pane.active > canvas").attr("id");
+		console.log("table_filter CLICKED",active_canvas);
+
+		if($("#"+active_canvas).length==0) return false;
+
+		var chart =  charts[active_canvas];
+		console.log("table_filter CLICKED",chart);
+		console.log("table_filter CLICKED", chart.config.data);
+		console.log("table_filter CLICKED", chart.config.options.legend.onClick);
+		console.log($(this).val())
+		dataset_n = $(this).val();
+		var n=dataset_n,i=chart,a=i.getDatasetMeta(n);
+		console.log("A: ",a);
+		//TODO the val() from the button needs to be -1
+		//TODO the hiding needs to be inversed to make click on the button positive (ie just show clicked, rather than hide clicked)
+		a.hidden=null===a.hidden?!i.data.datasets[n].hidden:null,i.update();
+		return false;
+
+	});
+
+
+}
 function init_pages_thumbs(){
 	// NB This paging is managed on django until we can do so on transkribus rest
 	// would be great to manage page size and pages with datatable... but this is not a datatable....

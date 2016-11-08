@@ -21,21 +21,42 @@
  
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Table</a></li>
-    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Chart</a></li>
+    <li role="presentation" class="active"><a href="#a_table" aria-controls="home" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#a_chart_doc" aria-controls="profile" role="tab" data-toggle="tab">All activities</a></li>
+    <li role="presentation"><a href="#a_chart_me" aria-controls="profile" role="tab" data-toggle="tab">Your activities</a></li>
+    <li class="dropdown">
+	<a href="#" data-toggle="dropdown">Activities for... <span class="caret"></span></a>
+	<ul class="dropdown-menu" role="menu" id="user_list">
+	    <li><a href="#user_list_panel" data-toggle="tab">Default 4</a></li>
+	</ul>
+    </li>
+    <li role="presentation"><a href="#a_top_users" aria-controls="profile" role="tab" data-toggle="tab">Most Active Users</a></li>
+
   </ul>
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="home">
+    <div role="tabpanel" class="tab-pane active" id="a_table">
 	   {% include "dashboard/actions_table.html" with action_types=action_types%}
     </div>
-    <div role="tabpanel" class="tab-pane" id="profile">
+    <div role="tabpanel" class="tab-pane" id="a_chart_doc">
 	   <canvas id="actions_line" class="chart_canvas" width="400" height="200"></canvas>
     </div>
-    <div role="tabpanel" class="tab-pane" id="messages">messages</div>
-    <div role="tabpanel" class="tab-pane" id="settings">settings</div>
-  </div>
+    <div role="tabpanel" class="tab-pane" id="a_chart_me">
+	   <canvas id="user_actions_line" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="user_list_panel">
+	   <canvas id="user_actions_line_x" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="a_top_users">
+	   <canvas id="top_users" class="chart_canvas" width="400" height="200"></canvas>
+    </div>
+  </div> <!-- end .tab-content -->
+
+  {% for at in action_types %}
+	<button class="btn btn-default table_filter" id="filter_{{at.type}}" value="{{at.id}}">{{at.type}}</button>
+  {% endfor %}
+  <button class="btn btn-default table_filter" id="filter_clear" value="">X</button>
 
 </div>
 
