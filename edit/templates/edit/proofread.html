@@ -20,13 +20,40 @@
         <h1>
             {% trans "Proofreading Interface (working title)" %}
         </h1>
+	</div>
+	<div class="row row-centered">
+		<div class="col-md-3">	
+		
+			<div class="radio">
+			  <label>
+			    <input type="radio" id="version" value="original" checked>
+			    	{% trans "Original version" %}
+			  </label>
+			</div>
 
+		</div>
+	    <div class="col-md-3">
+
+			<div class="radio">
+			  <label>
+			    <input type="radio" id="version" value="your" checked>
+			    	{% trans "Your version" %}
+			  </label>
+			</div>
+	    	
+		</div>
+	    <div class="col-md-3">
+			<div id="message"></div>
+		</div>
+		<div class="col-md-3">
+			<a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a><br/><br/><br/>{# TODO CSS for this purpose. #}
+		</div>
 	</div>
     <div class="row">
 		<div class="col-md-6">
 			{% for line in lines %}
 				<div class="col-md-1">{{forloop.counter}}</div>
-				<div class="col-md-11 editable-line" contenteditable="true" id="{{line|get_item:"id"}}" >{{line|get_item:"Unicode"}}</div>
+				<div class="col-md-11 editable-line" contenteditable="true" id="{{line|get_item:"id"}}" spellcheck="false">{{line|get_item:"Unicode"}}</div>
 			{% endfor %}			
 		</div>
 		<div class="col-md-6">
@@ -44,12 +71,14 @@
 			"{{ line|get_item:"id"}}": "{{line|get_item:"Unicode"}}",
 		{% endfor %}
 	};
+	var changedLines = {};
+	
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
 	
 	{# TODO Saving functionality in this view as well! #}
-	$("a[data-target=#saveChanges]").click(function(event) {
+	$("a[data-target='#saveChanges']").click(function(event) {
     	event.preventDefault();
-    	$.post(window.location.href, {content: getContent(), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
+    	$.post(window.location.href, {content: JSON.stringify(changedLines), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
     		setMessage(data);
     		changed = false;
 		});

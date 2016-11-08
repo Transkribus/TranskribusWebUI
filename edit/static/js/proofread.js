@@ -1,3 +1,6 @@
+function setMessage(message) {
+	$("#message").html(message);
+}
 function getRelativeCursorPosition(node) { // Get the cursor position relative to the <DIV>. Regardless of <SPAN> tags.
 	var selection = window.getSelection();
 	var anchorNode =  selection.anchorNode;
@@ -31,6 +34,7 @@ $( ".editable-line" ).on('keyup', function(e) {// TODO Add other events?
 	});
 	
 	$("#" + e.target.id).html(editedString);
+	changedLines[e.target.id] = $(editedString).text();
 	
 	var sel = window.getSelection();
 	var anchorNode = sel.anchorNode;
