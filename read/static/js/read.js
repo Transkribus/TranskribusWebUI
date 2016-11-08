@@ -21,7 +21,7 @@ $(document).ready(function(){
 		$(this).closest("form").submit();
 	});
 	//actions (always)
-	
+	console.log("STATIC_URL: ",static_url);	
 	actions_table = init_actions_table();
 	init_date_inputs(actions_table);
 	init_actions_chart();
@@ -76,8 +76,8 @@ function init_actions_table(){
 	if(!$("#actions_table").length) return;
 
 	var ids = parse_path();
-	var url = static_url+"/dashboard/table_ajax/actions";
-
+//	var url = static_url+"/dashboard/table_ajax/actions";
+	var url = "./table_ajax/actions";
 	var context = '';
 	for(x in ids){
 		console.log(x," => ",ids[x])
@@ -104,7 +104,9 @@ function init_users_table(){
 	if(!$("#users_table").length) return;
 
 	var ids = parse_path();
-	var url = static_url+"/dashboard/table_ajax/users";
+//	var url = static_url+"/dashboard/table_ajax/users";
+	var url = "./table_ajax/users";
+
 	var context = '';
 	for(x in ids){
 		context += '/'+ids[x];
@@ -147,7 +149,9 @@ function init_documents_table(){
 	if(!$("#documents_table").length) return;
 
 //	var url = "/dashboard/documents_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
-	var url = static_url+"/dashboard/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+//	var url = static_url+"/dashboard/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+	var url = "./table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+
 
 	var ids = parse_path();	
 
@@ -167,7 +171,9 @@ function init_documents_table(){
 function init_pages_table(){
 
 //	var url = "/dashboard/pages_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
-	var url = static_url+"/dashboard/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+//	var url = static_url+"/dashboard/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+	var url = "./table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+
 
 	var ids = parse_path();	
 
@@ -256,7 +262,9 @@ function init_actions_chart(){
 
 	if(!$("#actions_line").length) return;
 	ids=parse_path();
-	var url = static_url+"/dashboard/chart_ajax/actions/line";
+//	var url = static_url+"/dashboard/chart_ajax/actions/line";
+	var url = "./chart_ajax/actions/line";
+
 	for(id in ids){
 		url += '/'+ids[id];
 	}
@@ -273,7 +281,9 @@ function init_user_actions_chart(userid,canvas_id){
 	//userid is set in header template and is the current_userid of currently logged in user
 //	console.log("USERNAME: ",current_userid);
 	if(userid == undefined) userid = current_userid;
-	var url = static_url+"/dashboard/chart_ajax/u/"+userid+"/actions/line";
+//	var url = static_url+"/dashboard/chart_ajax/u/"+userid+"/actions/line";
+	var url = "./chart_ajax/u/"+userid+"/actions/line";
+
 	for(id in ids){
 		url += '/'+ids[id];
 	}
@@ -284,7 +294,9 @@ function init_top_users_chart(){
 
 	if(!$("#top_users").length) return;
 	ids=parse_path();
-	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/userId/userName";
+//	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/userId/userName";
+	var url = "./chart_ajax/actions/top_bar/userId/userName";
+
 	for(id in ids){
 		url += '/'+ids[id];
 	}
@@ -295,7 +307,9 @@ function init_top_collections_chart(){
 
 	if(!$("#top_collections").length) return;
 	ids=parse_path();
-	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/colId/colName";
+//	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/colId/colName";
+	var url = "./chart_ajax/actions/top_bar/colId/colName";
+
 	init_chart("top_collections",url,"bar");
 }
 
@@ -303,7 +317,9 @@ function init_top_collections_chart(){
 function init_user_list(){
 	if(!$("#user_list").length) return;
 	ids=parse_path();
-	var url = static_url+"/dashboard/table_ajax/users"; //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
+//	var url = static_url+"/dashboard/table_ajax/users"; //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
+	var url = "./table_ajax/users"; //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
+
 	for(id in ids){
 		url += '/'+ids[id];
 	}
@@ -471,7 +487,9 @@ function init_pages_thumbs(){
 function get_thumbs(start,length){
 //	var url = "/dashboard/thumbnails_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
 	var ids = parse_path();	
-	var url = static_url+"/dashboard/table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
+//	var url = static_url+"/dashboard/table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
+	var url = "./table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
+
 
 	$.ajax({
 	    type: 'GET',
