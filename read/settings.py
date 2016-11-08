@@ -185,7 +185,7 @@ STATICFILES_DIRS = [
 
 # This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = '/dashboard'
 #UseCDNS for libs or static versions
 PAGE_SIZE_DEFAULT = 5
 USE_CDNS = False
