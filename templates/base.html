@@ -44,11 +44,11 @@
     <!-- Chart.js -->
     <script src="{{ "chart_js"|load_lib }}"></script>
     <!-- Local JS -->
-    <script src="{% static "js/read.js" %}"></script>
 	<script language="javascript">
 		var static_url = "{{ STATIC_URL|escapejs }}";
 		var current_userid = "{{ user.tsdata.userId }}";
 	</script>
+    <script src="{% static "js/read.js" %}"></script>
 	<!--- Only needed when logged in -->
 	{% if user.is_authenticated %}
 	    <script>
