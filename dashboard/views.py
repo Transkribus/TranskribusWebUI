@@ -37,7 +37,8 @@ def index(request):
         return action_types
 
     t_log("STATIC_URL %s" % read.settings.STATIC_URL)
-    return render(request, 'dashboard/homepage.html', {'action_types': action_types} )
+
+    return render(request, 'dashboard/homepage.html', {'action_types': sorted(action_types)} )
 
 # dashboard/{colID}
 # d_collection : overall view for a given collection
