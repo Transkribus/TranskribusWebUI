@@ -64,7 +64,7 @@
 	
 	$("a[data-target='#saveChanges']").click(function(event) {
     	event.preventDefault();
-    	$.post(window.location.href, {content: getContent(), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {//getContent()
+    	$.post(window.location.href, {content: getContent(), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
     		setMessage(data);
     		changed = false;
 		});
