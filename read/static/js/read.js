@@ -414,16 +414,22 @@ function init_chart_filters(){
 		if($("#"+active_canvas).length==0) return false;
 
 		var chart =  charts[active_canvas];
-		console.log("table_filter CLICKED",chart);
-		console.log("table_filter CLICKED", chart.config.data);
-		console.log("table_filter CLICKED", chart.config.options.legend.onClick);
-		console.log($(this).val())
-		dataset_n = $(this).val();
-		var n=dataset_n,i=chart,a=i.getDatasetMeta(n);
-		console.log("A: ",a);
-		//TODO the val() from the button needs to be -1
 		//TODO the hiding needs to be inversed to make click on the button positive (ie just show clicked, rather than hide clicked)
-		a.hidden=null===a.hidden?!i.data.datasets[n].hidden:null,i.update();
+		for(x in chart.data.datasets){
+			var a=chart.getDatasetMeta(x);
+			a.hidden=null;
+		}
+		if($(this).attr("id") === "filter_clear"){ chart.update(); return;}
+
+		var n=parseInt($(this).val())-1;
+		for(x in chart.data.datasets){
+			if(n!=x){
+				var a=chart.getDatasetMeta(x);
+				a.hidden=null===a.hidden ?! chart.data.datasets[x].hidden : null;
+			}
+
+		}
+		chart.update();
 		return false;
 
 	});
