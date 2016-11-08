@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^review/', include('review.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
+    url(r'^read/dashboard/', include('dashboard.urls')),
     url(r'^edit/', include('edit.urls')),
     url(r'^search/', include('search.urls')),
     url('', include('django.contrib.auth.urls')),
