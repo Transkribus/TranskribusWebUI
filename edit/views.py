@@ -44,9 +44,12 @@ def proofread(request, collId, docId, page, transcriptId):# TODO Decide whether 
         for text_region in transcript_root.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextRegion'):# We have to have the namespace...
             regionTextEquiv = ""
             for line in text_region.iter('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextLine'):
-                 modified_text = content.get(id = line.get("id"))
-                 regionTextEquiv += modified_text +"\r\n"
-                 line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
+                modified_text = content.get(line.get("id")) # Only lines which have changed are submitted...
+                if None == modified_text:
+                    modified_text = line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text
+                else:
+                    line.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = modified_text
+                regionTextEquiv += modified_text +"\r\n"
             text_region.find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}TextEquiv').find('{http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15}Unicode').text = regionTextEquiv
         t_save_transcript(request, ElementTree.tostring(transcript_root), collId, docId, page)
         current_transcript = t_current_transcript(request, collId, docId, page)# We want the updated transcript now.
