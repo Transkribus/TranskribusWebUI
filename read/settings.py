@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "library.context_processors.language_form_context_processor",
+		"read.contexts.appname",
             ],
             'libraries' : {
                 'read_tags': 'read.templatetags',
