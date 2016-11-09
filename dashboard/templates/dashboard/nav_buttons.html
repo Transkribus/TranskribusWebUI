@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div class="read_nav read_nav_out">
+	<ul>
+ <li><a href="#menu-toggle" id="menu-toggle-out" class="menu-toggle btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-chevron-right"><span></a></li>
+{% if up %}
+<li><a href="{{up}}" id="" class="btn btn-default btn-xs pull-left"><span class="">{% trans "up" %}<span></a></li>
+{% endif %}
+{% if next %}
+    <li><a href="{{next}}" id="" class="btn btn-default btn-xs pull-left"><span class="">{% trans "next" %}<span></a></li>
+{% endif %}
+{% if prev %}
+    <li><a href="{{prev}}" id="" class="btn btn-default btn-xs pull-left"><span class="">{% trans "prev" %}<span></a></li>
+{% endif %}
+</ul>
+</div>
+<div style="clear: both;"></div>
