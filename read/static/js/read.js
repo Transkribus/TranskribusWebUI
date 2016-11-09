@@ -17,7 +17,11 @@ var charts = {};
 console.log(window.location.pathname);
 //We strip off the ids and should have a useful app base that will work for any server context
 var appbase = window.location.pathname.replace(/\/\d+(|\/)/g, "");
-console.log(appbase);
+var serverbase = window.location.pathname.replace(/(|\/\w+)\/\d+(|\/)/g, "");
+
+console.log("APPBASE: ",appbase);
+console.log("SERVERBASE: ",serverbase);
+
 
 
 $(document).ready(function(){
@@ -44,7 +48,7 @@ $(document).ready(function(){
 	init_chart_filters();
 });
 function make_url(url){
-
+	appbase = appbase.replace(/\/$/,""); //remove trailing slash from appbase
 	return appbase+url;
 }
 function init_date_inputs(actions_table){
@@ -242,10 +246,10 @@ function init_datatable(table,url, columns){
 				if(data.docId != undefined && data.docId !== "n/a")
 					url += '/'+data.docId;
 				if(data.pageNr != undefined && data.pageNr !== "n/a") //NB will break until we use base url
-					url = '/edit/correct/'+data.colId+'/'+data.docId+'/'+data.pageNr;
+					url = serverbase+'/edit/correct/'+data.colId+'/'+data.docId+'/'+data.pageNr;
 				//TODO add case for userlist links 
 				if(url){
-					 window.location.href=static_url+url;
+					 window.location.href=appbase+'/'+url;
 				}
 			});
         	},
@@ -516,7 +520,7 @@ function get_thumbs(start,length){
 		var row = $(row_html);
 		for(x in data.data){
 			var status_label = data.data[x].status.ucfirst().replace(/_/," ");
-			var thumb = $('<div class="col-md-2"><a href="/edit/correct/'+ids['collId']+'/'+ids['docId']+'/'+data.data[x].pageNr+'" class="thumbnail '+data.data[x].status+'"><img src="'+data.data[x].thumbUrl+'"><div class="thumb_label">'+status_label+'</div></a></div>');
+			var thumb = $('<div class="col-md-2"><a href="'+serverbase+'/edit/correct/'+ids['collId']+'/'+ids['docId']+'/'+data.data[x].pageNr+'" class="thumbnail '+data.data[x].status+'"><img src="'+data.data[x].thumbUrl+'"><div class="thumb_label">'+status_label+'</div></a></div>');
 			$(row).append(thumb);
 		}
 		$("#pages_thumbnail_grid").html(menu);
