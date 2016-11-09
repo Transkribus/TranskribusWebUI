@@ -262,7 +262,7 @@ def top_bar(data,subject,label=None,chart_size=None):
     labels = {}
     for datum in data:
         subject_value = datum.get(subject)
-	if subject_value is None : continue
+        if subject_value is None : continue
 
         #we can maintain labels separate to subjects 
         # (eg we can use colId to key/sort data and colName when displaying... protects agains duplicate colNames cumulating
