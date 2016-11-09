@@ -17,11 +17,13 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^library/', include('library.urls')),
 #    url(r'^crowd/', include('crowd.urls')),
     url(r'^admin/', admin.site.urls),
+    #this causes various fails for some reason, though it would be nice to pass in app_name to library....
+    # url(r'^library/', include('library.urls', app_name='library', namespace='library')),
+    url(r'^library/', include('library.urls')),
     url(r'^review/', include('review.urls')),
-    url(r'^dashboard/', include('dashboard.urls')),
+    url(r'^dashboard/', include('dashboard.urls', app_name='dashboard', namespace='dashboard')),
     url(r'^read/dashboard/', include('dashboard.urls')),
     url(r'^edit/', include('edit.urls')),
     url(r'^search/', include('search.urls')),
