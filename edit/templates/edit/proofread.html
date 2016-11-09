@@ -23,24 +23,20 @@
 	</div>
 	<div class="row row-centered">
 		<div class="col-md-3">	
-		
 			<div class="radio">
 			  <label>
-			    <input type="radio" id="version" value="original" checked>
+			    <input type="radio" name="version" value="original">
 			    	{% trans "Original version" %}
 			  </label>
 			</div>
-
 		</div>
 	    <div class="col-md-3">
-
 			<div class="radio">
 			  <label>
-			    <input type="radio" id="version" value="your" checked>
+			    <input type="radio" name="version" value="your" checked>
 			    	{% trans "Your version" %}
 			  </label>
 			</div>
-	    	
 		</div>
 	    <div class="col-md-3">
 			<div id="message"></div>
@@ -50,7 +46,13 @@
 		</div>
 	</div>
     <div class="row">
-		<div class="col-md-6">
+		<div class="col-md-6 collapse version" id="original">
+			{% for line in lines %}
+				<div class="col-md-1">{{forloop.counter}}</div>
+				<div class="col-md-11" spellcheck="false">{{line|get_item:"Unicode"}}</div>
+			{% endfor %}			
+		</div>
+		<div class="col-md-6 version" id="your">
 			{% for line in lines %}
 				<div class="col-md-1">{{forloop.counter}}</div>
 				<div class="col-md-11 editable-line" contenteditable="true" id="{{line|get_item:"id"}}" spellcheck="false">{{line|get_item:"Unicode"}}</div>
@@ -74,8 +76,12 @@
 	var changedLines = {};
 	
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
+
+	$("input[name$='version']").click(function(event) {
+		$(".version").hide();
+		$("#" + $(this).val()).show();
+	});
 	
-	{# TODO Saving functionality in this view as well! #}
 	$("a[data-target='#saveChanges']").click(function(event) {
     	event.preventDefault();
     	$.post(window.location.href, {content: JSON.stringify(changedLines), csrfmiddlewaretoken: '{{ csrf_token }}'}, function( data ) {
