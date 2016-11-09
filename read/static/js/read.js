@@ -577,7 +577,7 @@ String.prototype.ucfirst = function() {
 }
 
 function parse_path(){
-	var pattern = /^\/dashboard(|\/(\d+)(|\/(\d+)(|\/(\d+))))$/;
+	var pattern = /\/dashboard(|\/(\d+)(|\/(\d+)(|\/(\d+))))$/;
 	var result = pattern.exec(window.location.pathname);
 	ids = {};
 	if(result != null && result[2]) ids['collId'] = result[2];
