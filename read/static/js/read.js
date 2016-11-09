@@ -129,7 +129,8 @@ function init_collections_table(){
 	if(!$("#collections_table").length) return;
 
 //	var url = "/dashboard/collections_for_table_ajax";
-	var url = static_url+"/dashboard/table_ajax/collections";
+///	var url = static_url+"/dashboard/table_ajax/collections";
+	var url = "./table_ajax/collections";
 
 	var columns =  [
 		    { "data": "colId" },
