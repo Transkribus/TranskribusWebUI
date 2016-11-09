@@ -11,9 +11,13 @@ $(document).ready(function(){
 	}
 });
 
+/* globals... */
 var data_cache = {};
 var charts = {};
-
+console.log(window.location.pathname);
+//We strip off the ids and should have a useful app base that will work for any server context
+var appbase = window.location.pathname.replace(/\/\d+(|\/)/g, "");
+console.log(appbase);
 
 
 $(document).ready(function(){
@@ -39,6 +43,10 @@ $(document).ready(function(){
 
 	init_chart_filters();
 });
+function make_url(url){
+
+	return appbase+url;
+}
 function init_date_inputs(actions_table){
 
     var min = new Date('2016.01.01').getTime() / 1000;
@@ -76,8 +84,10 @@ function init_actions_table(){
 	if(!$("#actions_table").length) return;
 
 	var ids = parse_path();
-//	var url = static_url+"/dashboard/table_ajax/actions";
-	var url = "./table_ajax/actions";
+	var url = make_url("/table_ajax/actions");
+	console.log("Using appbase: ",url);
+
+//	var url = "./table_ajax/actions";
 	var context = '';
 	for(x in ids){
 		console.log(x," => ",ids[x])
@@ -104,8 +114,7 @@ function init_users_table(){
 	if(!$("#users_table").length) return;
 
 	var ids = parse_path();
-//	var url = static_url+"/dashboard/table_ajax/users";
-	var url = "./table_ajax/users";
+	var url = make_url("/table_ajax/users");
 
 	var context = '';
 	for(x in ids){
@@ -128,9 +137,7 @@ function init_collections_table(){
 
 	if(!$("#collections_table").length) return;
 
-//	var url = "/dashboard/collections_for_table_ajax";
-///	var url = static_url+"/dashboard/table_ajax/collections";
-	var url = "./table_ajax/collections";
+	var url = make_url("/table_ajax/collections");
 
 	var columns =  [
 		    { "data": "colId" },
@@ -149,10 +156,8 @@ function init_documents_table(){
 
 	if(!$("#documents_table").length) return;
 
-//	var url = "/dashboard/documents_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
-//	var url = static_url+"/dashboard/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
-	var url = "./table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
-
+//	var url = "./table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1');
+	var url = make_url("/table_ajax/documents/"+window.location.pathname.replace(/^.*\/(\d+)$/, '$1'));
 
 	var ids = parse_path();	
 
@@ -171,9 +176,9 @@ function init_documents_table(){
 
 function init_pages_table(){
 
-//	var url = "/dashboard/pages_for_table_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
-//	var url = static_url+"/dashboard/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
-	var url = "./table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+//	var url = "./table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
+	var url = make_url("/table_ajax/pages"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1'));
+
 
 
 	var ids = parse_path();	
@@ -264,7 +269,7 @@ function init_actions_chart(){
 	if(!$("#actions_line").length) return;
 	ids=parse_path();
 //	var url = static_url+"/dashboard/chart_ajax/actions/line";
-	var url = "./chart_ajax/actions/line";
+	var url = make_url("/chart_ajax/actions/line");
 
 	for(id in ids){
 		url += '/'+ids[id];
@@ -283,7 +288,7 @@ function init_user_actions_chart(userid,canvas_id){
 //	console.log("USERNAME: ",current_userid);
 	if(userid == undefined) userid = current_userid;
 //	var url = static_url+"/dashboard/chart_ajax/u/"+userid+"/actions/line";
-	var url = "./chart_ajax/u/"+userid+"/actions/line";
+	var url = make_url("/chart_ajax/u/"+userid+"/actions/line");
 
 	for(id in ids){
 		url += '/'+ids[id];
@@ -296,7 +301,7 @@ function init_top_users_chart(){
 	if(!$("#top_users").length) return;
 	ids=parse_path();
 //	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/userId/userName";
-	var url = "./chart_ajax/actions/top_bar/userId/userName";
+	var url = make_url("/chart_ajax/actions/top_bar/userId/userName");
 
 	for(id in ids){
 		url += '/'+ids[id];
@@ -309,7 +314,7 @@ function init_top_collections_chart(){
 	if(!$("#top_collections").length) return;
 	ids=parse_path();
 //	var url = static_url+"/dashboard/chart_ajax/actions/top_bar/colId/colName";
-	var url = "./chart_ajax/actions/top_bar/colId/colName";
+	var url = make_url("/chart_ajax/actions/top_bar/colId/colName");
 
 	init_chart("top_collections",url,"bar");
 }
@@ -319,7 +324,7 @@ function init_user_list(){
 	if(!$("#user_list").length) return;
 	ids=parse_path();
 //	var url = static_url+"/dashboard/table_ajax/users"; //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
-	var url = "./table_ajax/users"; //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
+	var url = make_url("/table_ajax/users"); //use table data with -1... *nascent* javascript caching... will need to use url+paramss to stop pollution
 
 	for(id in ids){
 		url += '/'+ids[id];
@@ -489,7 +494,7 @@ function get_thumbs(start,length){
 //	var url = "/dashboard/thumbnails_ajax/"+window.location.pathname.replace(/^.*\/(\d+\/\d+)$/, '$1');
 	var ids = parse_path();	
 //	var url = static_url+"/dashboard/table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
-	var url = "./table_ajax/pages/"+ids['collId']+'/'+ids['docId'];
+	var url = make_url("/table_ajax/pages/"+ids['collId']+'/'+ids['docId']);
 
 
 	$.ajax({
