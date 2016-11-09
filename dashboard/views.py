@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse#,resolve
 #from django.contrib.auth.models import User
 import datetime
 import dateutil.parser
@@ -11,6 +11,7 @@ import collections
 #from django.contrib.auth.decorators import login_required #for ajax reponses
 from read.decorators import t_login_required, t_login_required_ajax
 import read.settings
+import dashboard.settings
 from read.services import *
 from read.utils import t_log
 
@@ -38,7 +39,7 @@ def index(request):
 
     t_log("STATIC_URL %s" % read.settings.STATIC_URL)
 
-    return render(request, 'dashboard/homepage.html', {'action_types': sorted(action_types)} )
+    return render(request, 'dashboard/homepage.html', {'action_types': sorted(action_types), 'up': None, 'next': None, 'prev': None} )
 
 # dashboard/{colID}
 # d_collection : overall view for a given collection
@@ -59,15 +60,34 @@ def d_collection(request,collId):
         return collections
 
     collection=None
+    prev=None
+    next=None
+    stop_next=False
     for col in collections:
+        if stop_next:
+            next=col.get('colId')
+            break
         if col.get("colId") == int(collId):
             collection = col
-            break
-
+            stop_next=True
+        else :
+            prev=col.get('colId')
+    up='/dashboard'
+    
+#    t_log("NEXT: %s PREV: %s UP: %s" % (next,prev,up))
+#    t_log("REQPATH: %s" % (request.path))
+#    t_log("RESOLVED %s" % (resolve(request.path)))
+#    t_log("APP_NAME: %s" % (request.resolver_match.app_name))
     action_types = t_actions_info(request)
     if isinstance(action_types,HttpResponse):
         return action_types
-    return render(request, 'dashboard/collection.html', {'collection': collection, 'action_types': action_types} ) #nb documents only used to display length...
+    return render(request, 'dashboard/collection.html', {
+			'collection': collection, 
+			'action_types': action_types, 
+			'up': up, 
+			'next': next, 
+			'prev':prev } )
+#			'app_base_url' : resolve(request.path).app_name  } ) #nb documents only used to display length...
 
 # dashboard/{colID}/{docId}
 # d_collection : overall view for a given collection
