@@ -38,8 +38,13 @@ def index(request):
         return action_types
 
     t_log("STATIC_URL %s" % read.settings.STATIC_URL)
+#    oat = collections.OrderedDict(sorted(action_types))
+#    myDic = action_types
+#    sorted_list=sorted(myDic.items(), key=lambda x: x[0])
+#    myOrdDic = OrderedDict(sorted_list)
+#    return render(request, 'dashboard/homepage.html', {'action_types': myOrdDic, 'up': None, 'next': None, 'prev': None} )
+    return render(request, 'dashboard/homepage.html', {'action_types': action_types, 'up': None, 'next': None, 'prev': None} )
 
-    return render(request, 'dashboard/homepage.html', {'action_types': sorted(action_types), 'up': None, 'next': None, 'prev': None} )
 
 # dashboard/{colID}
 # d_collection : overall view for a given collection
@@ -73,7 +78,7 @@ def d_collection(request,collId):
         else :
             prev=col.get('colId')
     up='/dashboard'
-
+    
 #    t_log("NEXT: %s PREV: %s UP: %s" % (next,prev,up))
 #    t_log("REQPATH: %s" % (request.path))
 #    t_log("RESOLVED %s" % (resolve(request.path)))
@@ -82,12 +87,12 @@ def d_collection(request,collId):
     if isinstance(action_types,HttpResponse):
         return action_types
     return render(request, 'dashboard/collection.html', {
-                        'collection': collection,
-                        'action_types': action_types,
-                        'up': up,
-                        'next': next,
-                        'prev':prev } )
-#                       'app_base_url' : resolve(request.path).app_name  } ) #nb documents only used to display length...
+			'collection': collection, 
+			'action_types': action_types, 
+			'up': up, 
+			'next': next, 
+			'prev':prev } )
+#			'app_base_url' : resolve(request.path).app_name  } ) #nb documents only used to display length...
 
 # dashboard/{colID}/{docId}
 # d_collection : overall view for a given collection
@@ -122,7 +127,7 @@ def d_document(request,collId,docId):
 def d_user(request,username):
 
     t_log("##################### USERNAME: %s " % username)
-
+    
     user = t_user(request,{'user' : username}) #TODO use url encoding...
     t_log("##################### USER: %s " % user)
     action_types = t_actions_info(request)
@@ -284,13 +289,13 @@ def top_bar(data,subject,label=None,chart_size=None):
         subject_value = datum.get(subject)
         if subject_value is None : continue
 
-        #we can maintain labels separate to subjects
+        #we can maintain labels separate to subjects 
         # (eg we can use colId to key/sort data and colName when displaying... protects agains duplicate colNames cumulating
         label_value = datum.get(label)
         if subject_value not in labels and label_value is not None:
             labels[subject_value] = label_value
         #use subject value in case there is no value for the label
-        if label_value is None:
+        if label_value is None: 
             labels[subject_value] = subject_value
 
         #accumulate the data
@@ -299,15 +304,15 @@ def top_bar(data,subject,label=None,chart_size=None):
         else:
             actions[subject_value]+=1
 
-    action_data = actions.values()
-    key_data = actions.keys()
+    action_data = list(actions.values())
+    key_data = list(actions.keys())
 
     chart_data=[]
     chart_labels=[]
     chart_label_ids=[]
     #This bit will retrun the index of the 5/chart_size subjects with the highest value in actions_data
     ind_arr = sorted(range(len(action_data)), key=lambda i: action_data[i], reverse=True)[:chart_size]
-    for ind in ind_arr :
+    for ind in ind_arr : 
         chart_data.append(action_data[ind])
         chart_labels.append(labels[key_data[ind]])
         chart_label_ids.append(key_data[ind])
@@ -315,34 +320,34 @@ def top_bar(data,subject,label=None,chart_size=None):
 
     #TODO dynamically process colours...
     return JsonResponse({
-            'labels': chart_labels,
-            'label_ids': chart_label_ids,
+            'labels': chart_labels,	
+	    'label_ids': chart_label_ids,
             'datasets' : [{
-                 #      'label' : "Top users by activity",
-                       'borderWidth': 1,
-                       'backgroundColor': [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                            ],
-                        'borderColor': [
-                                'rgba(255,99,132,1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                            ],
-                       'data': chart_data,
-                        }]
+		 #      'label' : "Top users by activity",
+		       'borderWidth': 1,
+		       'backgroundColor': [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+			    ],
+			'borderColor': [
+				'rgba(255,99,132,1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+			    ],
+            	       'data': chart_data,
+			}]
         },safe=False)
 
 
 #plot the (activites) data against time as a line
 #subject and label not used here (yet)
 def line(data,subject=None,label=None):
-
+    
     action_info = {
                   1 : {'label' : 'Save' ,'colour': 'rgba(255,99,132,1)'},
                   2 : {'label' : 'Login', 'colour': 'rgba(54, 162, 235, 1)'},
@@ -394,7 +399,7 @@ def line(data,subject=None,label=None):
         #order the dict by key (ie date) using collections.OrderedDict
         od = collections.OrderedDict(sorted(types.get(x).items()))
         datasets.append({
-                         'data': od.values(),
+                         'data': list(od.values()),
                          'label': action_info.get(x).get('label'),
                          'fill': False,
                          'borderColor': action_info.get(x).get('colour'),
@@ -402,17 +407,19 @@ def line(data,subject=None,label=None):
                          'pointRadius': 0,
                          'pointHoverRadius': 5,
                          })
+
     return JsonResponse({
-            'labels': x_data.keys(),
+            'labels':  sorted(list(x_data.keys())),
             'datasets' : datasets
         },safe=False)
 
 def isolate_data(data,field) :
-    return map(functools.partial(get_item, f=field), data)
-
-#I would do this anonymously in map, but not sure how...
-def get_item(x,f) :
-    return x.get(f)
+    return [d.get(field) for d in data]
+##    return map(functools.partial(get_item, f=field), data)
+##
+##I would do this anonymously in map, but not sure how...
+##def get_item(x,f) :
+##    return x.get(f)
 
 
 def filter_data(fields, data) :
