@@ -47,9 +47,19 @@ INSTALLED_APPS = [
     'search',
 
     'rest_framework',
-    'e_learning',
-    'transkribus',
+
+    'e_learning.tasks_',
+    'e_learning.learning_resources',
+    'e_learning.sessions_',
+
+    'e_learning.profiles',
+    'e_learning.api',
+    'e_learning.app',
+
     'django_q',
+
+    'transkribus',
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -170,9 +180,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 #TODO for when use is heavier use memcached
 #Enable cache
@@ -195,7 +205,7 @@ AUTHENTICATION_BACKENDS = [
     'transkribus.auth_backends.TranskribusBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 ]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 ### parameters for services
 #transkribus rest service
@@ -234,6 +244,6 @@ Q_CLUSTER = {
 
 TRANSKRIBUS_URL = TRP_URL
 TRANSKRIBUS_API = TRP_URL
-TRANSKRIBUS_IMAGE_URL_PATTERN = '{image}'
-MOCK = False
+TRANSKRIBUS_IMAGE_URL_PATTERN = 'https://dbis-thure.uibk.ac.at/f/Get?id={id}&fileType=view'
+MOCK = True
 
