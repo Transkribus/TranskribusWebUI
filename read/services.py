@@ -158,7 +158,7 @@ def t_refresh():
     t_log("### t_refresh response STATUS_CODE: %s" % (r.status_code) )
 
     if r.status_code != requests.codes.ok:
-        return None
+        return False
     else:
         return True
 

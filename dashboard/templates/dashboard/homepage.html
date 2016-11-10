@@ -7,16 +7,13 @@
 {% include "dashboard/nav_buttons.html"%}
 {% endblock %}
 
-<h1>COLLECTIONS</h1>
+<h1>My Collections</h1>
 
-<h2>Last activity (on any of owned collections?)</h2>
-
-<p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
-
+{% include "dashboard/collections_table.html" %}
 
 <div class="container">
 
- <h2>Your activities:</h2>
+ <h2>My activities:</h2>
 
    {% include "dashboard/date_input.html" %}
 
@@ -30,7 +27,6 @@
     <li role="presentation" class="active"><a href="#a_table" aria-controls="a_table" role="tab" data-toggle="tab">My activities</a></li>
     <li role="presentation"><a href="#a_chart" aria-controls="a_chart" role="tab" data-toggle="tab">My activities chart</a></li>
     <li role="presentation"><a href="#top_coll" aria-controls="top_coll" role="tab" data-toggle="tab">My most active collections</a></li>
-
   </ul>
 
   <!-- Tab panes -->
@@ -50,14 +46,6 @@
 	<button class="btn btn-default table_filter" id="filter_{{at.type}}" value="{{at.id}}">{{at.type}}</button>
   {% endfor %}
   <button class="btn btn-default table_filter" id="filter_clear" value="">X</button>
-
-</div>
-
-<div class="container">
-
-<h2>My Collections</h2>
-
-{% include "dashboard/collections_table.html" %}
 
 </div>
 

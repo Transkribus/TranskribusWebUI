@@ -3,11 +3,13 @@
 
 {% block content %}
 
+<div class="container">
+
 <h1>{{document.title}}</h1>
 
 <h2>Last activity {{document.title}}</h2>
 
-<p>Date/Time: User X, role, operation (save) on page ID X of document ID Y in collection ID Z</p>
+<p>{{last_action.time}}: User {{last_action.userName}}, {{last_action.role}}, operation ({{last_action.type}}) on page ID {{last_action.pageNr}} of document ID {{last_action.docId}}</p>
 
 <div class="container">
 
@@ -16,6 +18,8 @@
    {% include "dashboard/date_input.html" %}
 
 </div>
+
+<div class="container">
 
 <div class="panel">
  
@@ -60,8 +64,10 @@
 
 </div>
 
+</div>
 
 <div class="container" id="pages_thumbnail_grid"></div>
 
+</div>
 
 {% endblock %}

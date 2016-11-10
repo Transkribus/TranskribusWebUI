@@ -33,6 +33,11 @@ from querystring_parser import parser
 @t_login_required
 def index(request):
 
+    if not t_refresh() : 
+        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+       
+    last_action = t_actions(request,{'nValues' : 1})[0]
+    
     action_types = t_actions_info(request)
     if isinstance(action_types,HttpResponse):
         return action_types
@@ -43,7 +48,7 @@ def index(request):
 #    sorted_list=sorted(myDic.items(), key=lambda x: x[0])
 #    myOrdDic = OrderedDict(sorted_list)
 #    return render(request, 'dashboard/homepage.html', {'action_types': myOrdDic, 'up': None, 'next': None, 'prev': None} )
-    return render(request, 'dashboard/homepage.html', {'action_types': action_types, 'up': None, 'next': None, 'prev': None} )
+    return render(request, 'dashboard/homepage.html', {'last_action': last_action, 'action_types': action_types, 'up': None, 'next': None, 'prev': None} )
 
 
 # dashboard/{colID}
@@ -59,6 +64,12 @@ def index(request):
 
 @t_login_required
 def d_collection(request,collId):
+
+    if not t_refresh() : 
+        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+       
+    last_action = t_actions(request,{'nValues' : 1, 'collId' : collId})[0]
+
     #Avoid this sort of nonsense if possible
     collections = t_collections(request,{'end':None,'start':None})
     if isinstance(collections,HttpResponse):
@@ -87,6 +98,7 @@ def d_collection(request,collId):
     if isinstance(action_types,HttpResponse):
         return action_types
     return render(request, 'dashboard/collection.html', {
+			'last_action': last_action, 
 			'collection': collection, 
 			'action_types': action_types, 
 			'up': up, 
