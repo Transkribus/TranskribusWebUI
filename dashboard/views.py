@@ -38,8 +38,13 @@ def index(request):
         return action_types
 
     t_log("STATIC_URL %s" % read.settings.STATIC_URL)
+#    oat = collections.OrderedDict(sorted(action_types))
+#    myDic = action_types
+#    sorted_list=sorted(myDic.items(), key=lambda x: x[0])
+#    myOrdDic = OrderedDict(sorted_list)
+#    return render(request, 'dashboard/homepage.html', {'action_types': myOrdDic, 'up': None, 'next': None, 'prev': None} )
+    return render(request, 'dashboard/homepage.html', {'action_types': action_types, 'up': None, 'next': None, 'prev': None} )
 
-    return render(request, 'dashboard/homepage.html', {'action_types': sorted(action_types), 'up': None, 'next': None, 'prev': None} )
 
 # dashboard/{colID}
 # d_collection : overall view for a given collection
@@ -299,8 +304,8 @@ def top_bar(data,subject,label=None,chart_size=None):
         else:
             actions[subject_value]+=1
 
-    action_data = actions.values()
-    key_data = actions.keys()
+    action_data = list(actions.values())
+    key_data = list(actions.keys())
 
     chart_data=[]
     chart_labels=[]
@@ -394,7 +399,7 @@ def line(data,subject=None,label=None):
         #order the dict by key (ie date) using collections.OrderedDict
         od = collections.OrderedDict(sorted(types.get(x).items()))
         datasets.append({
-                         'data': od.values(),
+                         'data': list(od.values()),
                          'label': action_info.get(x).get('label'),
                          'fill': False,
                          'borderColor': action_info.get(x).get('colour'),
@@ -402,17 +407,19 @@ def line(data,subject=None,label=None):
                          'pointRadius': 0,
                          'pointHoverRadius': 5,
                          })
+
     return JsonResponse({
-            'labels': x_data.keys(),
+            'labels':  sorted(list(x_data.keys())),
             'datasets' : datasets
         },safe=False)
 
 def isolate_data(data,field) :
-    return map(functools.partial(get_item, f=field), data)
-
-#I would do this anonymously in map, but not sure how...
-def get_item(x,f) :
-    return x.get(f)
+    return [d.get(field) for d in data]
+##    return map(functools.partial(get_item, f=field), data)
+##
+##I would do this anonymously in map, but not sure how...
+##def get_item(x,f) :
+##    return x.get(f)
 
 
 def filter_data(fields, data) :
