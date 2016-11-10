@@ -22,7 +22,7 @@ python and pip. Use pip to install the packages below.
 ### Build Steps
 You need to have pip installed. Usage of Virtualenv is recommended. To run Transkribus Web UI install the following with pip:
 ```sh
-pip install django django-bootstrap3 requests xmltodict dicttoxml #if python 2.7 nocaptcha_recaptcha
+pip install django django-bootstrap3 requests xmltodict dicttoxml dateutil #if python 2.7 nocaptcha_recaptcha
 ```
 
 ### Running
