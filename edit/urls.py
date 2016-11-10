@@ -7,5 +7,5 @@ urlpatterns = [
     #allow edit of current transcript with no transcriptId
     url(r'correct/([0-9]+)/([0-9]+)/([0-9]+)$', views.correct, name='correct'),
     url(r'correct/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)$', views.correct, name='correct'),
-    url(r'transcribe/([0-9]+)/([0-9]+)/([0-9]+)$', views.transcribe, name='transcribe'),
+    #url(r'transcribe/([0-9]+)/([0-9]+)/([0-9]+)$', views.transcribe, name='transcribe'),
 ]
