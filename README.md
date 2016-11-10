@@ -30,6 +30,7 @@ To run, create the database:
 
 ```sh
 python manage.py makemigrations
+python manage.py makemigrations read
 python manage.py migrate
 ```
 
