@@ -32,7 +32,7 @@ def register(request):
 #TODO this is generic guff need to extend form for extra fields, send reg data to transkribus and authticate (which will handle the user creation)
 
     if request.user.is_authenticated(): #shouldn't really happen but...
-        return HttpResponseRedirect('/library/')
+        return HttpResponseRedirect(request.build_absolute_url('/library/'))
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         sys.stdout.write("### IN t_register \r\n" )
@@ -48,7 +48,7 @@ def register(request):
             # redirect to a new URL:
             try:
                 t_register(request)
-                return HttpResponseRedirect('/library/profile')
+                return HttpResponseRedirect(request.build_absolute_url('/library/profile'))
                 #tried out modal here and it is noce (but not really for registration)
 #               messages.info(request, _('Registration requested please check your email.'))
 #                return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
@@ -56,7 +56,7 @@ def register(request):
                 sys.stdout.write("### t_register response ERROR RAISED: %s  \r\n" % (err) )
 #               return render(request, 'registration/register.html', {'register_form': form} )
                 #Why the f**k won't this redirect?!? TODO fix or try another method
-                return HttpResponseRedirect('/library/error')
+                return HttpResponseRedirect(request.build_absolute_url('/library/error'))
 
     # if a GET (or any other method) we'll create a blank form
     else:
