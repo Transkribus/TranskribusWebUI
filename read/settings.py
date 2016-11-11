@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
-    #'nocaptcha_recaptcha',
+#    'nocaptcha_recaptcha',
     'read',
     'library',
     'review',
@@ -212,3 +212,8 @@ AUTHENTICATION_BACKENDS = [
 TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
