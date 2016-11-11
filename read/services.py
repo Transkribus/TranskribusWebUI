@@ -89,9 +89,9 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
             m = re.match(r'^.*/rest/[^/]+/(-?\d+)/.*', url)
             collId = m.group(1)
             if collId :
-                return HttpResponseRedirect(request.build_absolute_url("/library/collection_noaccess/"+str(collId)))
+                return HttpResponseRedirect(request.build_absolute_uri("/library/collection_noaccess/"+str(collId)))
         #otherwise you get logged out...
-        return HttpResponseRedirect(request.build_absolute_url("/logout/?next={!s}".format(request.get_full_path())))
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
 
 
     # Pass transkribus response to handler (NB naming convention is t_[t_id]_handler(r, handler_params)
@@ -195,7 +195,7 @@ def t_actions_handler(r,params=None):
     return json.loads(r.text)
 
 
-#t_actions_info called to get lookup for action types for subsequent action list calls
+#t_collections_recent called to get most recently actioned collection [NOT CURRENTLY USED.... and needs a different url or handler code!]
 def t_collection_recent(request,collId):
     url = settings.TRP_URL+'collections/'+str(collId)+'/list'
     t_id = "collection_recent"
