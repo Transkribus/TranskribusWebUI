@@ -49,7 +49,7 @@ def register(request):
             try:
                 t_register(request)
                 return HttpResponseRedirect(request.build_absolute_uri('/library/profile'))
-                #tried out modal here and it is noce (but not really for registration)
+                #tried out modal here and it is nice (but not really for registration)
 #               messages.info(request, _('Registration requested please check your email.'))
 #                return HttpResponse(json.dumps({'RESET': 'true', 'MESSAGE': render_to_string('library/message_modal.html', request=request)}), content_type='text/plain')
             except ValueError as err:
@@ -624,7 +624,7 @@ def collection_noaccess(request, collId):
                 'back' : back,
             })
 def error(request):
-    back = settings.APP_BASEURL+"/register"
+    back = request.build_absolute_uri('/register')
 
     return render(request, 'library/error.html', {
                 'msg' : messages,
