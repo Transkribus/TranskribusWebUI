@@ -76,12 +76,21 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     else:
         r = s.get(url, params=params, verify=False, headers=headers)
 
-    #Check to see if we are still authenticated...
+    #Check responses, 
+    #	401: unauth
+    #	403+rest+collId: forbidden collection
+    #	400+register bad data input
+    #	raise error for the rest
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        if e.response.status_code not in (401, 403):
+        if e.response.status_code not in (401, 403, 400):
             raise e
+
+        if e.response.status_code == 400 : # and handler_params is not None and "collId" in handler_params):
+            if re.match(r'^.*/rest/user/register', url) :
+                #t_register_handler only handles exceptions, if reg is successsful then t_user_data_handlercan be used
+                return t_register_handler(r,handler_params)
 
         #no access to requested collection... if we are indeed requesting a collection (which we usually are)
         #FAFF collId needs passed in via handler_params... we could extract from url??
@@ -117,6 +126,7 @@ def t_register(request):
 
     url = settings.TRP_URL+'user/register'
     t_id = "user_data" # note we are using the same t_id as for t_login...
+    t_log("G_CAPTCH_RESPONSE: %s" % request.POST.get('g-recaptcha-response'))
     params = {'user': request.POST.get('user'),
                 'pw': request.POST.get('pw'),
                 'firstName': request.POST.get('firstName'),
@@ -128,6 +138,11 @@ def t_register(request):
                 'application': "TSX"}
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     return t_request(request,t_id,url,params,"POST",headers)
+
+# REG FAIL HANDLER
+def t_register_handler(r,params=None):
+    t_log("400 from register...")
+    raise ValueError('%s' % (r.text))
 
 def t_login(user, pw):
     url = settings.TRP_URL+'auth/login'
