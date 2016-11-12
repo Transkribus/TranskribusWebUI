@@ -135,7 +135,7 @@ def t_register(request):
 #               'gender': request.POST.get('gender'),
 #               'orcid':request.POST.get('orcid'),
                 'token': request.POST.get('g-recaptcha-response'),
-                'application': "TSX"}
+                'application': "WEB_UI"}
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     return t_request(request,t_id,url,params,"POST",headers)
 
