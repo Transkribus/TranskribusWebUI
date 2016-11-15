@@ -165,6 +165,7 @@ function resetCanvas() {
 	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 	ctx.save();
 }
+
 function highlightLine(lineId) {
 	var length = contentArray.length;
 	var coords =  Array(8);// TODO Four coordinate pairs are not needed for a rectangle...
