@@ -178,14 +178,12 @@ function highlightLine(lineId) {
 	var ctx=c.getContext("2d");
 	ctx.clearRect(coords[0], coords[1], coords[4] - coords[0], coords[5] - coords[1]);
 }
-//function setZoom(zoom, x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2, y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2) {
-/* RM this may break something else, but it fixes the syntax error reported if above is switched in */
-function setZoom(zoom){
-	x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2;
-	y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2;
 
-
-// TODO: Remove the zoom buttons altogether or set default to center?
+function setZoom(zoom, x, y) {
+	if (1 == arguments.length) {
+		x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2;
+		y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2;
+	}
 	var newZoom = savedZoom + zoom;
 	if (newZoom >= 0) 
 		savedZoom = newZoom;
