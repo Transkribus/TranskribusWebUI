@@ -59,7 +59,6 @@
 		{% endfor %}
 	];
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
-
 	var previousInnerWidth = window.innerWidth;
 	
 	$("a[data-target='#saveChanges']").click(function(event) {
@@ -102,13 +101,6 @@
         	//keyboard: false {# TODO Needed? #}
     	});
 		buildLineList();
-	});
-	$('#transcriptImage').one("load", function() {
-		initialWidth = $('#transcriptImage').width();
-		scrollFactor = initialWidth / $('#transcriptImage').get(0).naturalWidth;
-		transcriptDivHeightString = $( ".transcript-div" ).css("height");
-		$( ".modal-dialog" ).css("width", initialWidth*0.8 + 'px');
-		resetCanvas();
 	});
 	$('area').mouseenter(function(e) {
 		highlightLine(e.target.id);
@@ -180,6 +172,20 @@
 	    previousInnerWidth = window.innerWidth;
 	    $( ".modal-dialog" ).css("width", parseInt($( ".modal-dialog" ).css("width"))*widthFactor + 'px');
 	    $( ".modal" ).css("left", parseInt($( ".modal" ).css("left"))*widthFactor + 'px');
+	});
+	$(document).ready(function() {
+		$(window).bind("load", function() {
+			initialWidth = $('#transcriptImage').width();
+			scrollFactor = initialWidth / $('#transcriptImage').get(0).naturalWidth;
+			$( ".modal-dialog" ).css("width", initialWidth*0.8 + 'px');
+			resetCanvas();
+			var errorStop = 1000; {# We want to stop the loop below in case something goes wrong. The problem solved below doesn't matter in that case. #}
+			divHeightNonZero = setInterval(function() { {# A workaround since it seems impossible to get a non-zero transcriptDivHeightString reliably otherwise when loading. #}
+				if (0 != parseInt((transcriptDivHeightString = $( ".transcript-div" ).css("height")), 10) || errorStop < 0)
+					clearInterval(divHeightNonZero);
+				errorStop--;
+			}, 50);
+		});
 	});
 </script>
 
