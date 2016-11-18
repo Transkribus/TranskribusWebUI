@@ -7,6 +7,7 @@ var savedZoom = 0;
 var surroundingCount = 1;
 var currentLineId;
 var modalBelowMouse = 50;// TODO Decide whether to calculate this or have a simple default. Note pages with text near the lower edge...
+var ballRadius = 50;// TODO Decide how to set this. 
 var ignoreLeave = false;
 var topLineId = null;
 
@@ -127,6 +128,7 @@ function buildLineList() {
 	}
 	$(".line-list").append('<li><input class="form-control added-line" type="text" id="currentLine" value="' + contentArray[getIndexFromLineId(currentLineId)][1] + '" /></li>');
 	highlightLine(currentLineId);
+	placeBalls(currentLineId);
 	while (i < idArray.length) {
 		id = idArray[i];
 		if (null != id) {
@@ -165,7 +167,25 @@ function resetCanvas() {
 	ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
 	ctx.save();
 }
-
+function placeBalls(lineId) {
+	var length = contentArray.length;
+	var coords =  Array(8);// TODO Four coordinate pairs are not needed...
+	for (j = 0; j < length; j++) {// TODO Stop the loop sooner!
+		if (contentArray[j][0] == lineId) {
+			for (k = 0; k < coords.length; k++) {
+				coords[k] = Math.round(scrollFactor*contentArray[j][2][k]);
+			}
+		}
+	}
+	var lineHeight = (coords[5] - coords[1]); // We use this to get "appropriate" places for the balls in relation to the lize size...
+	var c=document.getElementById("transcriptCanvas");
+	var ctx=c.getContext("2d");
+	ctx.beginPath(); 
+	ctx.arc(coords[0] -1.5 * lineHeight, coords[1] + lineHeight / 2, 10, 0, 2*Math.PI);
+	ctx.arc(coords[4] + 1.5 * lineHeight, coords[1] + lineHeight / 2, 10, 0, 2*Math.PI);
+	ctx.fillStyle = "rgba(0, 255, 0, 1)";
+	ctx.fill();
+}
 function highlightLine(lineId) {
 	var length = contentArray.length;
 	var coords =  Array(8);// TODO Four coordinate pairs are not needed for a rectangle...
