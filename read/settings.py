@@ -47,18 +47,17 @@ INSTALLED_APPS = [
     'search',
 
     'rest_framework',
+    'transkribus',
 
-    'e_learning.tasks_',
-    'e_learning.learning_resources',
-    'e_learning.sessions_',
-
-    'e_learning.profiles',
-    'e_learning.api',
-    'e_learning.app',
+    'learn.app',
+    'learn.api',
+    'learn.learning_resources',
+    'learn.sessions_',
+    'learn.profiles',
+    'learn.tasks_',
 
     'django_q',
 
-    'transkribus',
 
 ]
 
@@ -108,6 +107,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'OPTIONS': {
+            'timeout': 20
+        }
     }
 }
 
