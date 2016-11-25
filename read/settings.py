@@ -232,6 +232,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 Q_CLUSTER = {
@@ -248,4 +251,3 @@ TRANSKRIBUS_URL = TRP_URL
 TRANSKRIBUS_API = TRP_URL
 TRANSKRIBUS_IMAGE_URL_PATTERN = 'https://dbis-thure.uibk.ac.at/f/Get?id={id}&fileType=view'
 MOCK = True
-
