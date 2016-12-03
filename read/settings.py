@@ -19,9 +19,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'wqu(q!hn%1we=&48qm@qigap_(t#+hq1ljxda-3w+k)#uh!&j0'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -46,9 +43,7 @@ INSTALLED_APPS = [
     'edit',
     'search',
 
-    'rest_framework',
-    'transkribus',
-
+    # e-learning application
     'learn.app',
     'learn.api',
     'learn.learning_resources',
@@ -56,6 +51,9 @@ INSTALLED_APPS = [
     'learn.profiles',
     'learn.tasks_',
 
+    # e-learning dependencies
+    'rest_framework',
+    'transkribus',
     'django_q',
 
 
@@ -71,8 +69,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-#pip install yet_another_django_profiler and uncomment below then read https://pypi.python.org/pypi/yet-another-django-profiler/ for use
-#    'yet_another_django_profiler.middleware.ProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'read.urls'
@@ -176,78 +172,23 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/static/'
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-# ]
-
-#TODO for when use is heavier use memcached
-#Enable cache
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#        'LOCATION': '127.0.0.1:11211',
-#    }
-#}
-#and cache session
-#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-
-# This assumes per app view for these... may promote this sttuff to their own app...??
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
 
-### Auth backend that logs in to transkribus.eu and extends the django.contrib.auth.User
 AUTHENTICATION_BACKENDS = [
     # 'read.backends.TranskribusBackend',
     'transkribus.auth_backends.TranskribusBackend',
-#    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-### parameters for services
-#transkribus rest service
-TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
-
 PROFILE_LOG_BASE = '/tmp/'
 
-NORECAPTCHA_SITE_KEY = '6LdNWyQTAAAAADOF2SOV-EGyqXDpG6Jdldu8XWZB'
-NORECAPTCHA_SECRET_KEY = '6LdNWyQTAAAAAEuPGBbK4PxhdqKrx_s8l6eu5MTT'
+from read.secrets import *
 
-#not used...
-ADMIN_LOGIN = 'admin'
-ADMIN_PASSWORD = 'norsun'
-
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-    ),
-    'DEFAULT_PARSER_CLASSES': (
-        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    )
-}
-
-Q_CLUSTER = {
-    'name': 'DjangORM',
-    'workers': 1,
-    'retry': 3600,
-    'queue_limit': 50,
-    'bulk': 10,
-    'orm': 'default'
-}
-
-
-TRANSKRIBUS_URL = TRP_URL
-TRANSKRIBUS_API = TRP_URL
-TRANSKRIBUS_IMAGE_URL_PATTERN = 'https://dbis-thure.uibk.ac.at/f/Get?id={id}&fileType=view'
-MOCK = True
+if DEBUG:
+    from learn.settings.development import *
+else:
+    from learn.settings.production import *
