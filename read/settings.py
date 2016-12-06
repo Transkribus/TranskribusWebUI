@@ -174,6 +174,29 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+        },
+        'console': {
+            # 'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'learn.tasks': {
+            'handlers': ['console'],
+            'level': 'INFO'
+        },
+    }
+}
+
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile'
 
