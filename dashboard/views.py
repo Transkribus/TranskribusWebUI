@@ -34,7 +34,7 @@ from querystring_parser import parser
 def index(request):
 
     if not t_refresh() : 
-        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
        
     last_action = t_actions(request,{'nValues' : 1})[0]
     
@@ -66,8 +66,8 @@ def index(request):
 def d_collection(request,collId):
 
     if not t_refresh() : 
-        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
-       
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
+ 
     last_action = t_actions(request,{'nValues' : 1, 'collId' : collId})[0]
 
     #Avoid this sort of nonsense if possible
@@ -121,6 +121,13 @@ def d_collection(request,collId):
 @t_login_required
 def d_document(request,collId,docId):
 
+    if not t_refresh() : 
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
+
+    documents = t_documents(request,{'collId': collId}) #for nav only...
+    if isinstance(documents,HttpResponse):
+        return documents
+
     fulldoc = t_fulldoc(request,{'collId': collId, 'docId': docId})
     if isinstance(fulldoc,HttpResponse):
         return fulldoc
@@ -128,6 +135,28 @@ def d_document(request,collId,docId):
     action_types = t_actions_info(request)
     if isinstance(action_types,HttpResponse):
         return action_types
+
+    document=None
+    prev=None
+    next=None
+    stop_next=False
+    for doc in documents:
+        if stop_next:
+            next=doc.get('docId')
+            break
+        if doc.get("docId") == int(docId):
+            document = doc
+            stop_next=True
+        else :
+            prev=doc.get('docId')
+    up='/dashboard/{!s}'.format(collId)
+
+
+    t_log("NEXT: %s PREV: %s UP: %s" % (next,prev,up))
+#    t_log("REQPATH: %s" % (request.path))
+#    t_log("RESOLVED %s" % (resolve(request.path)))
+#    t_log("APP_NAME: %s" % (request.resolver_match.app_name))
+
     return render(request, 'dashboard/document.html', {'document': fulldoc.get('md'),
                                                         'action_types': action_types,
 #                                                       'pages': fulldoc.get('pageList').get('pages')
@@ -137,6 +166,9 @@ def d_document(request,collId,docId):
 # dashboard/u/{userId} is the dashboard for that user. Will show actions, collections and metrics for that user, can only be accessed by collection owners (editors?)
 @t_login_required
 def d_user(request,username):
+
+    if not t_refresh() : 
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
 
     t_log("##################### USERNAME: %s " % username)
     

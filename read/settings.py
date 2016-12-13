@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
-    #'nocaptcha_recaptcha',
+    'captcha',
     'read',
     'library',
     'review',
@@ -160,6 +160,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+NOCAPTCHA = True
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
@@ -212,3 +214,8 @@ AUTHENTICATION_BACKENDS = [
 TRP_URL = 'https://transkribus.eu/TrpServer/rest/'
 
 PROFILE_LOG_BASE = '/tmp/'
+
+try:
+    from read.local_settings import *
+except ImportError:
+    pass

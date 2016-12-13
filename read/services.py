@@ -76,12 +76,21 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
     else:
         r = s.get(url, params=params, verify=False, headers=headers)
 
-    #Check to see if we are still authenticated...
+    #Check responses, 
+    #	401: unauth
+    #	403+rest+collId: forbidden collection
+    #	400+register bad data input
+    #	raise error for the rest
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        if e.response.status_code not in (401, 403):
+        if e.response.status_code not in (401, 403, 400):
             raise e
+
+        if e.response.status_code == 400 : # and handler_params is not None and "collId" in handler_params):
+            if re.match(r'^.*/rest/user/register', url) :
+                #t_register_handler only handles exceptions, if reg is successsful then t_user_data_handlercan be used
+                return t_register_handler(r,handler_params)
 
         #no access to requested collection... if we are indeed requesting a collection (which we usually are)
         #FAFF collId needs passed in via handler_params... we could extract from url??
@@ -89,9 +98,10 @@ def t_request(request,t_id,url,params=None,method=None,headers=None,handler_para
             m = re.match(r'^.*/rest/[^/]+/(-?\d+)/.*', url)
             collId = m.group(1)
             if collId :
-                return HttpResponseRedirect("/library/collection_noaccess/"+str(collId))
+                return HttpResponseRedirect(request.build_absolute_uri("/library/collection_noaccess/"+str(collId)))
         #otherwise you get logged out...
-        return HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+        return HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
+
 
     # Pass transkribus response to handler (NB naming convention is t_[t_id]_handler(r, handler_params)
     # handler_params are for things that we might need to pass through this t_request to the handler
@@ -116,6 +126,7 @@ def t_register(request):
 
     url = settings.TRP_URL+'user/register'
     t_id = "user_data" # note we are using the same t_id as for t_login...
+    t_log("G_CAPTCH_RESPONSE: %s" % request.POST.get('g-recaptcha-response'))
     params = {'user': request.POST.get('user'),
                 'pw': request.POST.get('pw'),
                 'firstName': request.POST.get('firstName'),
@@ -124,9 +135,14 @@ def t_register(request):
 #               'gender': request.POST.get('gender'),
 #               'orcid':request.POST.get('orcid'),
                 'token': request.POST.get('g-recaptcha-response'),
-                'application': "TSX"}
+                'application': "WEB_UI"}
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     return t_request(request,t_id,url,params,"POST",headers)
+
+# REG FAIL HANDLER
+def t_register_handler(r,params=None):
+    t_log("400 from register...")
+    raise ValueError('%s' % (r.text))
 
 def t_login(user, pw):
     url = settings.TRP_URL+'auth/login'
@@ -194,7 +210,7 @@ def t_actions_handler(r,params=None):
     return json.loads(r.text)
 
 
-#t_actions_info called to get lookup for action types for subsequent action list calls
+#t_collections_recent called to get most recently actioned collection [NOT CURRENTLY USED.... and needs a different url or handler code!]
 def t_collection_recent(request,collId):
     url = settings.TRP_URL+'collections/'+str(collId)+'/list'
     t_id = "collection_recent"

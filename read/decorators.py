@@ -42,7 +42,7 @@ def t_login_required(function,redirect_field_name=REDIRECT_FIELD_NAME,login_url=
                 t_log(e)
 #                if e.status_code not in (401, 403):
 #                    raise e
-                response = HttpResponseRedirect("/logout/?next={!s}".format(request.get_full_path()))
+                response = HttpResponseRedirect(request.build_absolute_uri("/logout/?next={!s}".format(request.get_full_path())))
 
             return response
         else:
