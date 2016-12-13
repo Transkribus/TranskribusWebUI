@@ -18,6 +18,7 @@
 .transcript-map-div {
 	overflow: hidden;
 	position: relative;
+	transform-origin: 0px 0px;// Required by the zoom transform...
 }
 
 /* We make the transcript fit neatly... */
