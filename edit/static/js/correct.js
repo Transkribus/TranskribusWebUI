@@ -1,8 +1,4 @@
-var initialWidth;
-var scrollFactor;
 var changed = false;
-var isDragged = false;
-var transcriptDivHeightString;
 var savedZoom = 0;
 var surroundingCount = 1;
 var currentLineId;
@@ -10,6 +6,10 @@ var modalBelowMouse = 50;// TODO Decide whether to calculate this or have a simp
 var ballRadius = 50;// TODO Decide how to set this. 
 var ignoreLeave = false;
 var topLineId = null;
+var zoomFactor = 0;
+var accumExtraX = 0;
+var accumExtraY = 0;
+var initialWidth, initialHeight, initialScale, naturalWidth;
 
 // "JSON.stringifies" contentArray and also strips out content which does not need to be submitted.
 function getContent() {
@@ -64,22 +64,23 @@ function setCurrentLineId(newId) {// We're not happy with just "=" to set the ne
 	}	
 	currentLineId = newId;
 }
-function getHighlightBottomY(centerLineId) {
-	return Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(centerLineId) + surroundingCount, contentArray.length - 1)][2][5]);
-}
-function scrollToNextTop() { 
-	var currentTop = -Math.round(parseInt($( ".transcript-map-div" ).css("top"), 10)/scrollFactor) + 1;// +1 to avoid problems caused by rounding.
+function scrollToNextTop() { // This function scrolls the image up as if it were dragged with the mouse.
+	var currentTop = accumExtraY / (initialScale * (1 + zoomFactor)) + 1;// +1 to ensure that a new top is obtained for every click
+	if (contentArray[contentArray.length - 1][2][1] < currentTop)
+		return; // If the page has been moved so that the last line is above the top, we don't do anything.
 	var newTop;
-	for (idx = 0; idx < contentArray.length; idx++) {
+	for (var idx = 0; idx < contentArray.length; idx++) {
 		newTop = contentArray[idx][2][1];
-		if (newTop > currentTop) {
+		if (newTop > currentTop)
 			break;
-		}
 	}
-	$( ".transcript-map-div" ).css("top", -Math.round(newTop*scrollFactor) + 'px');
+	accumExtraY = newTop * initialScale * (1 + zoomFactor);
+	$( ".transcript-map-div" ).css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
 }
 function scrollToPreviousTop() { 
-	var currentTop = -Math.round(parseInt($( ".transcript-map-div" ).css("top"), 10)/scrollFactor) - 1;// -1 to avoid problems caused by rounding.
+	var currentTop = accumExtraY / (initialScale * (1 + zoomFactor)) - 1;// -1 to ensure that a new top is obtained for every click
+	if (contentArray[0][2][1] > currentTop)
+		return; // If the page has been moved so that the first line is below the top, we don't do anything.
 	var newTop;
 	for (idx = contentArray.length - 1; idx >= 0; idx--) {
 		newTop = contentArray[idx][2][1];
@@ -87,7 +88,8 @@ function scrollToPreviousTop() {
 			break;
 		}
 	}
-	$( ".transcript-map-div" ).css("top", -Math.round(newTop*scrollFactor) + 'px');
+	accumExtraY = newTop * initialScale * (1 + zoomFactor);
+	$( ".transcript-map-div" ).css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
 }
 
 // GUI:
@@ -96,7 +98,6 @@ function setMessage(message) {
 }
 function buildLineList() {
 	$(".line-list").html("");
-	$('area').mapster('set', false);
 	idArray = new Array(2*surroundingCount);
 	i = surroundingCount - 1;
 	id = currentLineId;
@@ -122,18 +123,21 @@ function buildLineList() {
 		id = idArray[i];
 		if (null != id) {
 			$(".line-list").append('<li>' + contentArray[getIndexFromLineId(id)][1] + '</li>');
-			highlightLine(id);
+			// TODO Restore, if our usability testers change their minds...
+			//highlightLine(id);
 		}
 		i++;
 	}
-	$(".line-list").append('<li><input class="form-control added-line" type="text" id="currentLine" value="' + contentArray[getIndexFromLineId(currentLineId)][1] + '" /></li>');
+	var ampString = contentArray[getIndexFromLineId(currentLineId)][1].replace('&', '&amp;');// ampersands cause problems in an input and there doesn't seem to be any other escape than this
+	$(".line-list").append('<li><input class="form-control added-line" type="text" id="currentLine" value="' + ampString + '" /></li>');
 	highlightLine(currentLineId);
 	placeBalls(currentLineId);
 	while (i < idArray.length) {
 		id = idArray[i];
 		if (null != id) {
 			$(".line-list").append('<li>' + contentArray[getIndexFromLineId(id)][1] + '</li>');
-			highlightLine(id);
+			// TODO Restore, if our usability testers change their minds...
+			//highlightLine(id);
 		}
 		i++;			
 	}
@@ -144,16 +148,16 @@ function buildLineList() {
 function typewriterNext() { // Aka. "press typewriter enter scroll". Changes the selected lines and the modal content.
 	newLineId = getNextLineId(currentLineId);
 	if (newLineId != null)
-		typewriterStep(newLineId, Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]))
+		typewriterStep(newLineId, (contentArray[Math.min(getIndexFromLineId(newLineId), contentArray.length - 1)][2][5]) - Math.round(contentArray[Math.min(getIndexFromLineId(currentLineId), contentArray.length - 1)][2][5]))
 }
 function typewriterPrevious() {
 	newLineId = getPreviousLineId(currentLineId);
 	if (newLineId != null)
-		typewriterStep(getPreviousLineId(currentLineId), Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(newLineId) + surroundingCount, contentArray.length - 1)][2][5]) - Math.round(scrollFactor*contentArray[Math.min(getIndexFromLineId(currentLineId) + surroundingCount, contentArray.length - 1)][2][5]));
+		typewriterStep(newLineId, Math.round(contentArray[Math.min(getIndexFromLineId(newLineId), contentArray.length - 1)][2][5]) - Math.round(contentArray[Math.min(getIndexFromLineId(currentLineId), contentArray.length - 1)][2][5]));
 }
 function typewriterStep(newLineId, delta) {
-	var old = parseInt($( ".transcript-map-div" ).css("top"), 10);
-	$( ".transcript-map-div" ).css("top", (old - delta) + 'px');
+	accumExtraY += delta * initialScale * (1 + zoomFactor);
+	$( ".transcript-map-div" ).css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
 	resetCanvas();
 	setCurrentLineId(newLineId);
 	buildLineList();
@@ -173,16 +177,17 @@ function placeBalls(lineId) {
 	for (j = 0; j < length; j++) {// TODO Stop the loop sooner!
 		if (contentArray[j][0] == lineId) {
 			for (k = 0; k < coords.length; k++) {
-				coords[k] = Math.round(scrollFactor*contentArray[j][2][k]);
+				coords[k] = Math.round(initialScale*contentArray[j][2][k]);
 			}
 		}
 	}
-	var lineHeight = (coords[5] - coords[1]); // We use this to get "appropriate" places for the balls in relation to the lize size...
+	var lineHeight = (coords[5] - coords[1]); // We use this to get "appropriate" places for the balls in relation to the line size...
 	var c=document.getElementById("transcriptCanvas");
 	var ctx=c.getContext("2d");
 	ctx.beginPath(); 
 	ctx.arc(coords[0] -1.5 * lineHeight, coords[1] + lineHeight / 2, 10, 0, 2*Math.PI);
-	ctx.arc(coords[4] + 1.5 * lineHeight, coords[1] + lineHeight / 2, 10, 0, 2*Math.PI);
+	// TODO Restore, if our usability testers change their minds...
+	//ctx.arc(coords[4] + 1.5 * lineHeight, coords[1] + lineHeight / 2, 10, 0, 2*Math.PI);
 	ctx.fillStyle = "rgba(0, 255, 0, 1)";
 	ctx.fill();
 }
@@ -192,34 +197,42 @@ function highlightLine(lineId) {
 	for (j = 0; j < length; j++) {// TODO Stop the loop sooner!
 		if (contentArray[j][0] == lineId) {						
 			for (k = 0; k < coords.length; k++)
-				coords[k] = Math.round(scrollFactor*contentArray[j][2][k]);
+				coords[k] = Math.round(initialScale*contentArray[j][2][k]);
 		}
 	}
 	var c=document.getElementById("transcriptCanvas");
 	var ctx=c.getContext("2d");
 	ctx.clearRect(coords[0], coords[1], coords[4] - coords[0], coords[5] - coords[1]);
 }
-
+function calculateAreas(scaleFactor) {
+	$("#transcriptMap").children().each(function (value) {
+		var coords = this.coords.split(',');
+		for (var i = 0; i < coords.length; i++)
+			coords[i] = scaleFactor * coords[i];
+		this.coords = coords.join(',');
+	});
+}
 function setZoom(zoom, x, y) {
-	if (1 == arguments.length) {
-		x = parseInt($( ".transcript-map-div" ).css("width"), 10)/2;
-		y = parseInt($( ".transcript-map-div" ).css("height"), 10)/2;
-	}
+	if (!readyToZoom)
+		return;// Zooming before the page has fully loaded breaks it.
 	var newZoom = savedZoom + zoom;
 	if (newZoom >= 0) 
 		savedZoom = newZoom;
 	else
 		return;// We don't allow zooming out more than what the size originally was.
-	var zoom_factor = savedZoom / 100;
-	$('#transcriptImage').mapster('resize', Math.round(initialWidth * (1 + zoom_factor)));
-	widthBefore = parseInt($( ".transcript-map-div" ).css("width"), 10);
-	heightBefore = $('#transcriptImage').height();
-	$( ".transcript-map-div" ).css("width", $('#transcriptImage').width() + 'px');// If the image is offset so that it can grow within the div, we let it.
-	$( ".transcript-div" ).css("height", transcriptDivHeightString);// We wish to preserve the height.
-	ratio = parseInt($( ".transcript-map-div" ).css("width"), 10)/widthBefore - 1;
-	newLeftOffset = $( ".transcript-map-div" ).offset().left - x * ratio;
-	newTopOffset = $( "#transcriptImage" ).offset().top - y * ratio;
-	$( ".transcript-map-div" ).offset({top: newTopOffset, left: newLeftOffset}); 
-	scrollFactor = $('#transcriptImage').width() / $('#transcriptImage').get(0).naturalWidth;	
+	if (1 == arguments.length) {// If no cursor position has been given, we use the center
+		x = initialWidth/2 + accumExtraX;
+		y = initialHeight/2 + accumExtraY;
+	}
+	// x and y are in relation to the current (scaled) image size. We wish to obtain the relative position of the pointer:
+	var xRatio = x / ((1 + zoomFactor) * parseInt($( ".transcript-map-div" ).css("width"), 10));
+	var yRatio = y / ((1 + zoomFactor) * parseInt($( ".transcript-map-div" ).css("height"), 10));
+	// Calculate the absolute no. of pixels added and get the total offset to move in order to preserve the cursor position...
+	var oldZoomFactor = zoomFactor;	
+	zoomFactor = savedZoom / 100;
+	accumExtraX += initialWidth * (zoomFactor - oldZoomFactor) * xRatio;
+	accumExtraY += initialHeight * (zoomFactor - oldZoomFactor) * yRatio;
+	// ...and move the image accordingly before scaling:
+	$( ".transcript-map-div" ).css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px" 
 	resetCanvas();
 }

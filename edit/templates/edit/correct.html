@@ -15,7 +15,7 @@
 
 <link href="{% static "css/correct.css" %}" rel="stylesheet">
 
-<div class="container">
+<div class="container col-md-12">
     <div class="row">
         <h1>
             {% trans "Correction Interface, Line by Line (working title)" %}
@@ -32,7 +32,7 @@
 			<div id="message"></div>
 		</div>
 		<div class="col-md-3">
-			<a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a><br/><br/><br/>{# TODO CSS for this purpose. #}
+			{# TODO Restore this when saving no longer breaks tags! <a href="#" class="btn btn-primary" data-target="#saveChanges">{% trans "Save changes" %}</a><br/><br/><br/>{# TODO CSS for this purpose. #}
 		</div>
 	</div>
 	<div class="transcript-div">
@@ -42,17 +42,17 @@
 						<area line-key="{{ line|get_item:"id"}}" id="{{ line|get_item:"id"}}"  href="{{ line|get_item:"id"}}"  shape="poly" coords="{{line|get_item:"crop"|coords_for_imagemap}}" >
 				{% endfor %}
 			</map>
-			<canvas id="transcriptCanvas"   style="position: absolute; z-index: 998;"></canvas>
-			<img src="{{imageUrl}}" usemap="#transcriptMap"  id="transcriptImage" class="transcript-img" style="position: absolute; z-index: 999;">
+			<canvas id="transcriptCanvas" style="position: absolute; z-index: 998; pointer-events: none;"></canvas>
+			<img src="{{imageUrl}}" usemap="#transcriptMap" id="transcriptImage" class="transcript-img"  style="z-index: 999;"> 
 		</div>
 	</div>
 </div>
 
 {% include "edit/correct_modal.html" %}
 
-<script src="{% static "js/jquery.imagemapster.min.js" %}"></script>
 <script src="{% static "js/correct.js" %}"></script>
 <script>
+	var readyToZoom = false;{# If the user begins to zoom before the page has fully loaded, it won't function normally. #}
 	var contentArray= [[0, '', [0, 0, 0, 0, 0, 0, 0, 0]]
 		{% for line in lines %}
 			,['{{ line|get_item:"id"}}', '{{line|get_item:"Unicode"}}', [{{line|get_item:"crop"|coords_for_imagemap}}]]
@@ -60,6 +60,8 @@
 	];
 	var transUnsavedChanges = "{% trans "You have unsaved changes." %}";
 	var previousInnerWidth = window.innerWidth;
+	var isDragged = false;
+	var triggerTime;
 	
 	$("a[data-target='#saveChanges']").click(function(event) {
     	event.preventDefault();
@@ -75,12 +77,17 @@
 	$('.transcript-map-div').draggable({
 		start: function() {
 			isDragged = true;
-			$('area').mapster('set', false); {# We assume that the user does not want to select a region when dragging. #}
 		},
 		stop: function() {
 			setTimeout(function() { {# A hack to avoid triggering clicks on the map if clicking a region when dragging. #}
 				isDragged = false;
 			}, 250);
+			{# We prefer to keep it simple and let accumExtra* contain the offsets regardless of how they were created (i.e. also when the user has dragged the image): #}
+			accumExtraY -= Math.round(parseInt($( ".transcript-map-div" ).css("top"), 10));
+			accumExtraX -= Math.round(parseInt($( ".transcript-map-div" ).css("left"), 10));
+			$(".transcript-map-div" ).css("top", "0px");
+			$(".transcript-map-div" ).css("left", "0px");
+			$(".transcript-map-div" ).css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
 		}
 	});
 	$('#correctModal').on('hidden.bs.modal', function () {
@@ -102,7 +109,7 @@
     	});
 		buildLineList();
 	});
-	$('area').mouseenter(function(e) {
+	$('area').mouseenter(function(e) { 
 		highlightLine(e.target.id);
 	});
 	$('area').mouseleave(function(e) {
@@ -147,45 +154,45 @@
     	e.preventDefault();
     	var mouseZoom;
     	if (e.originalEvent.detail > 0)
-			mouseZoom = -10;        	
+			mouseZoom = -20;        	
 		else
-			mouseZoom = 10;
+			mouseZoom = 20;
     	setZoom(mouseZoom, e.originalEvent.pageX - $( ".transcript-map-div" ).offset().left, e.originalEvent.pageY - $( ".transcript-map-div" ).offset().top);
     });
-	$('#transcriptImage').mapster({ {# TODO Figure out if we can do without mapster. This configuration already makes it as invisible as possible. #}
-		mapKey: 'line-key',
-        render_highlight: {
-	        fade: false,
-            fillColor: 'ffffff',
-            fillOpacity: 0
-        },
-	    render_select: {
-        	fillColor: 'ffffff',
-        	fillOpacity: 0   
-        }
+    $(window).resize(function() {
+    	{# We don't want to respond until the window has finished resizing. #}
+	   	triggerTime = new Date().getTime();
+    	setTimeout(function() {
+			if (new Date().getTime() > (triggerTime + 480)) {
+			   	var widthFactor = window.innerWidth/previousInnerWidth;
+		    	var oldWidth = initialWidth;
+			    previousInnerWidth = window.innerWidth;
+		    	initialWidth = document.getElementById('transcriptImage').width;
+				initialWidth = $('#transcriptImage').width();
+				initialHeight = $('#transcriptImage').height();
+				naturalWidth = $('#transcriptImage').get(0).naturalWidth;
+				initialScale = initialWidth / naturalWidth;	
+				
+				{# We have to update these too in case the image has gotten resized along with the window: #}
+				accumExtraX = initialWidth * accumExtraX / oldWidth;
+				accumExtraY = initialWidth * accumExtraY / oldWidth;
+			    
+			    $( ".modal-dialog" ).css("width", parseInt($( ".modal-dialog" ).css("width"))*widthFactor + 'px');
+			    $( ".modal" ).css("left", parseInt($( ".modal" ).css("left"))*widthFactor + 'px');
+				$(".transcript-map-div").css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
+			}			
+		}, 500);
 	});
-	$(window).resize(function(){
-		console.log("old: " + previousInnerWidth);
-		console.log("current. " + window.innerWidth);
-	   	var widthFactor = window.innerWidth/previousInnerWidth;
-	   	console.log("resizing with factor: " + widthFactor);
-	    previousInnerWidth = window.innerWidth;
-	    $( ".modal-dialog" ).css("width", parseInt($( ".modal-dialog" ).css("width"))*widthFactor + 'px');
-	    $( ".modal" ).css("left", parseInt($( ".modal" ).css("left"))*widthFactor + 'px');
-	});
-	$(document).ready(function() {
-		$(window).bind("load", function() {
+	$('#transcriptImage').load(function() {
 			initialWidth = $('#transcriptImage').width();
-			scrollFactor = initialWidth / $('#transcriptImage').get(0).naturalWidth;
-			$( ".modal-dialog" ).css("width", initialWidth*0.8 + 'px');
+			initialHeight = $('#transcriptImage').height();
+			naturalWidth = $('#transcriptImage').get(0).naturalWidth;
+			initialScale = initialWidth / naturalWidth;
+						
+			$( ".modal-dialog" ).css("width", initialWidth*0.8 + 'px'); {# Reasonable default? #}
 			resetCanvas();
-			var errorStop = 1000; {# We want to stop the loop below in case something goes wrong. The problem solved below doesn't matter in that case. #}
-			divHeightNonZero = setInterval(function() { {# A workaround since it seems impossible to get a non-zero transcriptDivHeightString reliably otherwise when loading. #}
-				if (0 != parseInt((transcriptDivHeightString = $( ".transcript-div" ).css("height")), 10) || errorStop < 0)
-					clearInterval(divHeightNonZero);
-				errorStop--;
-			}, 50);
-		});
+			calculateAreas(initialScale);
+			readyToZoom = true;
 	});
 </script>
 
