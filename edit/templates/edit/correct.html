@@ -180,6 +180,7 @@
 			    $( ".modal-dialog" ).css("width", parseInt($( ".modal-dialog" ).css("width"))*widthFactor + 'px');
 			    $( ".modal" ).css("left", parseInt($( ".modal" ).css("left"))*widthFactor + 'px');
 				$(".transcript-map-div").css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
+				console.log("init w: " + initialWidth);
 			}			
 		}, 500);
 	});
