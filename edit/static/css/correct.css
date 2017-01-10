@@ -18,7 +18,7 @@
 .transcript-map-div {
 	overflow: hidden;
 	position: relative;
-	transform-origin: 0px 0px;// Required by the zoom transform...
+	transform-origin: 0px 0px;/* Required by the zoom transform... */
 }
 
 /* We make the transcript fit neatly... */
@@ -30,6 +30,25 @@
 	background: none;
 }
 
+/* Thumbnails: */
+.thumb-row {
+	overflow: hidden;
+}
+.thumbs {
+    transition: transform 1s;
+}
+.thumb-current {
+    padding: 3%;
+    background-color: red;
+}
+.thumb-img:hover {
+    padding: 3%;
+    background-color: blue;
+}
+.thumb-img {
+    padding: 3%;
+    background-color: white;
+}
 li {
     list-style-type: none; 
 }
