@@ -1,3 +1,4 @@
+var readyToZoom = false;// Zooming too zoon breaks the page
 var changed = false;
 var savedZoom = 0;
 var surroundingCount = 1;
@@ -10,12 +11,82 @@ var zoomFactor = 0;
 var accumExtraX = 0;
 var accumExtraY = 0;
 var initialWidth, initialHeight, initialScale, naturalWidth;
+var pageNo, pathWithoutPage;
+var previousInnerWidth = window.innerWidth;
+var isDragged = false;
+var triggerTime;
+var THUMBS_TO_SHOW = 10; // "static" variable for playing around with the no. of thumbs to show
+var thumbCountOffset = 0;
+var thumbWidth;
+var toLoadCount;
+
+// Thumbnail functions
+function gotoPage(page) {
+	window.location.assign(pathWithoutPage + page + '?tco=' + thumbCountOffset);
+}
+function scrollThumbsLeft() {
+	thumbCountOffset += THUMBS_TO_SHOW;
+	thumbCountOffset = Math.min(thumbCountOffset, 0);
+	$(".thumbs" ).css("transform",  "translateX(" + thumbCountOffset * thumbWidth + "px)");	
+}
+function scrollThumbsRight() {
+	thumbCountOffset -= THUMBS_TO_SHOW;
+	thumbCountOffset = Math.max(thumbCountOffset, -thumbArray.length + THUMBS_TO_SHOW);
+	$(".thumbs" ).css("transform",  "translateX(" + thumbCountOffset * thumbWidth + "px)");
+}
+// Loads all thumbs and shows the ones which are visible (from, to) as soon as they've been loaded
+function loadThumbs(from, to) {
+	var to = Math.min(10 - thumbCountOffset, thumbArray.length);
+	toLoadCount = 10;
+	var tempImg;
+	for (var i = -thumbCountOffset; i <= to; i++) {
+		tempImg = new Image(); 
+		tempImg.src = thumbArray[i];
+		tempImg.onload = function() {
+			toLoadCount--; //  JavaScript is single-threaded...
+			if (0 == toLoadCount) {
+				generateThumbGrid(thumbArray, 0, thumbArray.length);
+			}
+		};
+	}
+}
+function generateThumbGrid(thumbs) {
+	// Calculate appropriate arrow and thumbnail sizes according to initialWidth
+	var showCount = Math.min(thumbs.length, THUMBS_TO_SHOW);
+	thumbWidth = Math.round(initialWidth/(showCount + 1)); // + 1 because each arrow will be roughly half as wide as a thumbnail
+	var padding = 0.08 * thumbWidth; // This results in roughly 10 pixels with a maximized window on an HD screen if 10 thumbs are shown
+	var arrowWidth =Math.floor((initialWidth - THUMBS_TO_SHOW * thumbWidth)/2);// We use the arrow width (= ~thumbWidth /2)  to compensate when the rounded thumb width might become problematic when multiplied
+	var thumbTDs = '';
+	// Generate the markup for navigation arrows and thumbnails and thumbnail placeholders
+	thumbTDs += '<td style="max-width: ' + arrowWidth + 'px;"><a href="#" onclick="scrollThumbsLeft();"><svg width="' + arrowWidth + '" height="' + thumbWidth + '"><polygon points="' + (arrowWidth - padding) + ',' + padding + ' ' + padding + ',' + (arrowWidth) + ' '  + ' ' + (arrowWidth - padding) + ',' + (thumbWidth - padding) + '" style="fill: blue; stroke-width: 0;" /></svg></a></td><td><div class="thumb-row"><div class="thumbs" style="text-align: center;"><table><tr>';
+	var i = 1;
+	// Before the current page
+	while(i < pageNo) {
+		thumbTDs += '<td class="thumb" style="padding: ' + padding + 'px;"><a href="#" onclick="gotoPage(' + i + ')"><img class="thumb thumb-img" src="' + thumbs[i - 1] + '"><br/><span style="color: white;">' + i +'</span></a></td>';
+		i++;
+	}
+	// Highlight current page
+	thumbTDs += '<td class="thumb" style="padding: ' + padding + 'px;"><img class="thumb thumb-current" src="' + thumbs[i - 1] + '"><br/><span style="color: white;">' + i +'</span></td>';
+	i++;
+	// After the current page
+	while(i < thumbs.length) {
+		thumbTDs += '<td class="thumb" style="padding: ' + padding + 'px;"><a href="#" onclick="gotoPage(' + i + ')"><img class="thumb thumb-img" src="' + thumbs[i - 1] + '"><br/><span style="color: white;">' + i +'</span></a></td>';
+		i++;
+	}
+	thumbTDs += '</tr></table></div></div></td><td style="max-width: ' + arrowWidth + 'px;"><a href="#" onclick="scrollThumbsRight();"><svg width="' + arrowWidth + '" height="' + thumbWidth + '"><polygon points="' + padding + ',' + padding + ' ' + (arrowWidth - padding) + ',' + (arrowWidth) + ' '  + ' ' + padding + ',' + (thumbWidth - padding) + '" style="fill: blue; stroke-width: 0;" /></svg></a></td>';
+	$("#thumbTR").html(thumbTDs);// Show it
+	// Then we alter the CSS
+	$(".thumb").css("width", (thumbWidth - 2*padding) + "px"); 
+	$(".thumb-row").css("width", THUMBS_TO_SHOW * thumbWidth + "px");
+	$(".thumbs" ).css("transform",  "translateX(" + thumbCountOffset * thumbWidth + "px)");
+
+}
 
 // "JSON.stringifies" contentArray and also strips out content which does not need to be submitted.
 function getContent() {
 	var lengthMinusOne = contentArray.length - 1;
 	content = '{';
-	for (var cI = 1; cI <= lengthMinusOne; cI++) {// cI = 1 since we skip the "line" which isn't real since it's the top of the page
+	for (var cI = 1; cI <= lengthMinusOne; cI++) {// cI = 1 because we skip the "line" which isn't real since it's the top of the page
 		content += '"' + contentArray[cI][0] + '":"' + contentArray[cI][1] + '"';
 		if (cI < lengthMinusOne)
 			content += ',';
@@ -204,12 +275,16 @@ function highlightLine(lineId) {
 	var ctx=c.getContext("2d");
 	ctx.clearRect(coords[0], coords[1], coords[4] - coords[0], coords[5] - coords[1]);
 }
-function calculateAreas(scaleFactor) {
+function calculateAreas() {
+	var i = 1;
 	$("#transcriptMap").children().each(function (value) {
-		var coords = this.coords.split(',');
-		for (var i = 0; i < coords.length; i++)
-			coords[i] = scaleFactor * coords[i];
-		this.coords = coords.join(',');
+		var coordString = "";
+		for (var j = 0; j < 7; j++) {
+			coordString += initialScale*contentArray[i][2][j] + ',';
+		}
+		coordString += initialScale*contentArray[i][2][7];
+		this.coords = coordString;
+		i++;
 	});
 }
 function setZoom(zoom, x, y) {
