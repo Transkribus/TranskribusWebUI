@@ -194,7 +194,7 @@
 				$(".transcript-map-div").css("transform",  "translate(" + -accumExtraX +"px, " + -accumExtraY+ "px) scale(" + (1 + zoomFactor) + ")");// Note, the CSS is set to "transform-origin: 0px 0px"
 
 				calculateAreas(initialScale);				
-				showThumbs(thumbArray);
+				loadThumbs();// TODO No need to load (even if it is from cache) when resizing...
 			}			
 		}, 500);
 	});
