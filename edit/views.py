@@ -108,22 +108,24 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
         success_message = str(_("Transcript saved!"))
         return HttpResponse("<div class='alert alert-success'>" + success_message + "</div>", content_type="text/plain")
     else:
-        regions=transcript.get("PcGts").get("Page").get("TextRegion");
-
+        regions = transcript.get("PcGts").get("Page").get("TextRegion");
         if isinstance(regions, dict):
             regions = [regions]
-
         lineList = []
         if regions:
             for x in regions:
                 lines = x.get("TextLine")
-                if isinstance(lines, dict):
-                    lineList.extend([lines])
-                else: # Assume that lines is a list of lines
-                    for line in lines:
-                        lineList.extend([line])
-
+                region_width = crop(x.get("Coords").get("@points"), 1).get('w')
+                if lines:
+                    if isinstance(lines, dict):
+                        lines['regionWidth'] = region_width
+                        lineList.extend([lines])
+                    else: # Assume that lines is a list of lines
+                        for line in lines:
+                            line['regionWidth'] = region_width
+                            lineList.extend([line])
         content_dict = {}
+        # TODO Unmessify this, the loop below might be better placed inside the one above
         # TODO Use "readingorder"?
         if lineList:
             for line in lineList:
@@ -131,9 +133,62 @@ def correct(request, collId, docId, page, transcriptId=None):# TODO Decide wheth
                 line['crop'] = line_crop
                 line_id = line.get("@id")
                 line['id'] = line_id
-                line['Unicode'] = line.get('TextEquiv').get('Unicode')
+                unicode_string = line.get('TextEquiv').get('Unicode')
+                line_tags = []
+                for custom in line.get("@custom").replace(' ', '').split('}'):
+                    tag_data = custom.split('{')
+                    if tag_data[0] and tag_data[0] != "readingOrder": # Skip readingOrder (anything else to skip?)
+                        offset_and_length = tag_data[1].lstrip("offset:").split(";length:")
+                        start = int(offset_and_length[0])
+                        end = start + int(offset_and_length[1].split(';')[0])
+                        line_tags.extend([{'offset': start, 'tag': tag_data[0], 'open': True}, {'offset': end, 'tag': tag_data[0], 'open': False}]) # opening and closing tag
+                if line_tags:
+                    line_tags.sort(key = lambda tag: tag['offset'])
+                    tag_stack = [] # TODO Some other data structure?
+                    # Copy text and insert tags
+                    tag_string = ""
+                    range_begin = -1
+                    # TODO Make safe safe in the template...
+                    keep_open_stack = [] # stack for tags we "close temporarily"
+                    for tag in line_tags:
+                        offset = tag["offset"]
+                        current_tag = tag["tag"]                        
+                        # TODO Issues with different tags having the same offsets? Probably works because </span> = </span> but....
+                        if offset != range_begin: # has this tag already been closed when closing an outer tag? If so, we don't need to open it again
+                            for keep_tag in keep_open_stack:
+                                # tag_string += "<" + keep_tag + ">" # The simple XML
+                                tag_string += "<span class='" + line_id + "_tag' tag='" + keep_tag + "'>" # What we actually need
+                                tag_stack.append(keep_tag)   
+                            for i in range(range_begin, offset): # copy characters until we get to the tag
+                                tag_string += unicode_string[i]
+                            if tag["open"]: # if the tag opens, just add it
+                                tag_stack.append(current_tag)
+                                # tag_string += "<" + current_tag + ">" # If we could use XML just like this
+                                tag_string += "<span class='" + line_id + "_tag' tag='" + current_tag + "'>" # What we actually need
+                            else: # if the tag closes, we need to close all open tags until we reach the "original" opening tag
+                                previous_tag = tag_stack.pop()
+                                while current_tag != previous_tag:
+                                    keep_open_stack.append(previous_tag)
+                                    #tag_string += "</" + previous_tag + ">" # We miss this information
+                                    tag_string += "</span>" # At least closing is easier in this sense
+                                    previous_tag = tag_stack.pop()
+                                # tag_string += "</" + current_tag + ">" # If it were XML...
+                                tag_string += "</span>" # At least closing is easier in this sense
+                            # TODO Solve the issue with tags like <blah></blah> after other tags as a consequence of them being closed above....
+                        range_begin = offset
+                    # copy the rest
+                    tag_string += unicode_string[range_begin:]
+                    line['Unicode'] = tag_string
+                else: # There were no tags in this line
+                    line['Unicode'] = unicode_string
+        # Get thumbnails
+        pages = t_document(request, collId, docId, -1).get('pageList').get('pages')
+        thumb_urls =[]
+        for thumb_page in pages:
+            thumb_urls.append(escape(thumb_page.get("thumbUrl")).replace("&amp;", "&"))# The JavaScript must get the strings like this.
         return render(request, 'edit/correct.html', {
-             'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
-             'lines': lineList,
-             'content': json.dumps(content_dict)
+                 'imageUrl': t_document(request, collId, docId, -1).get('pageList').get('pages')[int(page) - 1].get("url"),
+                 'lines': lineList,
+                 'content': json.dumps(content_dict),
+                 'thumbArray': "['" + "', '".join(thumb_urls) + "']",
             })
