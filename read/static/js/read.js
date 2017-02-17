@@ -618,21 +618,20 @@ glyph_opts = {
 /* The fancytree rendering */
 $(document).ready(function(){
 
-    	$(".menu-toggle").click(function(e) {
-
-	   if($(this).attr("id") === "menu-toggle-in"){
-		$(".read_nav_out").show();
-		$(".read_nav_in").hide();
-		localStorage.setItem("sidebar_state", "in");
-	   }else{
-		$(".read_nav_out").hide();
-		$(".read_nav_in").show();
-		localStorage.setItem("sidebar_state", "out");
-	   }
-           $("#wrapper").toggleClass("toggled");
-           e.preventDefault();
-
-    	});
+	$(".menu-toggle").click(function(e) {
+		if($(this).attr("id") === "menu-toggle-in") {
+			$(".read_nav_out").show();
+			$(".read_nav_in").hide();
+			localStorage.setItem("sidebar_state", "in");
+		} else {
+			$(".read_nav_out").hide();
+			$(".read_nav_in").show();
+			localStorage.setItem("sidebar_state", "out");
+		}
+		$("#wrapper").toggleClass("toggled");
+		e.preventDefault();
+		$(window).trigger("resize"); // faking this because some contents have to be resized when the sidebar is shown or hidden
+    });
 	if(typeof t_data === "undefined") t_data = [];
 //	$(".pager").hide();
 	$("#collections_tree").fancytree({
