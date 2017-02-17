@@ -61,7 +61,7 @@ function processTags(tagLineId) {
 	var svgRectsJSON = '';// JSON-2-B with the rect for each line
 	var backgroundHeight = lineY + tagStack.length * (thicknessAndSpacing);// spacing is added above each tag
 	var i = 0
-	for (; i < tackStack.length; i++) {
+	for (; i < tagStack.length; i++) {
 		svgRectsJSON += '"' + tagStack[i] + '":' + "\"<rect x='0' y='" + lineY + "' width='1' height='" + lineThickness + "' style='fill: %23" + tagColors[tagStack[i]] + ";' />\""; // # must be %23
 		lineY +=thicknessAndSpacing;
 		svgRectsJSON += ',';
@@ -212,7 +212,7 @@ function updateDockingStatus(dock) { // Toggles the docking status and the docki
 function saveDialog() { // Saves the undocked dialog properties...
 	dialogX = $("#correctModal").offset().left;
 	dialogY = $("#correctModal").offset().top;
-	dialogWidth = $("#correctModal").width();// TODO Search width vs. outerWidth
+	dialogWidth = $("#correctModal").width(); // TODO Search width vs. outerWidth
 	dialogHeight = $("#correctModal").height();	
 }
 function updateDialog(lineId) {
